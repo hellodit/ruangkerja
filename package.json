@@ -11,7 +11,8 @@
     "typecheck": "nuxt typecheck",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed-demo": "bun scripts/seed-demo.ts"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.147",

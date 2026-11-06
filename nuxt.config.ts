@@ -69,6 +69,17 @@ export default defineNuxtConfig({
         braceStyle: '1tbs'
       }
     }
+  },
+
+  // Icons picked at runtime (ternaries) are not found by the bundle scanner.
+  icon: {
+    clientBundle: {
+      scan: true,
+      icons: [
+        'lucide:mic', 'lucide:square', 'lucide:circle-check', 'lucide:clock', 'lucide:sun', 'lucide:moon',
+        'lucide:badge-check', 'lucide:circle-x', 'lucide:file-text', 'lucide:triangle-alert'
+      ]
+    }
   }
 
 })

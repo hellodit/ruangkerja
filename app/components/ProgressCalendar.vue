@@ -82,7 +82,10 @@ function slotLink(d: string, hour: number) {
             class="relative"
             :style="{ height: h === hours.at(-1) ? '0px' : `${HOUR_PX}px` }"
           >
-            <span class="absolute -top-2 right-2 font-mono text-[11px] text-muted">{{ String(h).padStart(2, '0') }}.00</span>
+            <span
+              class="absolute right-2 font-mono text-[11px] text-muted"
+              :class="h === hours[0] ? 'top-0.5' : '-top-2'"
+            >{{ String(h).padStart(2, '0') }}.00</span>
           </div>
         </div>
         <div

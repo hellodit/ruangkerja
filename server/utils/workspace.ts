@@ -168,9 +168,10 @@ export async function planStats(planIds: string[]) {
     planId: schema.dailyProgress.actionPlanId,
     realization: sql<string>`coalesce(sum(${schema.dailyProgress.realization}), 0)`,
     progressCount: sql<number>`count(*)::int`,
+    // Fully qualified: inside the subquery an unqualified "id" would bind to r.id.
     missingEvidence: sql<number>`count(*) filter (where not exists (
-      select 1 from ${schema.progressResults} r
-      where r.progress_id = ${schema.dailyProgress.id} and r.evidence_url is not null
+      select 1 from progress_results r
+      where r.progress_id = "daily_progress"."id" and r.evidence_url is not null
     ))::int`
   }).from(schema.dailyProgress)
     .where(and(inArray(schema.dailyProgress.actionPlanId, planIds), isNull(schema.dailyProgress.deletedAt)))
@@ -230,11 +231,15 @@ export async function syncPlanStatus(planId: string) {
   }
   const [agg] = await db.select({
     n: sql<number>`count(*)::int`,
-    completes: sql<number>`count(*) filter (where ${schema.dailyProgress.marksPlanComplete})::int`
+    completes: sql<number>`count(*) filter (where ${schema.dailyProgress.marksPlanComplete})::int`,
+    completedOn: sql<string | null>`max(${schema.dailyProgress.workDate}) filter (where ${schema.dailyProgress.marksPlanComplete})`
   }).from(schema.dailyProgress)
     .where(and(eq(schema.dailyProgress.actionPlanId, planId), isNull(schema.dailyProgress.deletedAt)))
   if ((agg?.completes ?? 0) > 0 && plan.status !== 'selesai') {
-    await db.update(schema.actionPlans).set({ status: 'selesai', completedAt: new Date() }).where(eq(schema.actionPlans.id, planId))
+    // Completion date = the work date of the progress that finished it
+    // (05:00Z is midday in WIB/WITA/WIT, so the calendar date is stable).
+    const completedAt = agg?.completedOn ? new Date(`${String(agg.completedOn).slice(0, 10)}T05:00:00Z`) : new Date()
+    await db.update(schema.actionPlans).set({ status: 'selesai', completedAt }).where(eq(schema.actionPlans.id, planId))
   } else if ((agg?.n ?? 0) > 0 && plan.status === 'belum_dimulai') {
     await db.update(schema.actionPlans).set({ status: 'berjalan' }).where(eq(schema.actionPlans.id, planId))
   }
