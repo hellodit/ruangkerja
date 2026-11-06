@@ -1,5 +1,155 @@
 {
   "app": {
     "name": "Ruang Kerja"
+  },
+  "nav": {
+    "login": "Sign in",
+    "register": "Sign up",
+    "profile": "Profile",
+    "editProfile": "Edit profile",
+    "logout": "Sign out",
+    "language": "Language"
+  },
+  "common": {
+    "or": "or",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "download": "Download",
+    "upload": "Upload",
+    "back": "Back",
+    "loading": "Loading…",
+    "error": "Something went wrong. Please try again.",
+    "success": "Success"
+  },
+  "validation": {
+    "email": "Invalid email address",
+    "required": "Required",
+    "passwordMin": "Password must be at least {min} characters",
+    "passwordMax": "Password must be at most {max} characters",
+    "passwordMismatch": "Passwords do not match",
+    "passwordSame": "New password must differ from the current one",
+    "nameMin": "Name must be at least {min} characters",
+    "nameMax": "Name must be at most {max} characters",
+    "captcha": "Please complete the security check first"
+  },
+  "auth": {
+    "fields": {
+      "name": "Full name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "remember": "Remember me"
+    },
+    "placeholders": {
+      "name": "Your name",
+      "email": "name{'@'}example.com",
+      "password": "Enter your password"
+    },
+    "google": "Continue with Google",
+    "login": {
+      "title": "Sign in to your account",
+      "description": "Don't have an account?",
+      "registerLink": "Sign up",
+      "forgot": "Forgot password?",
+      "submit": "Sign in"
+    },
+    "register": {
+      "title": "Create an account",
+      "description": "Already have an account?",
+      "loginLink": "Sign in",
+      "submit": "Sign up",
+      "success": "Account created. We've sent a verification link to your email."
+    },
+    "forgot": {
+      "title": "Forgot password",
+      "description": "Enter your email and we'll send you a link to reset your password.",
+      "submit": "Send link",
+      "sent": "If that email is registered, a password reset link has been sent. Check your inbox.",
+      "backToLogin": "Back to sign in"
+    },
+    "reset": {
+      "title": "Reset password",
+      "description": "Enter your new password.",
+      "submit": "Save password",
+      "success": "Password changed. Please sign in with your new password.",
+      "invalid": "This link is invalid or has expired. Please request a new one.",
+      "requestNew": "Request a new link"
+    },
+    "verify": {
+      "title": "Email verification",
+      "success": "Your email has been verified.",
+      "failed": "This verification link is invalid or has expired.",
+      "goProfile": "Go to profile",
+      "goLogin": "Go to sign in"
+    },
+    "errors": {
+      "INVALID_EMAIL_OR_PASSWORD": "Incorrect email or password",
+      "USER_ALREADY_EXISTS": "This email is already registered",
+      "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "This email is already registered, use another one",
+      "INVALID_PASSWORD": "Incorrect password",
+      "PASSWORD_TOO_SHORT": "Password is too short",
+      "PASSWORD_TOO_LONG": "Password is too long",
+      "INVALID_TOKEN": "This link is invalid or has expired",
+      "TOKEN_EXPIRED": "This link has expired",
+      "VERIFICATION_FAILED": "Security check failed. Please try again.",
+      "MISSING_RESPONSE": "Please complete the security check first",
+      "CREDENTIAL_ACCOUNT_NOT_FOUND": "This account does not use a password",
+      "EMAIL_ALREADY_VERIFIED": "Email is already verified",
+      "account_not_linked": "This email is already registered with a password but not verified yet. Sign in with your password and verify your email, or reset your password, before using Google.",
+      "RATE_LIMITED": "Too many attempts. Please wait a moment and try again.",
+      "oauth": "Google sign-in failed. Please try again."
+    }
+  },
+  "profile": {
+    "title": "My profile",
+    "editTitle": "Edit profile",
+    "memberSince": "Member since {date}",
+    "verified": "Verified",
+    "unverified": "Not verified",
+    "resendVerification": "Resend verification email",
+    "verificationSent": "Verification email sent",
+    "info": {
+      "title": "Account information",
+      "description": "Update the name shown on your account.",
+      "saved": "Profile updated"
+    },
+    "photo": {
+      "title": "Profile photo",
+      "description": "JPG, PNG, or WEBP. Up to 2 MB.",
+      "change": "Change photo",
+      "saved": "Profile photo updated"
+    },
+    "password": {
+      "title": "Change password",
+      "description": "Use a strong, unique password.",
+      "revokeOthers": "Sign out of all other devices",
+      "saved": "Password changed",
+      "googleOnly": "You sign in with Google, so your account has no password. Use “Forgot password” on the sign-in page if you want to create one."
+    }
+  },
+  "documents": {
+    "title": "My documents",
+    "description": "PDF, JPG, or PNG. Up to 10 MB per file.",
+    "empty": "No documents yet.",
+    "uploaded": "Document uploaded",
+    "deleted": "Document deleted",
+    "confirmDelete": "Delete document “{name}”?",
+    "drop": "Drop a file here or click to choose"
+  },
+  "upload": {
+    "invalidType": "Unsupported file type",
+    "tooLarge": "File exceeds the size limit",
+    "failed": "Upload failed",
+    "rejected": "File rejected because its content does not match its type",
+    "uploading": "Uploading…"
+  },
+  "home": {
+    "title": "Ruang Kerja",
+    "description": "Manage your account, profile, and documents securely in one place.",
+    "getStarted": "Get started",
+    "goProfile": "Open profile"
   }
 }

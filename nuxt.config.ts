@@ -4,7 +4,8 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/ui',
     '@vueuse/nuxt',
-    '@nuxtjs/i18n'
+    '@nuxtjs/i18n',
+    '@nuxtjs/turnstile'
   ],
 
   devtools: {
@@ -13,8 +14,38 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
-  routeRules: {
-    '/': { prerender: true }
+  // Server-only values are overridden at runtime by NUXT_* env vars
+  // (e.g. NUXT_R2_SECRET_ACCESS_KEY). Only `public` reaches the browser.
+  runtimeConfig: {
+    databaseUrl: '',
+    // true only when behind exactly one trusted proxy that sets X-Forwarded-For (e.g. Vercel)
+    trustProxy: false,
+    betterAuthSecret: '',
+    googleClientId: '',
+    googleClientSecret: '',
+    resendApiKey: '',
+    emailFrom: '',
+    r2: {
+      accountId: '',
+      accessKeyId: '',
+      secretAccessKey: '',
+      publicBucket: '',
+      privateBucket: '',
+      publicUrl: ''
+    },
+    singapay: {
+      // Comma-separated list so a rotated key can be accepted alongside the old one.
+      webhookSecret: ''
+    },
+    turnstile: {
+      secretKey: ''
+    },
+    public: {
+      siteUrl: 'http://localhost:3000',
+      turnstile: {
+        siteKey: ''
+      }
+    }
   },
 
   compatibilityDate: '2026-06-30',

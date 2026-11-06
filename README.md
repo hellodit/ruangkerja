@@ -1,64 +1,125 @@
-# Nuxt Starter Template
+# Ruang Kerja
 
-[![Nuxt UI](https://img.shields.io/badge/Made%20with-Nuxt%20UI-00DC82?logo=nuxt&labelColor=020420)](https://ui.nuxt.com)
+Aplikasi Nuxt 4 + [Nuxt UI 4](https://ui.nuxt.com) dengan autentikasi lengkap, profil pengguna, unggah file ke Cloudflare R2, dan penerima webhook SingaPay.
 
-Use this template to get started with [Nuxt UI](https://ui.nuxt.com) quickly.
+## Fitur
 
-- [Live demo](https://starter-template.nuxt.dev/)
-- [Documentation](https://ui.nuxt.com/docs/getting-started/installation/nuxt)
+- **Autentikasi** ([Better Auth](https://better-auth.com)): daftar, masuk, keluar, lupa & atur ulang kata sandi, verifikasi email (opsional, tidak memblokir login), masuk/daftar dengan Google.
+- **Cloudflare Turnstile** di halaman masuk, daftar, dan lupa kata sandi (diverifikasi di server).
+- **Profil**: lihat profil, ubah nama, ganti foto, ubah kata sandi, kirim ulang email verifikasi.
+- **Dokumen**: unggah (PDF/JPG/PNG ≤ 10 MB), unduh lewat signed URL 5 menit, hapus.
+- **Upload ke R2** memakai presigned URL langsung dari browser, lalu dikonfirmasi server (ukuran, tipe, dan *magic bytes* dicek; file yang tidak cocok dihapus).
+- **Validasi Zod** yang sama di form (client) dan API (server) — `shared/schemas/`.
+- **Webhook SingaPay** dengan verifikasi tanda tangan HMAC-SHA512 dan idempotensi.
+- **i18n**: Bahasa Indonesia (default) dan English.
 
-<a href="https://starter-template.nuxt.dev/" target="_blank">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://ui.nuxt.com/assets/templates/nuxt/starter-dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="https://ui.nuxt.com/assets/templates/nuxt/starter-light.png">
-    <img alt="Nuxt Starter Template" src="https://ui.nuxt.com/assets/templates/nuxt/starter-light.png" width="830" height="466">
-  </picture>
-</a>
-
-> The starter template for Vue is on https://github.com/nuxt-ui-templates/starter-vue.
-
-## Quick Start
-
-```bash [Terminal]
-npm create nuxt@latest -- -t ui
-```
-
-## Deploy your own
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-name=starter&repository-url=https%3A%2F%2Fgithub.com%2Fnuxt-ui-templates%2Fstarter&demo-image=https%3A%2F%2Fui.nuxt.com%2Fassets%2Ftemplates%2Fnuxt%2Fstarter-dark.png&demo-url=https%3A%2F%2Fstarter-template.nuxt.dev%2F&demo-title=Nuxt%20Starter%20Template&demo-description=A%20minimal%20template%20to%20get%20started%20with%20Nuxt%20UI.)
-
-## Setup
-
-Make sure to install the dependencies:
+## Persiapan
 
 ```bash
 bun install
+cp .env.example .env   # lalu isi semua nilainya
 ```
 
-## Development Server
+### 1. Database (PostgreSQL)
 
-Start the development server on `http://localhost:3000`:
+Isi `NUXT_DATABASE_URL`, lalu jalankan migrasi:
 
 ```bash
-bun dev
+bun run db:migrate      # terapkan migrasi di server/db/migrations
+bun run db:generate     # buat migrasi baru setelah mengubah server/db/schema.ts
 ```
 
-## Production
+### 2. Better Auth
 
-Build the application for production:
+`NUXT_BETTER_AUTH_SECRET` — string acak minimal 32 karakter (`openssl rand -base64 32`).
+`NUXT_PUBLIC_SITE_URL` — URL publik aplikasi (dipakai untuk callback OAuth dan tautan email).
+
+`NUXT_TRUST_PROXY` — isi `true` **hanya** jika aplikasi berada di belakang tepat satu reverse proxy tepercaya yang mengatur `X-Forwarded-For` (Vercel, nginx). IP klien dipakai untuk rate limit login; jika salah diatur, penyerang bisa memalsukan IP-nya.
+
+### 3. Google OAuth
+
+Di [Google Cloud Console](https://console.cloud.google.com/apis/credentials) buat *OAuth client ID* (Web application):
+
+- **Authorized JavaScript origins**: `NUXT_PUBLIC_SITE_URL`
+- **Authorized redirect URI**: `{NUXT_PUBLIC_SITE_URL}/api/auth/callback/google`
+
+Isi `NUXT_GOOGLE_CLIENT_ID` dan `NUXT_GOOGLE_CLIENT_SECRET`.
+
+> Akun Google hanya ditautkan otomatis ke akun email/kata sandi yang **sudah terverifikasi**. Ini mencegah pengambilalihan akun oleh orang yang mendaftar duluan memakai email korban.
+
+### 4. Email (Resend)
+
+Verifikasi domain pengirim di [Resend](https://resend.com/domains), lalu isi `NUXT_RESEND_API_KEY` dan `NUXT_EMAIL_FROM`.
+
+### 5. Cloudflare Turnstile
+
+Buat widget di dashboard Cloudflare → Turnstile, tambahkan hostname aplikasi, lalu isi `NUXT_PUBLIC_TURNSTILE_SITE_KEY` dan `NUXT_TURNSTILE_SECRET_KEY`.
+
+Untuk development bisa memakai [kunci uji](https://developers.cloudflare.com/turnstile/troubleshooting/testing/) Cloudflare: site key `1x00000000000000000000AA`, secret `1x0000000000000000000000000000000AA`.
+
+### 6. Cloudflare R2
+
+Buat **dua bucket**:
+
+| Bucket | Isi | Akses publik |
+|---|---|---|
+| `NUXT_R2_PUBLIC_BUCKET` | foto profil (`avatars/…`) | **Aktif** — custom domain atau r2.dev → `NUXT_R2_PUBLIC_URL` |
+| `NUXT_R2_PRIVATE_BUCKET` | dokumen (`documents/…`) | **Nonaktif** |
+
+Buat *R2 API token* (Object Read & Write, terbatas pada dua bucket tersebut), lalu isi `NUXT_R2_ACCOUNT_ID`, `NUXT_R2_ACCESS_KEY_ID`, `NUXT_R2_SECRET_ACCESS_KEY`.
+
+Atur **CORS** di kedua bucket (Settings → CORS policy), ganti origin dengan URL aplikasi:
+
+```json
+[
+  {
+    "AllowedOrigins": ["https://app.example.com"],
+    "AllowedMethods": ["PUT"],
+    "AllowedHeaders": ["content-type"],
+    "MaxAgeSeconds": 3600
+  }
+]
+```
+
+### 7. SingaPay
+
+Di dashboard SingaPay, atur URL notifikasi (transaksi dan/atau disbursement) ke:
+
+```
+{NUXT_PUBLIC_SITE_URL}/api/webhooks/singapay
+```
+
+Isi `NUXT_SINGAPAY_WEBHOOK_SECRET` dengan **HMAC Validation Key** dari dashboard. Untuk rotasi kunci, isi beberapa nilai dipisah koma.
+
+Verifikasi yang dilakukan:
+
+- `X-Signature = hex(HMAC-SHA512("POST:{path}:{token}:{sha256(body)}:{X-Timestamp}", secret))`, `token` dari header `Authorization: Bearer …`.
+- Body dinormalisasi persis seperti contoh PHP SingaPay (`json_decode` → `ksort` rekursif → `json_encode`); hash body mentah diterima sebagai cadangan. Kesesuaian dengan PHP diuji lewat `tests/fixtures/singapay-normalize.php`.
+- `X-Timestamp` maksimal ±300 detik dari waktu server.
+- Setiap pengiriman dicatat di tabel `singapay_webhook_event` (unik per hash body), jadi pengiriman ulang hanya diproses sekali.
+
+Logika bisnis untuk event (misalnya menandai pesanan lunas) ditulis di `server/utils/singapay-events.ts` — saat ini hanya mencatat log.
+
+> ⚠️ Skema tanda tangan ini diambil dari SDK pihak ketiga (`aliziodev/laravel-singapay`) karena dokumentasi resmi SingaPay tidak tersedia publik. **Uji dulu dengan sandbox SingaPay sebelum production.**
+
+## Development
 
 ```bash
+bun dev            # http://localhost:3000
+bun run test       # unit test (Vitest)
+bun run lint
+bun run typecheck
 bun run build
 ```
 
-Locally preview production build:
+## Struktur
 
-```bash
-bun run preview
 ```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
-
-## Renovate integration
-
-Install [Renovate GitHub app](https://github.com/apps/renovate/installations/select_target) on your repository and you are good to go.
+shared/schemas/      Skema Zod (auth, profil, upload) — dipakai client & server
+server/db/           Skema Drizzle + migrasi
+server/utils/        auth (Better Auth), r2, file-signature, singapay, email, session
+server/api/          /api/auth/**, /api/uploads/*, /api/documents/*, /api/webhooks/singapay
+app/pages/           login, register, forgot-password, reset-password, verify-email, profile/*
+app/composables/     useAuthSession, useAuthClient, useR2Upload
+tests/               unit test + fixture PHP untuk normalisasi SingaPay
+```
