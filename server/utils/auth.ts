@@ -37,7 +37,11 @@ function createAuth() {
       resetPasswordTokenExpiresIn: 60 * 60,
       revokeSessionsOnPasswordReset: true,
       sendResetPassword: async ({ user, url }) => {
-        await sendResetPasswordEmail(user.email, user.name, url)
+        // Never let a delivery failure change the response: that would reveal
+        // which emails are registered. Failures are logged for operators.
+        await sendResetPasswordEmail(user.email, user.name, url).catch((err: unknown) => {
+          console.error('[auth] reset password email failed', err)
+        })
       }
     },
     emailVerification: {
