@@ -4,7 +4,6 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/ui',
     '@vueuse/nuxt',
-    '@nuxtjs/i18n',
     '@nuxtjs/turnstile'
   ],
 
@@ -14,10 +13,24 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  // Fonts are self-hosted from the CTM design system (app/assets/css/main.css).
+  ui: {
+    fonts: false
+  },
+
+  app: {
+    head: {
+      htmlAttrs: { lang: 'id' },
+      title: 'RuangKerja'
+    }
+  },
+
   // Server-only values are overridden at runtime by NUXT_* env vars
   // (e.g. NUXT_R2_SECRET_ACCESS_KEY). Only `public` reaches the browser.
   runtimeConfig: {
     databaseUrl: '',
+    // base64 of 32 random bytes: openssl rand -base64 32
+    dataEncryptionKey: '',
     // true only when behind exactly one trusted proxy that sets X-Forwarded-For (e.g. Vercel)
     trustProxy: false,
     betterAuthSecret: '',
@@ -30,7 +43,6 @@ export default defineNuxtConfig({
       accessKeyId: '',
       secretAccessKey: '',
       publicBucket: '',
-      privateBucket: '',
       publicUrl: ''
     },
     singapay: {
@@ -57,14 +69,6 @@ export default defineNuxtConfig({
         braceStyle: '1tbs'
       }
     }
-  },
-
-  i18n: {
-    defaultLocale: 'id',
-    strategy: 'prefix_except_default',
-    locales: [
-      { code: 'id', language: 'id-ID', name: 'Bahasa Indonesia', file: 'id.json' },
-      { code: 'en', language: 'en-US', name: 'English', file: 'en.json' }
-    ]
   }
+
 })

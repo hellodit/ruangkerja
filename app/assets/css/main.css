@@ -1,18 +1,82 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-@theme static {
-  --font-sans: 'Public Sans', sans-serif;
+/* CTM Project design system — self-hosted fonts (SIL OFL, see /fonts/RethinkSans-OFL.txt) */
+@font-face {
+  font-family: 'Rethink Sans';
+  src: url('/fonts/RethinkSans-VariableFont_wght.ttf') format('truetype');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Rethink Sans';
+  src: url('/fonts/RethinkSans-Italic-VariableFont_wght.ttf') format('truetype');
+  font-weight: 400 800;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/JetBrainsMono_wght_.ttf') format('truetype');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
 
-  --color-green-50: #EFFDF5;
-  --color-green-100: #D9FBE8;
-  --color-green-200: #B3F5D1;
-  --color-green-300: #75EDAE;
-  --color-green-400: #00DC82;
-  --color-green-500: #00C16A;
-  --color-green-600: #00A155;
-  --color-green-700: #007F45;
-  --color-green-800: #016538;
-  --color-green-900: #0A5331;
-  --color-green-950: #052E16;
+@theme static {
+  --font-sans: 'Rethink Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* c-brand-* (gold) */
+  --color-brand-50: #fbf0d6;
+  --color-brand-100: #f5e1b4;
+  --color-brand-200: #efce84;
+  --color-brand-300: #edc56c;
+  --color-brand-400: #ecbd56;
+  --color-brand-500: #ddaa3f;
+  --color-brand-600: #c4922a;
+  --color-brand-700: #a87b1c;
+  --color-brand-800: #8a6410;
+  --color-brand-900: #6b4d0a;
+  --color-brand-950: #4a3506;
+
+  /* text-on-brand: ink on gold (10.7:1) */
+  --color-ink: #111216;
+}
+
+:root {
+  /* button 8 · input 12 · card 16 (CTM radius scale) */
+  --ui-radius: 0.5rem;
+  /* Gold is a light color: the brand fill is brand-400 in both themes. */
+  --ui-primary: var(--ui-color-primary-400);
+  --ui-bg: #ffffff;
+  --ui-bg-muted: var(--ui-color-neutral-50);
+  --ui-bg-elevated: var(--ui-color-neutral-100);
+  --ui-text: var(--ui-color-neutral-900);
+  --ui-text-toned: var(--ui-color-neutral-600);
+  --ui-text-muted: var(--ui-color-neutral-500);
+  --ui-border: var(--ui-color-neutral-200);
+}
+
+.dark {
+  --ui-primary: var(--ui-color-primary-400);
+  --ui-bg: #1a1d21;
+  --ui-bg-muted: #222529;
+  --ui-bg-elevated: #292c30;
+  --ui-bg-accented: #303236;
+  --ui-text: #d1d2d3;
+  --ui-text-toned: #abadb1;
+  --ui-text-muted: #94969b;
+  --ui-text-highlighted: #f3f4f6;
+  --ui-border: #303236;
+  --ui-border-accented: #3e4045;
+}
+
+/* Brand-colored text on light surfaces must use brand-800 (5.4:1), never the fill. */
+.text-brand-ink {
+  color: var(--color-brand-800);
+}
+.dark .text-brand-ink {
+  color: var(--color-brand-400);
 }

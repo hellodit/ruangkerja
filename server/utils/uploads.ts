@@ -1,8 +1,7 @@
 import { and, eq, isNull, lt } from 'drizzle-orm'
 
-/** Abuse limits for uploads. */
+/** Abuse limit for presigned uploads awaiting confirmation. */
 export const MAX_ACTIVE_PENDING_UPLOADS = 10
-export const MAX_DOCUMENTS_PER_USER = 50
 
 /**
  * Remove a user's expired, never-confirmed uploads (and any object that was
@@ -10,17 +9,32 @@ export const MAX_DOCUMENTS_PER_USER = 50
  */
 export async function purgeExpiredPendingUploads(userId: string) {
   const db = useDb()
-  const expired = await db.select().from(schema.pendingUpload).where(and(
-    eq(schema.pendingUpload.userId, userId),
-    isNull(schema.pendingUpload.consumedAt),
-    lt(schema.pendingUpload.expiresAt, new Date())
+  const expired = await db.select().from(schema.pendingUploads).where(and(
+    eq(schema.pendingUploads.userId, userId),
+    isNull(schema.pendingUploads.consumedAt),
+    lt(schema.pendingUploads.expiresAt, new Date())
   ))
   for (const row of expired) {
     try {
-      await deleteObject(row.bucket, row.objectKey)
-      await db.delete(schema.pendingUpload).where(eq(schema.pendingUpload.id, row.id))
+      await deleteObject('public', row.objectKey)
+      await db.delete(schema.pendingUploads).where(eq(schema.pendingUploads.id, row.id))
     } catch (err) {
       console.error('[uploads] failed to purge pending upload', row.id, err)
     }
+  }
+}
+
+/** Delete the user's R2 avatar if `image` points at one. Never throws. */
+export async function deleteUserAvatar(userId: string, image: string | null) {
+  if (!image) {
+    return
+  }
+  try {
+    const key = keyFromPublicUrl(image)
+    if (key && key.startsWith(`avatars/${userId}/`)) {
+      await deleteObject('public', key)
+    }
+  } catch (err) {
+    console.error('[uploads] failed to delete avatar', err)
   }
 }

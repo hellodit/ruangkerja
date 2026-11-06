@@ -1,58 +1,59 @@
 import { z } from 'zod'
-import { identity, type Translate } from './i18n'
 
 export const PASSWORD_MIN = 8
 export const PASSWORD_MAX = 128
 export const NAME_MIN = 2
 export const NAME_MAX = 80
 
-export const emailField = (t: Translate = identity) =>
-  z.string().trim().toLowerCase().pipe(z.email(t('validation.email')))
+export const emailField = () => z.string().trim().toLowerCase().pipe(z.email('Alamat email tidak valid'))
 
-export const passwordField = (t: Translate = identity) =>
-  z.string()
-    .min(PASSWORD_MIN, t('validation.passwordMin', { min: PASSWORD_MIN }))
-    .max(PASSWORD_MAX, t('validation.passwordMax', { max: PASSWORD_MAX }))
+export const passwordField = () => z.string()
+  .min(PASSWORD_MIN, `Kata sandi minimal ${PASSWORD_MIN} karakter`)
+  .max(PASSWORD_MAX, `Kata sandi maksimal ${PASSWORD_MAX} karakter`)
 
-export const nameField = (t: Translate = identity) =>
-  z.string().trim()
-    .min(NAME_MIN, t('validation.nameMin', { min: NAME_MIN }))
-    .max(NAME_MAX, t('validation.nameMax', { max: NAME_MAX }))
+export const nameField = () => z.string().trim()
+  .min(NAME_MIN, `Nama minimal ${NAME_MIN} karakter`)
+  .max(NAME_MAX, `Nama maksimal ${NAME_MAX} karakter`)
 
-export const makeSignInSchema = (t: Translate = identity) => z.object({
-  email: emailField(t),
-  password: passwordField(t),
+const passwordsMatch = { message: 'Konfirmasi kata sandi tidak cocok', path: ['confirmPassword'] }
+
+export const signInSchema = z.object({
+  email: emailField(),
+  password: passwordField(),
   remember: z.boolean().optional()
 })
 
-export const makeSignUpSchema = (t: Translate = identity) => z.object({
-  name: nameField(t),
-  email: emailField(t),
-  password: passwordField(t),
+export const magicLinkSchema = z.object({
+  email: emailField()
+})
+
+export const signUpSchema = z.object({
+  name: nameField(),
+  email: emailField(),
+  password: passwordField(),
   confirmPassword: z.string()
-}).refine(d => d.password === d.confirmPassword, {
-  message: t('validation.passwordMismatch'),
-  path: ['confirmPassword']
+}).refine(d => d.password === d.confirmPassword, passwordsMatch)
+
+export const forgotPasswordSchema = z.object({
+  email: emailField()
 })
 
-export const makeForgotPasswordSchema = (t: Translate = identity) => z.object({
-  email: emailField(t)
-})
-
-export const makeResetPasswordSchema = (t: Translate = identity) => z.object({
-  password: passwordField(t),
+export const resetPasswordSchema = z.object({
+  password: passwordField(),
   confirmPassword: z.string()
-}).refine(d => d.password === d.confirmPassword, {
-  message: t('validation.passwordMismatch'),
-  path: ['confirmPassword']
-})
+}).refine(d => d.password === d.confirmPassword, passwordsMatch)
 
-export const signInSchema = makeSignInSchema()
-export const signUpSchema = makeSignUpSchema()
-export const forgotPasswordSchema = makeForgotPasswordSchema()
-export const resetPasswordSchema = makeResetPasswordSchema()
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Wajib diisi'),
+  newPassword: passwordField(),
+  confirmPassword: z.string(),
+  revokeOtherSessions: z.boolean().optional()
+}).refine(d => d.newPassword === d.confirmPassword, { message: 'Konfirmasi kata sandi tidak cocok', path: ['confirmPassword'] })
+  .refine(d => d.newPassword !== d.currentPassword, { message: 'Kata sandi baru harus berbeda dari kata sandi saat ini', path: ['newPassword'] })
 
 export type SignInInput = z.output<typeof signInSchema>
+export type MagicLinkInput = z.output<typeof magicLinkSchema>
 export type SignUpInput = z.output<typeof signUpSchema>
 export type ForgotPasswordInput = z.output<typeof forgotPasswordSchema>
 export type ResetPasswordInput = z.output<typeof resetPasswordSchema>
+export type ChangePasswordInput = z.output<typeof changePasswordSchema>
