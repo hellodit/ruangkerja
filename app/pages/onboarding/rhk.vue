@@ -15,8 +15,12 @@ const bulkOpen = ref(false)
 const bulkText = ref('')
 const bulkSaving = ref(false)
 
+// Open the empty form once, for a first RHK; never re-open it on refresh.
+const formKey = ref(0)
+let autoOpened = false
 watchEffect(() => {
-  if (skp.value?.skp && !rhks.value.length && !adding.value) {
+  if (!autoOpened && skp.value?.skp && list.value && !rhks.value.length) {
+    autoOpened = true
     adding.value = true
   }
 })
@@ -32,9 +36,15 @@ function summary(r: (typeof rhks.value)[number]) {
 }
 
 async function onSaved() {
+  await refresh()
   adding.value = false
   openItem.value = undefined
-  await refresh()
+  formKey.value++
+}
+
+function startAdding() {
+  formKey.value++
+  adding.value = true
 }
 
 async function saveBulk() {
@@ -184,6 +194,7 @@ function onPeriodSaved() {
             </div>
           </template>
           <RhkForm
+            :key="formKey"
             :cancelable="rhks.length > 0"
             @saved="onSaved"
             @cancel="adding = false"
@@ -196,7 +207,7 @@ function onPeriodSaved() {
           variant="outline"
           icon="i-lucide-plus"
           class="self-start"
-          @click="adding = true"
+          @click="startAdding"
         >
           Tambah RHK
         </UButton>
