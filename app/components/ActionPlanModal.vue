@@ -46,31 +46,80 @@ async function onSubmit(event: FormSubmitEvent<z.output<typeof formSchema>>) {
 </script>
 
 <template>
-  <UModal v-model:open="open" :title="plan ? 'Ubah rencana aksi' : 'Tambah rencana aksi'" :description="`${period.label} · ${formatRange(period.startDate, period.endDate)}`">
+  <UModal
+    v-model:open="open"
+    :title="plan ? 'Ubah rencana aksi' : 'Tambah rencana aksi'"
+    :description="`${period.label} · ${formatRange(period.startDate, period.endDate)}`"
+  >
     <template #body>
-      <UForm id="action-plan-form" :schema="formSchema" :state="state" class="flex flex-col gap-4" @submit="onSubmit">
-        <UFormField label="Nama rencana aksi" name="name" required help="Tugas mendadak dari atasan juga dicatat sebagai rencana aksi di RHK yang relevan.">
-          <UInput v-model="state.name" placeholder="Contoh: Rekap data indikator dari OPD" />
+      <UForm
+        id="action-plan-form"
+        :schema="formSchema"
+        :state="state"
+        class="flex flex-col gap-4"
+        @submit="onSubmit"
+      >
+        <UFormField
+          label="Nama rencana aksi"
+          name="name"
+          required
+          help="Tugas mendadak dari atasan juga dicatat sebagai rencana aksi di RHK yang relevan."
+        >
+          <UInput
+            v-model="state.name"
+            placeholder="Contoh: Rekap data indikator dari OPD"
+          />
         </UFormField>
         <div class="grid gap-4 sm:grid-cols-3">
-          <UFormField label="Target periode" name="target" required>
-            <UInputNumber v-model="state.target" :min="0" :step="1" :format-options="{ maximumFractionDigits: 2 }" />
+          <UFormField
+            label="Target periode"
+            name="target"
+            required
+          >
+            <UInputNumber
+              v-model="state.target"
+              :min="0"
+              :step="1"
+              :format-options="{ maximumFractionDigits: 2 }"
+            />
           </UFormField>
-          <UFormField label="Satuan" name="unit" required>
-            <UInput v-model="state.unit" placeholder="dokumen" />
+          <UFormField
+            label="Satuan"
+            name="unit"
+            required
+          >
+            <UInput
+              v-model="state.unit"
+              placeholder="dokumen"
+            />
           </UFormField>
-          <UFormField label="Tenggat" name="dueDate" required>
-            <UInput v-model="state.dueDate" type="date" />
+          <UFormField
+            label="Tenggat"
+            name="dueDate"
+            required
+          >
+            <UInput
+              v-model="state.dueDate"
+              type="date"
+            />
           </UFormField>
         </div>
       </UForm>
     </template>
     <template #footer>
       <div class="flex w-full justify-end gap-2">
-        <UButton color="neutral" variant="ghost" @click="open = false">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          @click="open = false"
+        >
           Batal
         </UButton>
-        <UButton type="submit" form="action-plan-form" :loading="saving">
+        <UButton
+          type="submit"
+          form="action-plan-form"
+          :loading="saving"
+        >
           {{ plan ? 'Simpan perubahan' : 'Tambah rencana aksi' }}
         </UButton>
       </div>

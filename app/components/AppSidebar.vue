@@ -53,7 +53,11 @@ const userItems = computed<DropdownMenuItem[][]>(() => [
     :ui="{ footer: 'flex-col items-stretch gap-3 border-t border-default py-4' }"
   >
     <template #header="{ collapsed }">
-      <NuxtLink to="/beranda" class="rounded-md px-1 focus-visible:outline-2 focus-visible:outline-primary" aria-label="RuangKerja, ke Beranda">
+      <NuxtLink
+        to="/beranda"
+        class="rounded-md px-1 focus-visible:outline-2 focus-visible:outline-primary"
+        aria-label="RuangKerja, ke Beranda"
+      >
         <AppLogo :collapsed="collapsed" />
       </NuxtLink>
     </template>
@@ -69,7 +73,11 @@ const userItems = computed<DropdownMenuItem[][]>(() => [
     </template>
 
     <template #footer="{ collapsed }">
-      <UDropdownMenu :items="userItems" :content="{ align: 'start', side: 'top' }" :ui="{ content: 'w-(--reka-dropdown-menu-trigger-width) min-w-56' }">
+      <UDropdownMenu
+        :items="userItems"
+        :content="{ align: 'start', side: 'top' }"
+        :ui="{ content: 'w-(--reka-dropdown-menu-trigger-width) min-w-56' }"
+      >
         <UButton
           color="neutral"
           variant="ghost"
@@ -78,14 +86,24 @@ const userItems = computed<DropdownMenuItem[][]>(() => [
           class="justify-start gap-2.5 data-[state=open]:bg-elevated"
           :aria-label="`Menu akun ${me?.user.name ?? ''}`"
         >
-          <UAvatar :src="me?.user.image ?? undefined" :alt="me?.user.name" size="md" />
-          <span v-if="!collapsed" class="flex min-w-0 flex-col text-left">
+          <UAvatar
+            :src="me?.user.image ?? undefined"
+            :alt="me?.user.name"
+            size="md"
+          />
+          <span
+            v-if="!collapsed"
+            class="flex min-w-0 flex-col text-left"
+          >
             <span class="truncate text-sm font-semibold text-highlighted">{{ me?.user.name }}</span>
             <span class="truncate text-xs text-muted">{{ me?.positionTitle || 'Lengkapi profil' }}</span>
           </span>
         </UButton>
       </UDropdownMenu>
-      <p v-if="!collapsed" class="px-1 text-[11px] leading-4 text-muted">
+      <p
+        v-if="!collapsed"
+        class="px-1 text-[11px] leading-4 text-muted"
+      >
         Aplikasi independen. Bukan aplikasi resmi BKN atau e-Kinerja.
       </p>
     </template>

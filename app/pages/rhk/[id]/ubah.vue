@@ -46,10 +46,21 @@ async function remove() {
     <template #header>
       <UDashboardNavbar :title="`Ubah RHK ${data?.rhk.number ?? ''}`">
         <template #leading>
-          <UButton :to="`/rhk/${id}`" icon="i-lucide-chevron-left" color="neutral" variant="ghost" aria-label="Kembali ke detail RHK" />
+          <UButton
+            :to="`/rhk/${id}`"
+            icon="i-lucide-chevron-left"
+            color="neutral"
+            variant="ghost"
+            aria-label="Kembali ke detail RHK"
+          />
         </template>
         <template #right>
-          <UButton color="error" variant="ghost" icon="i-lucide-trash-2" @click="deleteOpen = true">
+          <UButton
+            color="error"
+            variant="ghost"
+            icon="i-lucide-trash-2"
+            @click="deleteOpen = true"
+          >
             Hapus RHK
           </UButton>
         </template>
@@ -57,24 +68,48 @@ async function remove() {
     </template>
     <template #body>
       <div class="mx-auto flex w-full max-w-4xl flex-col gap-4">
-        <UAlert color="neutral" variant="subtle" icon="i-lucide-info" title="Perubahan di RuangKerja tidak mengubah SKP resmi di e-Kinerja." />
+        <UAlert
+          color="neutral"
+          variant="subtle"
+          icon="i-lucide-info"
+          title="Perubahan di RuangKerja tidak mengubah SKP resmi di e-Kinerja."
+        />
         <UCard>
-          <RhkForm v-if="initial" :rhk-id="id" :initial="initial" submit-label="Simpan perubahan" cancelable @saved="onSaved" @cancel="navigateTo(`/rhk/${id}`)" />
+          <RhkForm
+            v-if="initial"
+            :rhk-id="id"
+            :initial="initial"
+            submit-label="Simpan perubahan"
+            cancelable
+            @saved="onSaved"
+            @cancel="navigateTo(`/rhk/${id}`)"
+          />
         </UCard>
       </div>
+      <UModal
+        v-model:open="deleteOpen"
+        title="Hapus RHK ini?"
+        description="Rencana aksi dan progres harian di bawahnya ikut disembunyikan dari semua halaman."
+      >
+        <template #footer>
+          <div class="flex w-full justify-end gap-2">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              @click="deleteOpen = false"
+            >
+              Batal
+            </UButton>
+            <UButton
+              color="error"
+              :loading="deleting"
+              @click="remove"
+            >
+              Hapus RHK {{ data?.rhk.number }}
+            </UButton>
+          </div>
+        </template>
+      </UModal>
     </template>
   </UDashboardPanel>
-
-  <UModal v-model:open="deleteOpen" title="Hapus RHK ini?" description="Rencana aksi dan progres harian di bawahnya ikut disembunyikan dari semua halaman.">
-    <template #footer>
-      <div class="flex w-full justify-end gap-2">
-        <UButton color="neutral" variant="ghost" @click="deleteOpen = false">
-          Batal
-        </UButton>
-        <UButton color="error" :loading="deleting" @click="remove">
-          Hapus RHK {{ data?.rhk.number }}
-        </UButton>
-      </div>
-    </template>
-  </UModal>
 </template>

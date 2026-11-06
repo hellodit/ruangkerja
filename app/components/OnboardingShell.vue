@@ -15,8 +15,17 @@ const current = computed(() => props.step)
   <div class="flex min-h-screen flex-col">
     <header class="flex flex-wrap items-center gap-x-8 gap-y-3 border-b border-default bg-default px-4 py-3 sm:px-8">
       <AppLogo :subtitle="false" />
-      <nav aria-label="Langkah persiapan" class="flex min-w-0 flex-1 justify-center">
-        <UStepper :model-value="current" :items="items" disabled size="sm" class="w-full max-w-md" />
+      <nav
+        aria-label="Langkah persiapan"
+        class="flex min-w-0 flex-1 justify-center"
+      >
+        <UStepper
+          :model-value="current"
+          :items="items"
+          disabled
+          size="sm"
+          class="w-full max-w-md"
+        />
       </nav>
     </header>
 

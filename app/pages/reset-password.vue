@@ -33,12 +33,21 @@ async function onSubmit(event: FormSubmitEvent<ResetPasswordInput>) {
 </script>
 
 <template>
-  <div v-if="invalid" class="space-y-5 text-center">
-    <UIcon name="i-lucide-link-2-off" class="mx-auto size-10 text-error" />
+  <div
+    v-if="invalid"
+    class="space-y-5 text-center"
+  >
+    <UIcon
+      name="i-lucide-link-2-off"
+      class="mx-auto size-10 text-error"
+    />
     <p class="text-muted">
       Tautan tidak valid atau sudah kedaluwarsa. Silakan minta tautan baru.
     </p>
-    <UButton to="/forgot-password" block>
+    <UButton
+      to="/forgot-password"
+      block
+    >
       Minta tautan baru
     </UButton>
   </div>
@@ -53,7 +62,13 @@ async function onSubmit(event: FormSubmitEvent<ResetPasswordInput>) {
     @submit="onSubmit"
   >
     <template #validation>
-      <UAlert v-if="formError" color="error" variant="subtle" icon="i-lucide-circle-alert" :title="formError" />
+      <UAlert
+        v-if="formError"
+        color="error"
+        variant="subtle"
+        icon="i-lucide-circle-alert"
+        :title="formError"
+      />
     </template>
   </UAuthForm>
 </template>

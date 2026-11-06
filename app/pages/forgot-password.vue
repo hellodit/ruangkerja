@@ -38,12 +38,23 @@ async function onSubmit(event: FormSubmitEvent<ForgotPasswordInput>) {
 </script>
 
 <template>
-  <div v-if="sent" class="space-y-5 text-center">
-    <UIcon name="i-lucide-mail-check" class="mx-auto size-10 text-brand-ink" />
+  <div
+    v-if="sent"
+    class="space-y-5 text-center"
+  >
+    <UIcon
+      name="i-lucide-mail-check"
+      class="mx-auto size-10 text-brand-ink"
+    />
     <p class="text-muted">
       Jika email tersebut terdaftar, tautan untuk mengatur ulang kata sandi sudah dikirim. Tautan berlaku 1 jam.
     </p>
-    <UButton to="/login" color="neutral" variant="outline" block>
+    <UButton
+      to="/login"
+      color="neutral"
+      variant="outline"
+      block
+    >
       Kembali ke halaman masuk
     </UButton>
   </div>
@@ -59,12 +70,24 @@ async function onSubmit(event: FormSubmitEvent<ForgotPasswordInput>) {
   >
     <template #validation>
       <div class="space-y-3">
-        <UAlert v-if="formError" color="error" variant="subtle" icon="i-lucide-circle-alert" :title="formError" />
-        <CaptchaField ref="captchaField" v-model="captcha" />
+        <UAlert
+          v-if="formError"
+          color="error"
+          variant="subtle"
+          icon="i-lucide-circle-alert"
+          :title="formError"
+        />
+        <CaptchaField
+          ref="captchaField"
+          v-model="captcha"
+        />
       </div>
     </template>
     <template #footer>
-      <ULink to="/login" class="text-sm font-medium text-brand-ink">
+      <ULink
+        to="/login"
+        class="text-sm font-medium text-brand-ink"
+      >
         Kembali ke halaman masuk
       </ULink>
     </template>

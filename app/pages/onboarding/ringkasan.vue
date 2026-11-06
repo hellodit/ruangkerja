@@ -71,7 +71,11 @@ const steps = [
             <h2 class="text-lg font-semibold text-highlighted">
               Profil
             </h2>
-            <ULink to="/onboarding/profil" class="text-sm font-medium text-brand-ink" aria-label="Ubah profil">
+            <ULink
+              to="/onboarding/profil"
+              class="text-sm font-medium text-brand-ink"
+              aria-label="Ubah profil"
+            >
               Ubah
             </ULink>
           </div>
@@ -112,7 +116,11 @@ const steps = [
             <h2 class="text-lg font-semibold text-highlighted">
               Periode dan RHK
             </h2>
-            <ULink to="/onboarding/rhk" class="text-sm font-medium text-brand-ink" aria-label="Ubah periode dan RHK">
+            <ULink
+              to="/onboarding/rhk"
+              class="text-sm font-medium text-brand-ink"
+              aria-label="Ubah periode dan RHK"
+            >
               Ubah
             </ULink>
           </div>
@@ -125,7 +133,10 @@ const steps = [
             <dd v-if="skp?.skp">
               SKP {{ skp.skp.year }} · {{ skp.skp.evaluationFrequency === 'monthly' ? 'Bulanan' : 'Triwulanan' }} · batas pengisian tanggal {{ skp.skp.submissionDeadlineDay }} bulan berikutnya
             </dd>
-            <dd v-else class="text-warning">
+            <dd
+              v-else
+              class="text-warning"
+            >
               Belum diatur
             </dd>
           </div>
@@ -136,7 +147,10 @@ const steps = [
             <dd>
               <span class="block font-medium text-highlighted">{{ rhks.length }} RHK · {{ indicatorCount }} indikator</span>
               <ul class="mt-1 list-disc space-y-1 pl-5">
-                <li v-for="r in rhks" :key="r.id">
+                <li
+                  v-for="r in rhks"
+                  :key="r.id"
+                >
                   {{ r.statement }}
                 </li>
               </ul>
@@ -152,19 +166,39 @@ const steps = [
           </h2>
         </template>
         <div class="flex flex-col gap-5">
-          <USwitch v-model="reminders.remindBeforeDeadline" label="Ingatkan sebelum batas pengisian" :description="`Dikirim ${settings?.remindDaysBefore ?? 3} hari sebelum batas pengisian realisasi.`" />
-          <USwitch v-model="reminders.remindDaily" label="Ingatkan mencatat progres harian" :description="`Setiap hari kerja pukul ${formatTime(settings?.remindDailyTime ?? '16:00')}.`" />
+          <USwitch
+            v-model="reminders.remindBeforeDeadline"
+            label="Ingatkan sebelum batas pengisian"
+            :description="`Dikirim ${settings?.remindDaysBefore ?? 3} hari sebelum batas pengisian realisasi.`"
+          />
+          <USwitch
+            v-model="reminders.remindDaily"
+            label="Ingatkan mencatat progres harian"
+            :description="`Setiap hari kerja pukul ${formatTime(settings?.remindDailyTime ?? '16:00')}.`"
+          />
         </div>
       </UCard>
 
-      <section aria-labelledby="al-title" class="space-y-3">
-        <h2 id="al-title" class="text-lg font-semibold text-highlighted">
+      <section
+        aria-labelledby="al-title"
+        class="space-y-3"
+      >
+        <h2
+          id="al-title"
+          class="text-lg font-semibold text-highlighted"
+        >
           Setelah ini, tiap periode
         </h2>
         <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <li v-for="s in steps" :key="s.title">
+          <li
+            v-for="s in steps"
+            :key="s.title"
+          >
             <UCard class="h-full">
-              <UIcon :name="s.icon" class="mb-3 size-6 text-brand-ink" />
+              <UIcon
+                :name="s.icon"
+                class="mb-3 size-6 text-brand-ink"
+              />
               <p class="font-semibold text-highlighted">
                 {{ s.title }}
               </p>
@@ -178,14 +212,30 @@ const steps = [
     </div>
 
     <template #footer>
-      <UButton to="/onboarding/rhk" color="neutral" variant="outline" size="lg" icon="i-lucide-chevron-left">
+      <UButton
+        to="/onboarding/rhk"
+        color="neutral"
+        variant="outline"
+        size="lg"
+        icon="i-lucide-chevron-left"
+      >
         Kembali
       </UButton>
       <span class="flex-1 text-sm text-muted">Langkah 3 dari 3</span>
-      <UButton color="neutral" variant="ghost" size="lg" :loading="finishing" @click="finish('/beranda')">
+      <UButton
+        color="neutral"
+        variant="ghost"
+        size="lg"
+        :loading="finishing"
+        @click="finish('/beranda')"
+      >
         Selesai, ke Beranda
       </UButton>
-      <UButton size="lg" :loading="finishing" @click="finish(firstRhkId ? `/rhk/${firstRhkId}` : '/rhk')">
+      <UButton
+        size="lg"
+        :loading="finishing"
+        @click="finish(firstRhkId ? `/rhk/${firstRhkId}` : '/rhk')"
+      >
         Selesai, susun rencana aksi
       </UButton>
     </template>

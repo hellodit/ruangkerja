@@ -28,15 +28,31 @@ async function onChange(event: Event) {
 
 <template>
   <div class="flex items-center gap-4">
-    <UAvatar :src="me?.user.image ?? undefined" :alt="me?.user.name" size="3xl" />
+    <UAvatar
+      :src="me?.user.image ?? undefined"
+      :alt="me?.user.name"
+      size="3xl"
+    />
     <div class="space-y-2">
-      <UButton icon="i-lucide-camera" color="neutral" variant="outline" :loading="uploading" @click="input?.click()">
+      <UButton
+        icon="i-lucide-camera"
+        color="neutral"
+        variant="outline"
+        :loading="uploading"
+        @click="input?.click()"
+      >
         {{ uploading ? `Mengunggah… ${progress}%` : 'Ganti foto' }}
       </UButton>
       <p class="text-xs text-muted">
         JPG, PNG, atau WEBP. Maksimal 2 MB.
       </p>
-      <input ref="input" type="file" class="hidden" :accept="accept" @change="onChange">
+      <input
+        ref="input"
+        type="file"
+        class="hidden"
+        :accept="accept"
+        @change="onChange"
+      >
     </div>
   </div>
 </template>

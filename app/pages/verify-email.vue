@@ -11,14 +11,21 @@ await auth.refresh()
 
 <template>
   <div class="space-y-5 text-center">
-    <UIcon :name="failed ? 'i-lucide-circle-x' : 'i-lucide-badge-check'" class="mx-auto size-12" :class="failed ? 'text-error' : 'text-success'" />
+    <UIcon
+      :name="failed ? 'i-lucide-circle-x' : 'i-lucide-badge-check'"
+      class="mx-auto size-12"
+      :class="failed ? 'text-error' : 'text-success'"
+    />
     <h1 class="text-xl font-semibold text-highlighted">
       Verifikasi email
     </h1>
     <p class="text-muted">
       {{ failed ? 'Tautan verifikasi tidak valid atau sudah kedaluwarsa.' : 'Email Anda berhasil diverifikasi.' }}
     </p>
-    <UButton :to="auth.loggedIn.value ? '/beranda' : '/login'" block>
+    <UButton
+      :to="auth.loggedIn.value ? '/beranda' : '/login'"
+      block
+    >
       {{ auth.loggedIn.value ? 'Buka RuangKerja' : 'Ke halaman masuk' }}
     </UButton>
   </div>

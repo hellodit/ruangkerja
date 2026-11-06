@@ -11,18 +11,18 @@ export default defineNuxtConfig({
     enabled: true
   },
 
-  css: ['~/assets/css/main.css'],
-
-  // Fonts are self-hosted from the CTM design system (app/assets/css/main.css).
-  ui: {
-    fonts: false
-  },
-
   app: {
     head: {
       htmlAttrs: { lang: 'id' },
       title: 'RuangKerja'
     }
+  },
+
+  css: ['~/assets/css/main.css'],
+
+  // Fonts are self-hosted from the CTM design system (app/assets/css/main.css).
+  ui: {
+    fonts: false
   },
 
   // Server-only values are overridden at runtime by NUXT_* env vars

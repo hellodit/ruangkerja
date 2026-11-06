@@ -111,21 +111,37 @@ const providers = [{ label: 'Lanjutkan dengan Google', icon: 'i-simple-icons-goo
 
 <template>
   <div class="space-y-6">
-    <div v-if="linkSent" class="space-y-4 text-center">
-      <UIcon name="i-lucide-mail-check" class="mx-auto size-10 text-brand-ink" />
+    <div
+      v-if="linkSent"
+      class="space-y-4 text-center"
+    >
+      <UIcon
+        name="i-lucide-mail-check"
+        class="mx-auto size-10 text-brand-ink"
+      />
       <h1 class="text-xl font-semibold text-highlighted">
         Cek email Anda
       </h1>
       <p class="text-muted">
         Jika email tersebut terdaftar, tautan masuk sudah dikirim. Tautan berlaku 15 menit.
       </p>
-      <UButton color="neutral" variant="outline" block @click="linkSent = false">
+      <UButton
+        color="neutral"
+        variant="outline"
+        block
+        @click="linkSent = false"
+      >
         Kembali
       </UButton>
     </div>
 
     <template v-else>
-      <UTabs v-model="mode" :items="tabs" :content="false" class="w-full" />
+      <UTabs
+        v-model="mode"
+        :items="tabs"
+        :content="false"
+        class="w-full"
+      />
 
       <UAuthForm
         v-if="mode === 'password'"
@@ -140,19 +156,35 @@ const providers = [{ label: 'Lanjutkan dengan Google', icon: 'i-simple-icons-goo
       >
         <template #description>
           Belum punya akun?
-          <ULink to="/register" class="font-medium text-brand-ink">
+          <ULink
+            to="/register"
+            class="font-medium text-brand-ink"
+          >
             Daftar
           </ULink>
         </template>
         <template #password-hint>
-          <ULink to="/forgot-password" class="text-sm font-medium text-brand-ink" tabindex="-1">
+          <ULink
+            to="/forgot-password"
+            class="text-sm font-medium text-brand-ink"
+            tabindex="-1"
+          >
             Lupa kata sandi?
           </ULink>
         </template>
         <template #validation>
           <div class="space-y-3">
-            <UAlert v-if="formError || oauthError" color="error" variant="subtle" icon="i-lucide-circle-alert" :title="formError || oauthError" />
-            <CaptchaField ref="captchaField" v-model="captcha" />
+            <UAlert
+              v-if="formError || oauthError"
+              color="error"
+              variant="subtle"
+              icon="i-lucide-circle-alert"
+              :title="formError || oauthError"
+            />
+            <CaptchaField
+              ref="captchaField"
+              v-model="captcha"
+            />
           </div>
         </template>
       </UAuthForm>
@@ -169,8 +201,17 @@ const providers = [{ label: 'Lanjutkan dengan Google', icon: 'i-simple-icons-goo
       >
         <template #validation>
           <div class="space-y-3">
-            <UAlert v-if="formError || oauthError" color="error" variant="subtle" icon="i-lucide-circle-alert" :title="formError || oauthError" />
-            <CaptchaField ref="captchaField" v-model="captcha" />
+            <UAlert
+              v-if="formError || oauthError"
+              color="error"
+              variant="subtle"
+              icon="i-lucide-circle-alert"
+              :title="formError || oauthError"
+            />
+            <CaptchaField
+              ref="captchaField"
+              v-model="captcha"
+            />
           </div>
         </template>
       </UAuthForm>

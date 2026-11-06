@@ -82,23 +82,54 @@ function onPeriodSaved() {
             Periode evaluasi
           </h2>
         </template>
-        <PeriodSettingsForm :key="skp?.skp?.id ?? 'new'" :initial="skp?.skp" :today="skp?.today ?? todayInTimeZone('Asia/Jakarta')" @saved="onPeriodSaved" />
+        <PeriodSettingsForm
+          :key="skp?.skp?.id ?? 'new'"
+          :initial="skp?.skp"
+          :today="skp?.today ?? todayInTimeZone('Asia/Jakarta')"
+          @saved="onPeriodSaved"
+        />
       </UCard>
 
-      <section aria-labelledby="ob-rhk-title" class="flex flex-col gap-3">
+      <section
+        aria-labelledby="ob-rhk-title"
+        class="flex flex-col gap-3"
+      >
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <h2 id="ob-rhk-title" class="text-lg font-semibold text-highlighted">
+          <h2
+            id="ob-rhk-title"
+            class="text-lg font-semibold text-highlighted"
+          >
             RHK kamu
           </h2>
-          <UButton v-if="skp?.skp" color="neutral" variant="ghost" icon="i-lucide-clipboard-paste" @click="bulkOpen = true">
+          <UButton
+            v-if="skp?.skp"
+            color="neutral"
+            variant="ghost"
+            icon="i-lucide-clipboard-paste"
+            @click="bulkOpen = true"
+          >
             Tempel beberapa RHK
           </UButton>
         </div>
 
-        <UAlert v-if="!skp?.skp" color="warning" variant="subtle" icon="i-lucide-calendar" title="Simpan periode evaluasi dulu" description="RHK disimpan untuk tahun SKP yang dipilih." />
+        <UAlert
+          v-if="!skp?.skp"
+          color="warning"
+          variant="subtle"
+          icon="i-lucide-calendar"
+          title="Simpan periode evaluasi dulu"
+          description="RHK disimpan untuk tahun SKP yang dipilih."
+        />
 
-        <UCard v-if="rhks.length" :ui="{ body: 'p-0 sm:p-0' }">
-          <UAccordion v-model="openItem" :items="items" :ui="{ item: 'px-4 sm:px-6', trigger: 'py-4' }">
+        <UCard
+          v-if="rhks.length"
+          :ui="{ body: 'p-0 sm:p-0' }"
+        >
+          <UAccordion
+            v-model="openItem"
+            :items="items"
+            :ui="{ item: 'px-4 sm:px-6', trigger: 'py-4' }"
+          >
             <template #leading="{ item }">
               <UIcon
                 :name="rhks.find(r => r.id === item.value)?.indicators.length ? 'i-lucide-circle-check' : 'i-lucide-clock'"
@@ -107,10 +138,18 @@ function onPeriodSaved() {
               />
             </template>
             <template #default="{ item }">
-              <span v-for="r in rhks.filter(x => x.id === item.value)" :key="r.id" class="flex min-w-0 flex-col gap-1 text-left">
+              <span
+                v-for="r in rhks.filter(x => x.id === item.value)"
+                :key="r.id"
+                class="flex min-w-0 flex-col gap-1 text-left"
+              >
                 <span class="flex flex-wrap items-center gap-2">
                   <span class="text-xs font-semibold tracking-wide text-muted uppercase">RHK {{ r.number }}</span>
-                  <UBadge color="neutral" variant="subtle" size="sm">{{ RHK_TYPE_LABELS[r.type] }}</UBadge>
+                  <UBadge
+                    color="neutral"
+                    variant="subtle"
+                    size="sm"
+                  >{{ RHK_TYPE_LABELS[r.type] }}</UBadge>
                 </span>
                 <span class="font-semibold text-highlighted">{{ r.statement }}</span>
                 <span class="text-sm text-muted">{{ summary(r) }}</span>
@@ -135,33 +174,67 @@ function onPeriodSaved() {
         <UCard v-if="adding && skp?.skp">
           <template #header>
             <div class="flex items-center gap-2">
-              <UBadge color="info" variant="subtle">
+              <UBadge
+                color="info"
+                variant="subtle"
+              >
                 Sedang diisi
               </UBadge>
               <span class="text-sm font-semibold text-highlighted">RHK {{ rhks.length + 1 }}</span>
             </div>
           </template>
-          <RhkForm :cancelable="rhks.length > 0" @saved="onSaved" @cancel="adding = false" />
+          <RhkForm
+            :cancelable="rhks.length > 0"
+            @saved="onSaved"
+            @cancel="adding = false"
+          />
         </UCard>
 
-        <UButton v-if="skp?.skp && !adding" color="neutral" variant="outline" icon="i-lucide-plus" class="self-start" @click="adding = true">
+        <UButton
+          v-if="skp?.skp && !adding"
+          color="neutral"
+          variant="outline"
+          icon="i-lucide-plus"
+          class="self-start"
+          @click="adding = true"
+        >
           Tambah RHK
         </UButton>
       </section>
     </div>
 
-    <UModal v-model:open="bulkOpen" title="Tempel beberapa RHK" description="Satu RHK per baris, salin dari SKP yang sudah disetujui. Indikator dilengkapi setelahnya.">
+    <UModal
+      v-model:open="bulkOpen"
+      title="Tempel beberapa RHK"
+      description="Satu RHK per baris, salin dari SKP yang sudah disetujui. Indikator dilengkapi setelahnya."
+    >
       <template #body>
-        <UFormField label="Daftar RHK" name="text">
-          <UTextarea v-model="bulkText" :rows="8" class="w-full" placeholder="1. Tersusunnya kajian kebijakan perencanaan pembangunan daerah&#10;2. Terlaksananya fasilitasi forum konsultasi publik" />
+        <UFormField
+          label="Daftar RHK"
+          name="text"
+        >
+          <UTextarea
+            v-model="bulkText"
+            :rows="8"
+            class="w-full"
+            placeholder="1. Tersusunnya kajian kebijakan perencanaan pembangunan daerah&#10;2. Terlaksananya fasilitasi forum konsultasi publik"
+          />
         </UFormField>
       </template>
       <template #footer>
         <div class="flex w-full justify-end gap-2">
-          <UButton color="neutral" variant="ghost" @click="bulkOpen = false">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            @click="bulkOpen = false"
+          >
             Batal
           </UButton>
-          <UButton :loading="bulkSaving" :disabled="!bulkText.trim()" @click="saveBulk">
+          <UButton
+            :loading="bulkSaving"
+            :disabled="!bulkText.trim()"
+            @click="saveBulk"
+          >
             Tambahkan RHK
           </UButton>
         </div>
@@ -169,17 +242,33 @@ function onPeriodSaved() {
     </UModal>
 
     <template #footer>
-      <UButton to="/onboarding/profil" color="neutral" variant="outline" size="lg" icon="i-lucide-chevron-left">
+      <UButton
+        to="/onboarding/profil"
+        color="neutral"
+        variant="outline"
+        size="lg"
+        icon="i-lucide-chevron-left"
+      >
         Kembali
       </UButton>
       <span class="min-w-60 flex-1 text-sm text-muted">
         <template v-if="incomplete">{{ incomplete }} RHK belum punya indikator.</template>
         <template v-else>{{ rhks.length }} RHK tersimpan. RHK lain bisa ditambah kapan saja dari menu RHK saya.</template>
       </span>
-      <UButton color="neutral" variant="ghost" size="lg" @click="notify.success('Tersimpan', 'Lanjutkan kapan saja.')">
+      <UButton
+        color="neutral"
+        variant="ghost"
+        size="lg"
+        @click="notify.success('Tersimpan', 'Lanjutkan kapan saja.')"
+      >
         Simpan dan lanjutkan nanti
       </UButton>
-      <UButton to="/onboarding/ringkasan" size="lg" trailing-icon="i-lucide-chevron-right" :disabled="!canContinue">
+      <UButton
+        to="/onboarding/ringkasan"
+        size="lg"
+        trailing-icon="i-lucide-chevron-right"
+        :disabled="!canContinue"
+      >
         Lanjut
       </UButton>
     </template>

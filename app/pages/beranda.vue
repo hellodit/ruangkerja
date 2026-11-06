@@ -35,14 +35,21 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
           <UDashboardSidebarCollapse />
         </template>
         <template #right>
-          <DeadlineBadge v-if="d" :deadline="d.period.submissionDeadline" :today="d.today" />
+          <DeadlineBadge
+            v-if="d"
+            :deadline="d.period.submissionDeadline"
+            :today="d.today"
+          />
         </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
       <StartFromRhk v-if="!d" />
-      <div v-else class="mx-auto flex w-full max-w-6xl flex-col gap-6">
+      <div
+        v-else
+        class="mx-auto flex w-full max-w-6xl flex-col gap-6"
+      >
         <div class="flex flex-col gap-1">
           <span class="text-xs font-semibold tracking-[1.1px] text-muted uppercase">{{ formatDateLong(d.today) }}</span>
           <h2 class="text-2xl font-bold text-highlighted sm:text-3xl">
@@ -94,15 +101,32 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                       {{ formatRange(d.week.start, d.week.end) }} · {{ d.week.count }} catatan · rata-rata {{ formatNumber(Math.round(avg * 10) / 10) }} per hari kerja
                     </p>
                   </div>
-                  <UButton to="/progres" color="neutral" variant="ghost" size="sm" trailing-icon="i-lucide-chevron-right">
+                  <UButton
+                    to="/progres"
+                    color="neutral"
+                    variant="ghost"
+                    size="sm"
+                    trailing-icon="i-lucide-chevron-right"
+                  >
                     Lihat progres harian
                   </UButton>
                 </div>
               </template>
-              <div role="img" :aria-label="`Jumlah progres harian per hari: ${chartLabel}`" class="flex flex-col gap-2">
+              <div
+                role="img"
+                :aria-label="`Jumlah progres harian per hari: ${chartLabel}`"
+                class="flex flex-col gap-2"
+              >
                 <div class="grid h-40 grid-cols-5 gap-4 border-b border-default px-2">
-                  <div v-for="p in d.week.perDay" :key="p.date" class="flex h-full flex-col items-center justify-end gap-1.5">
-                    <span class="text-xs font-semibold" :class="p.date === d.today ? 'text-highlighted' : 'text-muted'">{{ p.count }}</span>
+                  <div
+                    v-for="p in d.week.perDay"
+                    :key="p.date"
+                    class="flex h-full flex-col items-center justify-end gap-1.5"
+                  >
+                    <span
+                      class="text-xs font-semibold"
+                      :class="p.date === d.today ? 'text-highlighted' : 'text-muted'"
+                    >{{ p.count }}</span>
                     <div
                       class="w-full max-w-14 rounded-t-md"
                       :class="p.date === d.today ? 'bg-primary' : 'bg-brand-200 dark:bg-brand-800'"
@@ -111,7 +135,11 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                   </div>
                 </div>
                 <div class="grid grid-cols-5 gap-4 px-2 text-center text-xs text-muted">
-                  <span v-for="p in d.week.perDay" :key="p.date" :class="p.date === d.today && 'font-semibold text-highlighted'">
+                  <span
+                    v-for="p in d.week.perDay"
+                    :key="p.date"
+                    :class="p.date === d.today && 'font-semibold text-highlighted'"
+                  >
                     {{ DAYS_SHORT_ID[dayOfWeek(p.date)] }} {{ Number(p.date.slice(8)) }}<template v-if="p.date === d.today"> · hari ini</template>
                   </span>
                 </div>
@@ -124,24 +152,53 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                   <h3 class="text-lg font-semibold text-highlighted">
                     Rencana aksi prioritas
                   </h3>
-                  <UButton to="/rhk" color="neutral" variant="ghost" size="sm" trailing-icon="i-lucide-chevron-right">
+                  <UButton
+                    to="/rhk"
+                    color="neutral"
+                    variant="ghost"
+                    size="sm"
+                    trailing-icon="i-lucide-chevron-right"
+                  >
                     Lihat semua
                   </UButton>
                 </div>
               </template>
-              <p v-if="!d.priority.length" class="text-sm text-muted">
+              <p
+                v-if="!d.priority.length"
+                class="text-sm text-muted"
+              >
                 Tidak ada rencana aksi terbuka di periode ini.
               </p>
-              <ul v-else class="divide-y divide-default">
-                <li v-for="p in d.priority" :key="p.id" class="flex flex-wrap items-center gap-x-4 gap-y-2 py-3.5">
+              <ul
+                v-else
+                class="divide-y divide-default"
+              >
+                <li
+                  v-for="p in d.priority"
+                  :key="p.id"
+                  class="flex flex-wrap items-center gap-x-4 gap-y-2 py-3.5"
+                >
                   <div class="flex min-w-60 flex-1 flex-col gap-0.5">
-                    <NuxtLink :to="`/rhk/${p.rhkId}`" class="text-sm font-semibold text-highlighted hover:underline">
+                    <NuxtLink
+                      :to="`/rhk/${p.rhkId}`"
+                      class="text-sm font-semibold text-highlighted hover:underline"
+                    >
                       {{ p.name }}
                     </NuxtLink>
                     <span class="text-xs text-muted">RHK {{ p.rhkNumber }} · Realisasi {{ formatNumber(p.realization) }} dari {{ formatNumber(p.target) }} {{ p.unit }}</span>
                   </div>
-                  <UProgress :model-value="p.achievement" size="sm" class="w-30" :aria-label="`Realisasi ${p.name}`" />
-                  <PlanStatusBadge :status="p.status" :overdue="p.overdue" :due-date="p.dueDate" with-date />
+                  <UProgress
+                    :model-value="p.achievement"
+                    size="sm"
+                    class="w-30"
+                    :aria-label="`Realisasi ${p.name}`"
+                  />
+                  <PlanStatusBadge
+                    :status="p.status"
+                    :overdue="p.overdue"
+                    :due-date="p.dueDate"
+                    with-date
+                  />
                 </li>
               </ul>
             </UCard>
@@ -157,25 +214,49 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                   <span class="text-xs text-muted">{{ d.todayEntries.length }} catatan</span>
                 </div>
               </template>
-              <div v-if="!d.todayEntries.length" class="flex flex-col items-start gap-3">
+              <div
+                v-if="!d.todayEntries.length"
+                class="flex flex-col items-start gap-3"
+              >
                 <p class="text-sm text-muted">
                   Belum ada catatan hari ini.
                 </p>
-                <UButton to="/progres/tambah" icon="i-lucide-plus" size="sm">
+                <UButton
+                  to="/progres/tambah"
+                  icon="i-lucide-plus"
+                  size="sm"
+                >
                   Tambah progres
                 </UButton>
               </div>
-              <ul v-else class="flex flex-col gap-4">
-                <li v-for="e in d.todayEntries" :key="e.id" class="grid grid-cols-[84px_minmax(0,1fr)_auto] gap-3">
+              <ul
+                v-else
+                class="flex flex-col gap-4"
+              >
+                <li
+                  v-for="e in d.todayEntries"
+                  :key="e.id"
+                  class="grid grid-cols-[84px_minmax(0,1fr)_auto] gap-3"
+                >
                   <span class="font-mono text-xs leading-5 text-muted">{{ formatTime(e.startTime) }}–{{ formatTime(e.endTime) }}</span>
                   <div class="flex flex-col gap-1">
                     <span class="text-sm">{{ e.description }}</span>
-                    <span class="text-xs" :class="e.evidenceCount ? 'text-muted' : 'text-warning'">
+                    <span
+                      class="text-xs"
+                      :class="e.evidenceCount ? 'text-muted' : 'text-warning'"
+                    >
                       {{ e.planName }} · {{ e.evidenceCount ? `${e.evidenceCount} bukti` : 'Belum ada bukti' }}
                     </span>
                   </div>
                   <UTooltip text="Salin untuk e-Kinerja">
-                    <UButton icon="i-lucide-copy" color="neutral" variant="ghost" size="sm" aria-label="Salin untuk e-Kinerja" @click="copy(formatEkinerjaCopy([e.ekinerja]))" />
+                    <UButton
+                      icon="i-lucide-copy"
+                      color="neutral"
+                      variant="ghost"
+                      size="sm"
+                      aria-label="Salin untuk e-Kinerja"
+                      @click="copy(formatEkinerjaCopy([e.ekinerja]))"
+                    />
                   </UTooltip>
                 </li>
               </ul>
@@ -188,13 +269,24 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                 </h3>
               </template>
               <ul class="flex flex-col gap-5">
-                <li v-for="r in d.perRhk" :key="r.id" class="flex flex-col gap-1.5">
+                <li
+                  v-for="r in d.perRhk"
+                  :key="r.id"
+                  class="flex flex-col gap-1.5"
+                >
                   <div class="flex justify-between gap-2 text-sm">
-                    <NuxtLink :to="`/rhk/${r.id}`" class="font-semibold text-highlighted hover:underline">RHK {{ r.number }}</NuxtLink>
+                    <NuxtLink
+                      :to="`/rhk/${r.id}`"
+                      class="font-semibold text-highlighted hover:underline"
+                    >RHK {{ r.number }}</NuxtLink>
                     <span class="text-muted tabular-nums">{{ r.done }} dari {{ r.total }}</span>
                   </div>
                   <span class="text-xs text-muted">{{ r.statement }}</span>
-                  <UProgress :model-value="r.total ? Math.round(r.done / r.total * 100) : 0" size="sm" :aria-label="`RHK ${r.number}`" />
+                  <UProgress
+                    :model-value="r.total ? Math.round(r.done / r.total * 100) : 0"
+                    size="sm"
+                    :aria-label="`RHK ${r.number}`"
+                  />
                 </li>
               </ul>
             </UCard>

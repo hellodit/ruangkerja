@@ -6,6 +6,10 @@ import { profileSchema, type ProfileInput } from '#shared/schemas/workspace'
 const emit = defineEmits<{ saved: [] }>()
 
 const notify = useNotify()
+const form = useTemplateRef<{ submit: () => Promise<void> }>('form')
+const saving = ref(false)
+defineExpose({ submit: () => form.value?.submit(), saving })
+
 const { data } = await useFetch('/api/profile', { key: 'profile' })
 
 type ProfileState = Omit<ProfileInput, 'gender' | 'employmentStatus'> & { email: string, gender?: 'perempuan' | 'laki_laki', employmentStatus?: 'pns' | 'pppk' }
@@ -19,9 +23,6 @@ watch(data, (d) => {
   }
 }, { immediate: true })
 
-const form = useTemplateRef<{ submit: () => Promise<void> }>('form')
-const saving = ref(false)
-
 async function onSubmit(event: FormSubmitEvent<ReturnType<typeof profileSchema.parse>>) {
   saving.value = true
   try {
@@ -34,12 +35,16 @@ async function onSubmit(event: FormSubmitEvent<ReturnType<typeof profileSchema.p
     saving.value = false
   }
 }
-
-defineExpose({ submit: () => form.value?.submit(), saving })
 </script>
 
 <template>
-  <UForm ref="form" :schema="profileSchema" :state="state" class="flex flex-col gap-6" @submit="onSubmit">
+  <UForm
+    ref="form"
+    :schema="profileSchema"
+    :state="state"
+    class="flex flex-col gap-6"
+    @submit="onSubmit"
+  >
     <UCard>
       <template #header>
         <h2 class="text-lg font-semibold text-highlighted">
@@ -47,27 +52,67 @@ defineExpose({ submit: () => form.value?.submit(), saving })
         </h2>
       </template>
       <div class="grid gap-x-6 gap-y-5 sm:grid-cols-2">
-        <UFormField label="Nama lengkap" name="name" required>
-          <UInput v-model="state.name" autocomplete="name" />
+        <UFormField
+          label="Nama lengkap"
+          name="name"
+          required
+        >
+          <UInput
+            v-model="state.name"
+            autocomplete="name"
+          />
         </UFormField>
-        <UFormField label="Email" name="email" help="Email akun untuk masuk.">
-          <UInput :model-value="state.email" type="email" disabled />
+        <UFormField
+          label="Email"
+          name="email"
+          help="Email akun untuk masuk."
+        >
+          <UInput
+            :model-value="state.email"
+            type="email"
+            disabled
+          />
         </UFormField>
-        <UFormField label="Nomor WhatsApp" name="phoneWhatsapp">
-          <UInput v-model="state.phoneWhatsapp" type="tel" placeholder="0812 0000 0000" autocomplete="tel" />
+        <UFormField
+          label="Nomor WhatsApp"
+          name="phoneWhatsapp"
+        >
+          <UInput
+            v-model="state.phoneWhatsapp"
+            type="tel"
+            placeholder="0812 0000 0000"
+            autocomplete="tel"
+          />
         </UFormField>
-        <UFormField label="Tanggal lahir" name="birthDate">
-          <UInput v-model="state.birthDate" type="date" />
+        <UFormField
+          label="Tanggal lahir"
+          name="birthDate"
+        >
+          <UInput
+            v-model="state.birthDate"
+            type="date"
+          />
         </UFormField>
-        <UFormField label="Jenis kelamin" name="gender">
+        <UFormField
+          label="Jenis kelamin"
+          name="gender"
+        >
           <URadioGroup
             v-model="state.gender"
             orientation="horizontal"
             :items="[{ label: 'Perempuan', value: 'perempuan' }, { label: 'Laki-laki', value: 'laki_laki' }]"
           />
         </UFormField>
-        <UFormField label="Alamat" name="address" class="sm:col-span-2">
-          <UTextarea v-model="state.address" :rows="2" autoresize />
+        <UFormField
+          label="Alamat"
+          name="address"
+          class="sm:col-span-2"
+        >
+          <UTextarea
+            v-model="state.address"
+            :rows="2"
+            autoresize
+          />
         </UFormField>
       </div>
     </UCard>
@@ -79,23 +124,67 @@ defineExpose({ submit: () => form.value?.submit(), saving })
         </h2>
       </template>
       <div class="grid gap-x-6 gap-y-5 sm:grid-cols-2">
-        <UFormField label="NIP" name="nip" hint="Opsional" help="Disimpan terenkripsi.">
-          <UInput v-model="state.nip" inputmode="numeric" maxlength="18" placeholder="18 angka" />
+        <UFormField
+          label="NIP"
+          name="nip"
+          hint="Opsional"
+          help="Disimpan terenkripsi."
+        >
+          <UInput
+            v-model="state.nip"
+            inputmode="numeric"
+            maxlength="18"
+            placeholder="18 angka"
+          />
         </UFormField>
-        <UFormField label="Status kepegawaian" name="employmentStatus">
-          <URadioGroup v-model="state.employmentStatus" orientation="horizontal" :items="[{ label: 'PNS', value: 'pns' }, { label: 'PPPK', value: 'pppk' }]" />
+        <UFormField
+          label="Status kepegawaian"
+          name="employmentStatus"
+        >
+          <URadioGroup
+            v-model="state.employmentStatus"
+            orientation="horizontal"
+            :items="[{ label: 'PNS', value: 'pns' }, { label: 'PPPK', value: 'pppk' }]"
+          />
         </UFormField>
-        <UFormField label="Pangkat/golongan" name="rankGrade">
-          <UInput v-model="state.rankGrade" placeholder="Contoh: Penata Muda Tingkat I, III/b" />
+        <UFormField
+          label="Pangkat/golongan"
+          name="rankGrade"
+        >
+          <UInput
+            v-model="state.rankGrade"
+            placeholder="Contoh: Penata Muda Tingkat I, III/b"
+          />
         </UFormField>
-        <UFormField label="Jabatan" name="positionTitle" required>
-          <UInput v-model="state.positionTitle" placeholder="Contoh: Perencana Ahli Pertama" />
+        <UFormField
+          label="Jabatan"
+          name="positionTitle"
+          required
+        >
+          <UInput
+            v-model="state.positionTitle"
+            placeholder="Contoh: Perencana Ahli Pertama"
+          />
         </UFormField>
-        <UFormField label="Unit kerja" name="workUnit" required>
-          <UInput v-model="state.workUnit" placeholder="Contoh: Bidang Perekonomian" />
+        <UFormField
+          label="Unit kerja"
+          name="workUnit"
+          required
+        >
+          <UInput
+            v-model="state.workUnit"
+            placeholder="Contoh: Bidang Perekonomian"
+          />
         </UFormField>
-        <UFormField label="Instansi" name="agency" required>
-          <UInput v-model="state.agency" placeholder="Contoh: Bappeda Kabupaten Contoh" />
+        <UFormField
+          label="Instansi"
+          name="agency"
+          required
+        >
+          <UInput
+            v-model="state.agency"
+            placeholder="Contoh: Bappeda Kabupaten Contoh"
+          />
         </UFormField>
       </div>
     </UCard>
@@ -110,10 +199,16 @@ defineExpose({ submit: () => form.value?.submit(), saving })
         </p>
       </template>
       <div class="grid gap-x-6 gap-y-5 sm:grid-cols-2">
-        <UFormField label="Nama atasan" name="supervisorName">
+        <UFormField
+          label="Nama atasan"
+          name="supervisorName"
+        >
           <UInput v-model="state.supervisorName" />
         </UFormField>
-        <UFormField label="Jabatan atasan" name="supervisorTitle">
+        <UFormField
+          label="Jabatan atasan"
+          name="supervisorTitle"
+        >
           <UInput v-model="state.supervisorTitle" />
         </UFormField>
       </div>

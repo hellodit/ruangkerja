@@ -63,13 +63,26 @@ async function onPeriodSaved() {
           </p>
         </template>
         <template #right>
-          <UButton color="neutral" variant="outline" icon="i-lucide-calendar" @click="periodOpen = true">
+          <UButton
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-calendar"
+            @click="periodOpen = true"
+          >
             Ubah periode evaluasi
           </UButton>
-          <UButton color="neutral" variant="ghost" icon="i-lucide-clipboard-paste" @click="bulkOpen = true">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            icon="i-lucide-clipboard-paste"
+            @click="bulkOpen = true"
+          >
             Tempel beberapa RHK
           </UButton>
-          <UButton to="/rhk/tambah" icon="i-lucide-plus">
+          <UButton
+            to="/rhk/tambah"
+            icon="i-lucide-plus"
+          >
             Tambah RHK
           </UButton>
         </template>
@@ -93,31 +106,58 @@ async function onPeriodSaved() {
           :actions="[{ label: 'Tambah RHK', to: '/rhk/tambah', icon: 'i-lucide-plus' }]"
         />
 
-        <UCard v-for="r in rhks" :key="r.id">
+        <UCard
+          v-for="r in rhks"
+          :key="r.id"
+        >
           <div class="flex flex-col gap-4">
             <div class="flex flex-wrap items-start justify-between gap-3">
               <div class="flex min-w-0 flex-1 flex-col gap-1.5">
                 <div class="flex flex-wrap items-center gap-2">
                   <RhkTag :number="r.number" />
-                  <UBadge color="neutral" variant="subtle" size="sm">
+                  <UBadge
+                    color="neutral"
+                    variant="subtle"
+                    size="sm"
+                  >
                     {{ RHK_TYPE_LABELS[r.type] }}
                   </UBadge>
                 </div>
                 <h2 class="text-lg font-semibold text-highlighted">
-                  <NuxtLink :to="`/rhk/${r.id}`" class="hover:underline">
+                  <NuxtLink
+                    :to="`/rhk/${r.id}`"
+                    class="hover:underline"
+                  >
                     {{ r.statement }}
                   </NuxtLink>
                 </h2>
-                <p v-if="r.supervisorRhk" class="text-sm text-muted">
+                <p
+                  v-if="r.supervisorRhk"
+                  class="text-sm text-muted"
+                >
                   Mendukung RHK atasan: {{ r.supervisorRhk }}
                 </p>
               </div>
-              <UButton :to="`/rhk/${r.id}/ubah`" icon="i-lucide-pencil" color="neutral" variant="ghost" size="sm" :aria-label="`Ubah RHK ${r.number}`">
+              <UButton
+                :to="`/rhk/${r.id}/ubah`"
+                icon="i-lucide-pencil"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                :aria-label="`Ubah RHK ${r.number}`"
+              >
                 Ubah
               </UButton>
             </div>
 
-            <UAlert v-if="!r.indicators.length" color="warning" variant="subtle" icon="i-lucide-triangle-alert" title="Belum ada indikator" description="Tambahkan indikator dan target tahunan lewat tombol Ubah." />
+            <UAlert
+              v-if="!r.indicators.length"
+              color="warning"
+              variant="subtle"
+              icon="i-lucide-triangle-alert"
+              title="Belum ada indikator"
+              description="Tambahkan indikator dan target tahunan lewat tombol Ubah."
+            />
             <UTable
               v-else
               :data="r.indicators"
@@ -139,7 +179,13 @@ async function onPeriodSaved() {
               <span class="text-sm text-muted">
                 <template v-if="data?.current">{{ data.current.label }}: </template>{{ summaryText(r.summary) }}
               </span>
-              <UButton :to="`/rhk/${r.id}`" color="neutral" variant="ghost" size="sm" trailing-icon="i-lucide-chevron-right">
+              <UButton
+                :to="`/rhk/${r.id}`"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                trailing-icon="i-lucide-chevron-right"
+              >
                 Buka detail RHK
               </UButton>
             </div>
@@ -149,30 +195,57 @@ async function onPeriodSaved() {
           Perubahan RHK di RuangKerja tidak mengubah SKP resmi di e-Kinerja.
         </p>
       </div>
+      <UModal
+        v-model:open="periodOpen"
+        title="Periode evaluasi"
+        :ui="{ content: 'sm:max-w-2xl' }"
+      >
+        <template #body>
+          <PeriodSettingsForm
+            :initial="skp?.skp"
+            :today="skp?.today ?? todayInTimeZone('Asia/Jakarta')"
+            @saved="onPeriodSaved"
+          />
+        </template>
+      </UModal>
+
+      <UModal
+        v-model:open="bulkOpen"
+        title="Tempel beberapa RHK"
+        description="Satu RHK per baris, salin dari SKP yang sudah disetujui. Indikator dilengkapi setelahnya."
+      >
+        <template #body>
+          <UFormField
+            label="Daftar RHK"
+            name="text"
+          >
+            <UTextarea
+              v-model="bulkText"
+              :rows="8"
+              class="w-full"
+              placeholder="1. Tersusunnya kajian kebijakan perencanaan pembangunan daerah&#10;2. Terlaksananya fasilitasi forum konsultasi publik"
+            />
+          </UFormField>
+        </template>
+        <template #footer>
+          <div class="flex w-full justify-end gap-2">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              @click="bulkOpen = false"
+            >
+              Batal
+            </UButton>
+            <UButton
+              :loading="bulkSaving"
+              :disabled="!bulkText.trim()"
+              @click="saveBulk"
+            >
+              Tambahkan RHK
+            </UButton>
+          </div>
+        </template>
+      </UModal>
     </template>
   </UDashboardPanel>
-
-  <UModal v-model:open="periodOpen" title="Periode evaluasi" :ui="{ content: 'sm:max-w-2xl' }">
-    <template #body>
-      <PeriodSettingsForm :initial="skp?.skp" :today="skp?.today ?? todayInTimeZone('Asia/Jakarta')" @saved="onPeriodSaved" />
-    </template>
-  </UModal>
-
-  <UModal v-model:open="bulkOpen" title="Tempel beberapa RHK" description="Satu RHK per baris, salin dari SKP yang sudah disetujui. Indikator dilengkapi setelahnya.">
-    <template #body>
-      <UFormField label="Daftar RHK" name="text">
-        <UTextarea v-model="bulkText" :rows="8" class="w-full" placeholder="1. Tersusunnya kajian kebijakan perencanaan pembangunan daerah&#10;2. Terlaksananya fasilitasi forum konsultasi publik" />
-      </UFormField>
-    </template>
-    <template #footer>
-      <div class="flex w-full justify-end gap-2">
-        <UButton color="neutral" variant="ghost" @click="bulkOpen = false">
-          Batal
-        </UButton>
-        <UButton :loading="bulkSaving" :disabled="!bulkText.trim()" @click="saveBulk">
-          Tambahkan RHK
-        </UButton>
-      </div>
-    </template>
-  </UModal>
 </template>

@@ -13,13 +13,23 @@ async function onSaved(id: string) {
     <template #header>
       <UDashboardNavbar title="Tambah RHK">
         <template #leading>
-          <UButton to="/rhk" icon="i-lucide-chevron-left" color="neutral" variant="ghost" aria-label="Kembali ke RHK saya" />
+          <UButton
+            to="/rhk"
+            icon="i-lucide-chevron-left"
+            color="neutral"
+            variant="ghost"
+            aria-label="Kembali ke RHK saya"
+          />
         </template>
       </UDashboardNavbar>
     </template>
     <template #body>
       <UCard class="mx-auto w-full max-w-4xl">
-        <RhkForm cancelable @saved="onSaved" @cancel="navigateTo('/rhk')" />
+        <RhkForm
+          cancelable
+          @saved="onSaved"
+          @cancel="navigateTo('/rhk')"
+        />
       </UCard>
     </template>
   </UDashboardPanel>

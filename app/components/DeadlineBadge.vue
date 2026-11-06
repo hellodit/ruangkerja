@@ -10,8 +10,16 @@ const label = computed(() => {
 </script>
 
 <template>
-  <UBadge :color="days <= 3 ? 'error' : 'warning'" variant="subtle" size="lg" class="whitespace-nowrap">
-    <span class="size-1.5 rounded-full bg-current" aria-hidden="true" />
+  <UBadge
+    :color="days <= 3 ? 'error' : 'warning'"
+    variant="subtle"
+    size="lg"
+    class="whitespace-nowrap"
+  >
+    <span
+      class="size-1.5 rounded-full bg-current"
+      aria-hidden="true"
+    />
     {{ label }}
   </UBadge>
 </template>

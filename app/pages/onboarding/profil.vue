@@ -30,14 +30,26 @@ function submit(mode: 'continue' | 'later') {
         Data dari pendaftaran sudah terisi. Periksa, lalu lengkapi yang masih kosong.
       </p>
     </div>
-    <ProfileForm ref="form" @saved="onSaved" />
+    <ProfileForm
+      ref="form"
+      @saved="onSaved"
+    />
 
     <template #footer>
       <span class="flex-1 text-sm text-muted">Langkah 1 dari 3</span>
-      <UButton color="neutral" variant="ghost" size="lg" @click="submit('later')">
+      <UButton
+        color="neutral"
+        variant="ghost"
+        size="lg"
+        @click="submit('later')"
+      >
         Simpan dan lanjutkan nanti
       </UButton>
-      <UButton size="lg" trailing-icon="i-lucide-chevron-right" @click="submit('continue')">
+      <UButton
+        size="lg"
+        trailing-icon="i-lucide-chevron-right"
+        @click="submit('continue')"
+      >
         Lanjut
       </UButton>
     </template>

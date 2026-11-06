@@ -67,14 +67,26 @@ async function signUpWithGoogle() {
   >
     <template #description>
       Sudah punya akun?
-      <ULink to="/login" class="font-medium text-brand-ink">
+      <ULink
+        to="/login"
+        class="font-medium text-brand-ink"
+      >
         Masuk
       </ULink>
     </template>
     <template #validation>
       <div class="space-y-3">
-        <UAlert v-if="formError" color="error" variant="subtle" icon="i-lucide-circle-alert" :title="formError" />
-        <CaptchaField ref="captchaField" v-model="captcha" />
+        <UAlert
+          v-if="formError"
+          color="error"
+          variant="subtle"
+          icon="i-lucide-circle-alert"
+          :title="formError"
+        />
+        <CaptchaField
+          ref="captchaField"
+          v-model="captcha"
+        />
       </div>
     </template>
     <template #footer>

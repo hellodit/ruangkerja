@@ -74,9 +74,10 @@
 }
 
 /* Brand-colored text on light surfaces must use brand-800 (5.4:1), never the fill. */
-.text-brand-ink {
+@utility text-brand-ink {
   color: var(--color-brand-800);
-}
-.dark .text-brand-ink {
-  color: var(--color-brand-400);
+
+  @variant dark {
+    color: var(--color-brand-400);
+  }
 }

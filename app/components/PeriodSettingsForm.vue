@@ -39,16 +39,41 @@ async function onSubmit(event: FormSubmitEvent<SkpInput>) {
 </script>
 
 <template>
-  <UForm :schema="skpSchema" :state="state" class="flex flex-col gap-5" @submit="onSubmit">
+  <UForm
+    :schema="skpSchema"
+    :state="state"
+    class="flex flex-col gap-5"
+    @submit="onSubmit"
+  >
     <div class="grid gap-x-6 gap-y-5 md:grid-cols-3">
-      <UFormField label="Tahun SKP" name="year">
-        <USelect v-model="state.year" :items="yearItems" />
+      <UFormField
+        label="Tahun SKP"
+        name="year"
+      >
+        <USelect
+          v-model="state.year"
+          :items="yearItems"
+        />
       </UFormField>
-      <UFormField label="Penilaian dilakukan" name="evaluationFrequency">
-        <URadioGroup v-model="state.evaluationFrequency" orientation="horizontal" class="min-h-8 justify-center" :items="[{ label: 'Bulanan', value: 'monthly' }, { label: 'Triwulanan', value: 'quarterly' }]" />
+      <UFormField
+        label="Penilaian dilakukan"
+        name="evaluationFrequency"
+      >
+        <URadioGroup
+          v-model="state.evaluationFrequency"
+          orientation="horizontal"
+          class="min-h-8 justify-center"
+          :items="[{ label: 'Bulanan', value: 'monthly' }, { label: 'Triwulanan', value: 'quarterly' }]"
+        />
       </UFormField>
-      <UFormField label="Batas pengisian realisasi" name="submissionDeadlineDay">
-        <USelect v-model="state.submissionDeadlineDay" :items="dayItems" />
+      <UFormField
+        label="Batas pengisian realisasi"
+        name="submissionDeadlineDay"
+      >
+        <USelect
+          v-model="state.submissionDeadlineDay"
+          :items="dayItems"
+        />
       </UFormField>
     </div>
     <UAlert
@@ -59,7 +84,12 @@ async function onSubmit(event: FormSubmitEvent<SkpInput>) {
       :description="`${formatRange(preview.startDate, preview.endDate)} · batas pengisian ${formatDate(preview.submissionDeadline)}`"
     />
     <div class="flex justify-end">
-      <UButton type="submit" :loading="saving" color="neutral" variant="outline">
+      <UButton
+        type="submit"
+        :loading="saving"
+        color="neutral"
+        variant="outline"
+      >
         Simpan periode evaluasi
       </UButton>
     </div>
