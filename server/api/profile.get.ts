@@ -1,0 +1,23 @@
+import { eq } from 'drizzle-orm'
+
+export default defineEventHandler(async (event) => {
+  const { user } = await requireWorkspaceUser(event)
+  const [p] = await useDb().select().from(schema.profiles).where(eq(schema.profiles.userId, user.id))
+  return {
+    name: user.name,
+    email: user.email,
+    image: user.image ?? null,
+    phoneWhatsapp: p?.phoneWhatsapp ?? '',
+    birthDate: decryptField(p?.birthDate) ?? '',
+    gender: p?.gender ?? undefined,
+    address: decryptField(p?.address) ?? '',
+    nip: decryptField(p?.nip) ?? '',
+    employmentStatus: p?.employmentStatus ?? undefined,
+    rankGrade: p?.rankGrade ?? '',
+    positionTitle: p?.positionTitle ?? '',
+    workUnit: p?.workUnit ?? '',
+    agency: p?.agency ?? '',
+    supervisorName: p?.supervisorName ?? '',
+    supervisorTitle: p?.supervisorTitle ?? ''
+  }
+})

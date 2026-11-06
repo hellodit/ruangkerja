@@ -1,38 +1,32 @@
 <script setup lang="ts">
-const { t } = useI18n()
-const localePath = useLocalePath()
+definePageMeta({ layout: 'auth' })
+useSeoMeta({ title: 'Verifikasi email', robots: 'noindex' })
+
 const route = useRoute()
 const auth = useAuthSession()
-
-useSeoMeta({ title: () => t('auth.verify.title'), robots: 'noindex' })
-
 // Better Auth redirects here after verification; failures carry ?error=...
 const failed = computed(() => typeof route.query.error === 'string')
-
-// autoSignInAfterVerification may have just created a session.
 await auth.refresh()
 </script>
 
 <template>
-  <AuthCard>
-    <div class="space-y-6 text-center">
-      <UIcon
-        :name="failed ? 'i-lucide-circle-x' : 'i-lucide-badge-check'"
-        class="mx-auto size-12"
-        :class="failed ? 'text-error' : 'text-primary'"
-      />
-      <h1 class="text-xl font-semibold text-highlighted">
-        {{ t('auth.verify.title') }}
-      </h1>
-      <p class="text-muted">
-        {{ failed ? t('auth.verify.failed') : t('auth.verify.success') }}
-      </p>
-      <UButton
-        :to="localePath(auth.loggedIn.value ? '/profile' : '/login')"
-        block
-      >
-        {{ auth.loggedIn.value ? t('auth.verify.goProfile') : t('auth.verify.goLogin') }}
-      </UButton>
-    </div>
-  </AuthCard>
+  <div class="space-y-5 text-center">
+    <UIcon
+      :name="failed ? 'i-lucide-circle-x' : 'i-lucide-badge-check'"
+      class="mx-auto size-12"
+      :class="failed ? 'text-error' : 'text-success'"
+    />
+    <h1 class="text-xl font-semibold text-highlighted">
+      Verifikasi email
+    </h1>
+    <p class="text-muted">
+      {{ failed ? 'Tautan verifikasi tidak valid atau sudah kedaluwarsa.' : 'Email Anda berhasil diverifikasi.' }}
+    </p>
+    <UButton
+      :to="auth.loggedIn.value ? '/beranda' : '/login'"
+      block
+    >
+      {{ auth.loggedIn.value ? 'Buka RuangKerja' : 'Ke halaman masuk' }}
+    </UButton>
+  </div>
 </template>

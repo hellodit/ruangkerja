@@ -1,7 +1,8 @@
 import { AwsClient } from 'aws4fetch'
 import { SNIFF_BYTES } from './file-signature'
 
-export type BucketKind = 'public' | 'private'
+/** Only the public avatar bucket exists: evidence is stored as links, never files. */
+export type BucketKind = 'public'
 
 let _client: AwsClient | undefined
 
@@ -28,7 +29,7 @@ function client() {
 
 export function bucketName(kind: BucketKind): string {
   const r2 = r2Config()
-  const name = kind === 'public' ? r2.publicBucket : r2.privateBucket
+  const name = kind === 'public' ? r2.publicBucket : ''
   if (!name) {
     throw new Error(`R2 ${kind} bucket is not configured`)
   }
@@ -86,22 +87,6 @@ export async function presignPut(opts: { bucket: BucketKind, key: string, conten
     // Headers the browser must send. Content-Length is set by the browser.
     headers: { 'Content-Type': opts.contentType }
   }
-}
-
-/** Presigned GET that forces a download with the original file name. */
-export async function presignGet(opts: { bucket: BucketKind, key: string, fileName: string, expiresIn: number }) {
-  const url = objectUrl(opts.bucket, opts.key)
-  url.searchParams.set('X-Amz-Expires', String(opts.expiresIn))
-  const asciiName = opts.fileName.replace(/[^\x20-\x7E]/g, '_').replace(/"/g, '')
-  url.searchParams.set(
-    'response-content-disposition',
-    `attachment; filename="${asciiName}"; filename*=UTF-8''${encodeURIComponent(opts.fileName)}`
-  )
-  const signed = await client().sign(url.toString(), {
-    method: 'GET',
-    aws: { signQuery: true }
-  })
-  return signed.url
 }
 
 export async function headObject(bucket: BucketKind, key: string): Promise<{ size: number, contentType: string } | null> {

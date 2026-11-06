@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { UPLOAD_RULES } from '#shared/schemas/upload'
 
-const { t } = useI18n()
+/** Profile photo: presigned upload to R2, verified by the server (magic bytes). */
 const toast = useToast()
 const auth = useAuthSession()
+const { me, refresh } = useMe()
 const { upload, uploading, progress } = useR2Upload()
 const input = useTemplateRef<HTMLInputElement>('input')
-
 const accept = UPLOAD_RULES.avatar.mimeTypes.join(',')
 
 async function onChange(event: Event) {
@@ -18,10 +18,10 @@ async function onChange(event: Event) {
   }
   try {
     await upload('avatar', file)
-    await auth.refresh()
-    toast.add({ title: t('profile.photo.saved'), color: 'success', icon: 'i-lucide-check' })
+    await Promise.all([auth.refresh(), refresh()])
+    toast.add({ title: 'Foto profil diperbarui', color: 'success', icon: 'i-lucide-check' })
   } catch (err) {
-    toast.add({ title: t(err instanceof UploadError ? err.message : 'upload.failed'), color: 'error', icon: 'i-lucide-circle-alert' })
+    toast.add({ title: err instanceof UploadError ? err.message : 'Gagal mengunggah foto', color: 'error', icon: 'i-lucide-circle-alert' })
   }
 }
 </script>
@@ -29,22 +29,22 @@ async function onChange(event: Event) {
 <template>
   <div class="flex items-center gap-4">
     <UAvatar
-      :src="auth.user.value?.image ?? undefined"
-      :alt="auth.user.value?.name"
+      :src="me?.user.image ?? undefined"
+      :alt="me?.user.name"
       size="3xl"
     />
     <div class="space-y-2">
       <UButton
         icon="i-lucide-camera"
         color="neutral"
-        variant="subtle"
+        variant="outline"
         :loading="uploading"
         @click="input?.click()"
       >
-        {{ uploading ? `${t('upload.uploading')} ${progress}%` : t('profile.photo.change') }}
+        {{ uploading ? `Mengunggah… ${progress}%` : 'Ganti foto' }}
       </UButton>
       <p class="text-xs text-muted">
-        {{ t('profile.photo.description') }}
+        JPG, PNG, atau WEBP. Maksimal 2 MB.
       </p>
       <input
         ref="input"

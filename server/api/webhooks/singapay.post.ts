@@ -54,14 +54,14 @@ export default defineEventHandler(async (event) => {
     await handleSingapayEvent(type, payload as Record<string, unknown>)
   } catch (err) {
     // Release the claim so SingaPay's retry can reprocess (at-least-once).
-    await db.delete(schema.singapayWebhookEvent).where(eq(schema.singapayWebhookEvent.id, claimId))
+    await db.delete(schema.singapayWebhookEvents).where(eq(schema.singapayWebhookEvents.id, claimId))
     console.error('[singapay] handler failed', { eventId, type, err })
     throw createError({ statusCode: 500, statusMessage: 'Processing failed' })
   }
 
-  await db.update(schema.singapayWebhookEvent)
+  await db.update(schema.singapayWebhookEvents)
     .set({ processedAt: new Date() })
-    .where(eq(schema.singapayWebhookEvent.id, claimId))
+    .where(eq(schema.singapayWebhookEvents.id, claimId))
 
   return { received: true }
 })
@@ -72,10 +72,10 @@ export default defineEventHandler(async (event) => {
  */
 async function claim(eventId: string, eventType: string | null, payload: Record<string, unknown>, retrying = false): Promise<string | null> {
   const db = useDb()
-  const [row] = await db.insert(schema.singapayWebhookEvent)
+  const [row] = await db.insert(schema.singapayWebhookEvents)
     .values({ eventId, eventType, payload })
-    .onConflictDoNothing({ target: schema.singapayWebhookEvent.eventId })
-    .returning({ id: schema.singapayWebhookEvent.id })
+    .onConflictDoNothing({ target: schema.singapayWebhookEvents.eventId })
+    .returning({ id: schema.singapayWebhookEvents.id })
   if (row) {
     return row.id
   }
@@ -83,10 +83,10 @@ async function claim(eventId: string, eventType: string | null, payload: Record<
     return null
   }
   // Reclaim a stale claim left behind by a crashed worker (once).
-  const removed = await db.delete(schema.singapayWebhookEvent).where(and(
-    eq(schema.singapayWebhookEvent.eventId, eventId),
-    isNull(schema.singapayWebhookEvent.processedAt),
-    lt(schema.singapayWebhookEvent.createdAt, new Date(Date.now() - STALE_CLAIM_MS))
-  )).returning({ id: schema.singapayWebhookEvent.id })
+  const removed = await db.delete(schema.singapayWebhookEvents).where(and(
+    eq(schema.singapayWebhookEvents.eventId, eventId),
+    isNull(schema.singapayWebhookEvents.processedAt),
+    lt(schema.singapayWebhookEvents.createdAt, new Date(Date.now() - STALE_CLAIM_MS))
+  )).returning({ id: schema.singapayWebhookEvents.id })
   return removed.length > 0 ? claim(eventId, eventType, payload, true) : null
 }
