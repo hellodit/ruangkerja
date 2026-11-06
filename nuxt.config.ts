@@ -18,6 +18,8 @@ export default defineNuxtConfig({
   // (e.g. NUXT_R2_SECRET_ACCESS_KEY). Only `public` reaches the browser.
   runtimeConfig: {
     databaseUrl: '',
+    // true only when behind exactly one trusted proxy that sets X-Forwarded-For (e.g. Vercel)
+    trustProxy: false,
     betterAuthSecret: '',
     googleClientId: '',
     googleClientSecret: '',

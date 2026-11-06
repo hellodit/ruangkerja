@@ -64,9 +64,9 @@
 
 **Acceptance Criteria:** schemas reject short passwords, mismatched confirm, oversize/wrong-type uploads; accept valid input; `bun run test` passes.
 
-- [ ] Write `tests/unit/schemas.test.ts` (cases above) → run, expect FAIL (module missing)
-- [ ] Implement schemas → run, expect PASS
-- [ ] Commit
+- [x] Write `tests/unit/schemas.test.ts` (cases above) → run, expect FAIL (module missing)
+- [x] Implement schemas → run, expect PASS
+- [x] Commit
 
 ### Task 2: Database schema + Better Auth server + email
 
@@ -76,10 +76,10 @@
 
 **Acceptance Criteria:** `drizzle-kit generate` produces a migration; typecheck passes; config matches spec §Server (captcha endpoints, reset expiry 3600, revoke on reset, optional verification, Google, DB rate limit).
 
-- [ ] Write schema, db, email, auth, session, handler
-- [ ] `bunx drizzle-kit generate` → migration file created
-- [ ] `bun run typecheck` → PASS
-- [ ] Commit
+- [x] Write schema, db, email, auth, session, handler
+- [x] `bunx drizzle-kit generate` → migration file created
+- [x] `bun run typecheck` → PASS
+- [x] Commit
 
 ### Task 3: File signature sniffing + R2 utility
 
@@ -89,9 +89,9 @@
 
 **Acceptance Criteria:** sniffing identifies jpeg (`FF D8 FF`), png (`89 50 4E 47 0D 0A 1A 0A`), webp (`RIFF....WEBP`), pdf (`%PDF-`); rejects a `.png` that is really HTML.
 
-- [ ] Write failing tests → FAIL
-- [ ] Implement → PASS
-- [ ] Commit
+- [x] Write failing tests → FAIL
+- [x] Implement → PASS
+- [x] Commit
 
 ### Task 4: Upload + document API
 
@@ -99,9 +99,9 @@
 
 **Acceptance Criteria:** all endpoints 401 without session; presign validates via `presignSchema` and stores pending row; confirm enforces owner + TTL + single-use (conditional `UPDATE ... WHERE consumedAt IS NULL RETURNING`), HEAD size/type match, magic bytes, deletes object on failure (422); avatar confirm updates `user.image` and deletes previous own avatar; documents scoped to owner (404 otherwise).
 
-- [ ] Implement endpoints
-- [ ] typecheck + lint → PASS
-- [ ] Commit
+- [x] Implement endpoints
+- [x] typecheck + lint → PASS
+- [x] Commit
 
 ### Task 5: SingaPay webhook
 
@@ -113,10 +113,10 @@
 
 **Acceptance Criteria:** tests pass; endpoint returns 401 on verification failure, 400 on invalid JSON, 200 `{received:true}` first time and `{received:true,duplicate:true}` on replay; claim released + 500 when handler throws.
 
-- [ ] Write failing tests → FAIL
-- [ ] Implement util → PASS
-- [ ] Implement endpoint, typecheck
-- [ ] Commit
+- [x] Write failing tests → FAIL
+- [x] Implement util → PASS
+- [x] Implement endpoint, typecheck
+- [x] Commit
 
 ### Task 6: Client auth: client, middleware, auth pages, header menu, i18n
 
@@ -124,9 +124,9 @@
 
 **Acceptance Criteria:** forms use shared Zod schemas via `UAuthForm`; Turnstile token sent as `x-captcha-response` header and widget reset after each attempt; Google button calls `signIn.social({ provider: 'google', callbackURL: '/profile' })`; forgot password shows the same success message regardless of email; reset page reads `token` and handles `error=INVALID_TOKEN`; header shows login/register or user menu.
 
-- [ ] Implement
-- [ ] lint + typecheck → PASS
-- [ ] Commit
+- [x] Implement
+- [x] lint + typecheck → PASS
+- [x] Commit
 
 ### Task 7: Profile pages + uploads UI
 
@@ -134,9 +134,9 @@
 
 **Acceptance Criteria:** `/profile` shows avatar, name, email, verified badge + resend verification button, documents list (upload/download/delete); `/profile/edit` updates name (`authClient.updateUser`), uploads photo, changes password (hidden if no credential account — `authClient.listAccounts()`); client-side validation mirrors server; errors surface via `useToast`.
 
-- [ ] Implement
-- [ ] lint + typecheck + build → PASS
-- [ ] Commit
+- [x] Implement
+- [x] lint + typecheck + build → PASS
+- [x] Commit
 
 ### Task 8: Docs + final verification
 
@@ -144,9 +144,9 @@
 
 **Acceptance Criteria:** README covers every env var in `.env.example`; CI runs tests; lint, typecheck, test, build all green.
 
-- [ ] Write docs, update CI
-- [ ] Run full verification
-- [ ] Commit + push
+- [x] Write docs, update CI
+- [x] Run full verification
+- [x] Commit + push
 
 ## Spec coverage
 

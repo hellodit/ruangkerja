@@ -1,6 +1,8 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { captcha } from 'better-auth/plugins'
+import { authBeforeHook } from './auth-hooks'
+import { CLIENT_IP_HEADER } from './client-ip'
 import { schema, useDb } from './db'
 import { sendResetPasswordEmail, sendVerificationEmail } from './email'
 
@@ -84,7 +86,14 @@ function createAuth() {
         '/change-password': { window: 60, max: 5 }
       }
     },
+    hooks: {
+      before: authBeforeHook
+    },
     advanced: {
+      ipAddress: {
+        // Set by server/api/auth/[...all].ts from the socket / trusted proxy.
+        ipAddressHeaders: [CLIENT_IP_HEADER]
+      },
       useSecureCookies: siteUrl.startsWith('https://'),
       database: {
         generateId: () => crypto.randomUUID()
