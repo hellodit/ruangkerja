@@ -1,10 +1,10 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
-import { captcha } from 'better-auth/plugins'
+import { captcha, magicLink } from 'better-auth/plugins'
 import { authBeforeHook } from './auth-hooks'
 import { CLIENT_IP_HEADER } from './client-ip'
 import { schema, useDb } from './db'
-import { sendResetPasswordEmail, sendVerificationEmail } from './email'
+import { sendMagicLinkEmail, sendResetPasswordEmail, sendVerificationEmail } from './email'
 
 function createAuth() {
   const config = useRuntimeConfig()
@@ -15,7 +15,7 @@ function createAuth() {
   }
 
   return betterAuth({
-    appName: 'Ruang Kerja',
+    appName: 'RuangKerja',
     baseURL: siteUrl,
     basePath: '/api/auth',
     secret: config.betterAuthSecret,
@@ -23,11 +23,11 @@ function createAuth() {
     database: drizzleAdapter(useDb(), {
       provider: 'pg',
       schema: {
-        user: schema.user,
-        session: schema.session,
-        account: schema.account,
-        verification: schema.verification,
-        rateLimit: schema.rateLimit
+        users: schema.users,
+        sessions: schema.sessions,
+        accounts: schema.accounts,
+        verifications: schema.verifications,
+        rate_limits: schema.rateLimits
       }
     }),
     emailAndPassword: {
@@ -62,6 +62,7 @@ function createAuth() {
       }
     },
     account: {
+      modelName: 'accounts',
       accountLinking: {
         enabled: true,
         // Never auto-link Google to a local account whose email is unverified:
@@ -69,18 +70,36 @@ function createAuth() {
         requireLocalEmailVerified: true
       }
     },
+    // Plural table names (PRD): avoids PostgreSQL's reserved word "user".
     user: {
+      modelName: 'users',
+      additionalFields: {
+        timezone: { type: 'string', required: false, defaultValue: 'Asia/Jakarta', input: false },
+        onboardingCompletedAt: { type: 'date', required: false, input: false }
+      },
       // Email change is out of scope (needs its own verification flow).
-      changeEmail: { enabled: false }
+      changeEmail: { enabled: false },
+      // PRD: users can delete their account; this removes ALL their data
+      // (FK cascade), not a soft delete.
+      deleteUser: {
+        enabled: true,
+        beforeDelete: async (user) => {
+          await deleteUserAvatar(user.id, user.image ?? null)
+        }
+      }
     },
+    session: { modelName: 'sessions' },
+    verification: { modelName: 'verifications' },
     rateLimit: {
       enabled: true,
       storage: 'database',
+      modelName: 'rate_limits',
       window: 60,
       max: 100,
       customRules: {
         '/sign-in/email': { window: 60, max: 5 },
         '/sign-up/email': { window: 60, max: 5 },
+        '/sign-in/magic-link': { window: 60, max: 3 },
         '/request-password-reset': { window: 60, max: 3 },
         '/send-verification-email': { window: 60, max: 3 },
         '/change-password': { window: 60, max: 5 }
@@ -96,14 +115,25 @@ function createAuth() {
       },
       useSecureCookies: siteUrl.startsWith('https://'),
       database: {
-        generateId: () => crypto.randomUUID()
+        generateId: 'uuid'
       }
     },
     plugins: [
       captcha({
         provider: 'cloudflare-turnstile',
         secretKey: config.turnstile.secretKey,
-        endpoints: ['/sign-in/email', '/sign-up/email', '/request-password-reset']
+        endpoints: ['/sign-in/email', '/sign-up/email', '/request-password-reset', '/sign-in/magic-link']
+      }),
+      magicLink({
+        expiresIn: 15 * 60,
+        // Magic links sign in existing accounts only; registration goes through the form.
+        disableSignUp: true,
+        sendMagicLink: async ({ email, url }) => {
+          // Same response whether or not the email exists (no enumeration).
+          await sendMagicLinkEmail(email, url).catch((err: unknown) => {
+            console.error('[auth] magic link email failed', err)
+          })
+        }
       })
     ]
   })

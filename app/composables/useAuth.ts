@@ -1,4 +1,5 @@
 import { createAuthClient } from 'better-auth/vue'
+import { magicLinkClient } from 'better-auth/client/plugins'
 
 export interface AuthUser {
   id: string
@@ -6,6 +7,8 @@ export interface AuthUser {
   email: string
   emailVerified: boolean
   image?: string | null
+  timezone?: string
+  onboardingCompletedAt?: string | null
   createdAt: string | Date
 }
 
@@ -14,15 +17,20 @@ interface SessionPayload {
   session: { id: string, expiresAt: string | Date }
 }
 
-let _client: ReturnType<typeof createAuthClient> | undefined
+function makeClient() {
+  return createAuthClient({
+    baseURL: import.meta.client ? window.location.origin : useRuntimeConfig().public.siteUrl,
+    basePath: '/api/auth',
+    plugins: [magicLinkClient()]
+  })
+}
 
-/** Better Auth client. Use for user-initiated actions (browser side). */
+let _client: ReturnType<typeof makeClient> | undefined
+
+/** Better Auth client for user-initiated actions (browser side). */
 export function useAuthClient() {
   if (!_client) {
-    _client = createAuthClient({
-      baseURL: import.meta.client ? window.location.origin : useRuntimeConfig().public.siteUrl,
-      basePath: '/api/auth'
-    })
+    _client = makeClient()
   }
   return _client
 }
@@ -56,6 +64,7 @@ export function useAuthSession() {
     await useAuthClient().signOut()
     state.value = null
     loaded.value = true
+    clearNuxtState('me')
   }
 
   return {
@@ -68,17 +77,30 @@ export function useAuthSession() {
   }
 }
 
+const AUTH_ERRORS: Record<string, string> = {
+  INVALID_EMAIL_OR_PASSWORD: 'Email atau kata sandi salah',
+  USER_ALREADY_EXISTS: 'Email sudah terdaftar',
+  USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: 'Email sudah terdaftar, gunakan email lain',
+  INVALID_PASSWORD: 'Kata sandi salah',
+  PASSWORD_TOO_SHORT: 'Kata sandi terlalu pendek',
+  PASSWORD_TOO_LONG: 'Kata sandi terlalu panjang',
+  INVALID_TOKEN: 'Tautan tidak valid atau sudah kedaluwarsa',
+  TOKEN_EXPIRED: 'Tautan sudah kedaluwarsa',
+  VERIFICATION_FAILED: 'Verifikasi keamanan gagal. Silakan coba lagi.',
+  MISSING_RESPONSE: 'Selesaikan verifikasi keamanan terlebih dahulu',
+  CREDENTIAL_ACCOUNT_NOT_FOUND: 'Akun ini tidak memakai kata sandi',
+  EMAIL_ALREADY_VERIFIED: 'Email sudah terverifikasi',
+  SESSION_EXPIRED: 'Sesi sudah lama. Masuk ulang lalu coba lagi.',
+  VALIDATION_ERROR: 'Periksa kembali isian Anda'
+}
+
 /** Translate a Better Auth client error into a user-facing message. */
-export function useAuthErrorMessage() {
-  const { t, te } = useI18n()
-  return (error: { code?: string, status?: number, message?: string } | null | undefined) => {
-    if (!error) {
-      return t('common.error')
-    }
-    if (error.status === 429) {
-      return t('auth.errors.RATE_LIMITED')
-    }
-    const key = `auth.errors.${error.code}`
-    return error.code && te(key) ? t(key) : t('common.error')
+export function authErrorMessage(error: { code?: string, status?: number, message?: string } | null | undefined): string {
+  if (!error) {
+    return 'Terjadi kesalahan. Silakan coba lagi.'
   }
+  if (error.status === 429) {
+    return 'Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi.'
+  }
+  return (error.code && AUTH_ERRORS[error.code]) || 'Terjadi kesalahan. Silakan coba lagi.'
 }

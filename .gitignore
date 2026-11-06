@@ -23,3 +23,5 @@ logs
 .env.*
 !.env.example
 .claude
+# Installed agent skills (restore with: bunx skills experimental_install)
+.agents
