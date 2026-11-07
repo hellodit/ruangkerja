@@ -13,15 +13,7 @@ const view = computed(() => {
 </script>
 
 <template>
-  <UBadge
-    :color="view.color"
-    variant="subtle"
-    class="whitespace-nowrap"
-  >
-    <span
-      class="size-1.5 rounded-full bg-current"
-      aria-hidden="true"
-    />
+  <StatusChip :color="view.color">
     {{ view.label }}
-  </UBadge>
+  </StatusChip>
 </template>

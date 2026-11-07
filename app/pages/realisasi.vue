@@ -7,6 +7,7 @@ type Rhk = InternalApi['/api/realizations']['get']['rhks'][number]
 type PlanRow = Rhk['plans'][number]
 
 const route = useRoute()
+const openSources = ref<Record<string, boolean>>({})
 const notify = useNotify()
 const copy = useCopyText()
 const { me } = useMe()
@@ -68,74 +69,69 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
 <template>
   <UDashboardPanel id="realisasi">
     <template #header>
-      <UDashboardNavbar title="Realisasi periode">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
-      </UDashboardNavbar>
-      <UDashboardToolbar v-if="data">
-        <template #left>
-          <USelect
-            v-model="selectedPeriod"
-            :items="periodItems"
-            icon="i-lucide-calendar"
-            class="w-56"
-            aria-label="Pilih periode"
-          />
-        </template>
-        <template #right>
-          <UButton
-            :to="exportUrl"
-            external
-            download
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-download"
-          >
-            Unduh Word
-          </UButton>
-          <UButton
-            icon="i-lucide-copy"
-            @click="copyRealization()"
-          >
-            Salin semua realisasi
-          </UButton>
-        </template>
-      </UDashboardToolbar>
+      <UDashboardNavbar title="Realisasi periode" />
     </template>
 
     <template #body>
       <StartFromRhk v-if="me && !me.rhkCount" />
       <div
         v-else-if="data"
-        class="mx-auto flex w-full max-w-5xl flex-col gap-6"
+        class="flex w-full max-w-[1200px] flex-col gap-6"
       >
+        <div class="flex flex-wrap items-center gap-3">
+          <USelect
+            v-model="selectedPeriod"
+            :items="periodItems"
+            icon="i-ctm-date"
+            class="w-auto min-w-56"
+            :ui="{ base: 'h-9 rounded-sm px-4 gap-2 text-sm/5 font-semibold text-highlighted' }"
+            aria-label="Pilih periode"
+          />
+          <UButton
+            :to="exportUrl"
+            external
+            download
+            color="neutral"
+            variant="outline"
+            icon="i-ctm-upload"
+            class="ml-auto"
+          >
+            Unduh Word
+          </UButton>
+          <UButton
+            icon="i-ctm-copy"
+            @click="copyRealization()"
+          >
+            Salin semua realisasi
+          </UButton>
+        </div>
         <UAlert
           :color="data.daysToDeadline <= 3 ? 'error' : 'warning'"
           variant="subtle"
-          icon="i-lucide-clock"
+          icon="i-ctm-clock"
+          :ui="{ description: 'text-xs/4' }"
           :title="`Batas pengisian ${data.period.label}: ${formatDateLong(data.period.submissionDeadline)} · ${data.daysToDeadline >= 0 ? `${data.daysToDeadline} hari lagi` : `lewat ${-data.daysToDeadline} hari`}`"
           description="Isi realisasi dan tautan bukti dukung di e-Kinerja sebelum tanggal ini. Setelah itu atasan melakukan evaluasi periode."
         />
         <div class="flex flex-wrap gap-2">
           <UBadge
             color="neutral"
-            variant="outline"
-            size="lg"
+            variant="soft"
+            size="sm"
           >
             {{ data.totals.plans }} rencana aksi · {{ data.totals.done }} selesai
           </UBadge>
           <UBadge
             color="neutral"
-            variant="outline"
-            size="lg"
+            variant="soft"
+            size="sm"
           >
             {{ data.totals.progress }} progres harian
           </UBadge>
           <UBadge
             color="neutral"
-            variant="outline"
-            size="lg"
+            variant="soft"
+            size="sm"
           >
             {{ data.totals.evidence }} bukti dukung
           </UBadge>
@@ -147,28 +143,32 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
         >
           <div class="flex flex-col gap-5">
             <div class="flex flex-wrap items-start justify-between gap-3">
-              <div class="flex min-w-0 flex-1 flex-col gap-1.5">
-                <RhkTag
-                  :number="r.rhk.number"
-                  class="self-start"
-                />
-                <h2 class="text-lg font-semibold text-highlighted">
-                  {{ r.rhk.statement }}
-                </h2>
-                <p
-                  v-if="r.indicator"
-                  class="text-sm text-muted"
+              <div class="flex min-w-0 flex-1 items-start gap-3">
+                <UBadge
+                  color="neutral"
+                  variant="subtle"
+                  class="shrink-0"
                 >
-                  IKI: {{ r.indicator.indicator }} · Target tahunan {{ formatNumber(r.indicator.target) }} {{ r.indicator.unit }}
-                </p>
+                  RHK {{ r.rhk.number }}
+                </UBadge>
+                <div class="flex min-w-0 flex-col gap-0.5">
+                  <h2 class="text-[17px]/7 font-semibold text-highlighted">
+                    {{ r.rhk.statement }}
+                  </h2>
+                  <p
+                    v-if="r.indicator"
+                    class="text-xs/[18px] text-muted"
+                  >
+                    IKI: {{ r.indicator.indicator }} · Target tahunan {{ formatNumber(r.indicator.target) }} {{ r.indicator.unit }}
+                  </p>
+                </div>
               </div>
               <div class="flex gap-2">
                 <UButton
                   v-if="r.draftText || r.finalText"
-                  color="neutral"
                   variant="ghost"
                   size="sm"
-                  icon="i-lucide-pencil"
+                  icon="i-ctm-edit"
                   @click="startEdit(r)"
                 >
                   Ubah
@@ -177,7 +177,7 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
                   color="neutral"
                   variant="outline"
                   size="sm"
-                  icon="i-lucide-copy"
+                  icon="i-ctm-copy"
                   :disabled="!(r.finalText || r.draftText)"
                   @click="copyRealization(r.rhk.id)"
                 >
@@ -188,21 +188,19 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
 
             <div class="rounded-md bg-muted p-4">
               <div class="mb-2 flex flex-wrap items-center gap-2">
-                <span class="text-xs font-semibold tracking-wide text-muted uppercase">
+                <span class="text-[11px]/4 font-semibold tracking-[1.1px] text-toned uppercase">
                   {{ r.finalText ? 'Narasi realisasi · diubah pengguna' : 'Draf realisasi · disusun dari progres harian' }}
                 </span>
-                <UBadge
+                <StatusChip
                   v-if="r.status === 'disalin'"
                   color="success"
-                  variant="subtle"
-                  size="sm"
                 >
                   Sudah disalin
-                </UBadge>
+                </StatusChip>
               </div>
               <p
                 v-if="r.finalText || r.draftText"
-                class="text-sm whitespace-pre-line text-highlighted"
+                class="text-sm/[22px] whitespace-pre-line text-highlighted"
               >
                 {{ r.finalText ?? r.draftText }}
               </p>
@@ -212,14 +210,58 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
               >
                 Belum ada progres harian untuk RHK ini di {{ data.period.label }}. Realisasi tidak diisi otomatis.
               </p>
-              <p class="mt-3 text-xs text-muted">
-                Sumber: {{ r.sourceCount }} progres harian · {{ r.evidenceCount }} bukti dukung ·
-                <ULink
-                  :to="`/progres?rhkId=${r.rhk.id}&minggu=${data.period.startDate}`"
-                  class="text-info"
+              <div
+                v-if="r.sources.length"
+                class="mt-3"
+              >
+                <div class="flex flex-wrap items-center gap-1 text-xs/4 text-muted">
+                  <span>Sumber: {{ r.sourceCount }} progres harian · {{ r.evidenceCount }} bukti dukung ·</span>
+                  <UButton
+                    variant="link"
+                    class="gap-1 text-xs/4"
+                    trailing-icon="i-ctm-chevron-down"
+                    :aria-expanded="!!openSources[r.id]"
+                    :aria-controls="`sumber-${r.id}`"
+                    :ui="{ trailingIcon: openSources[r.id] ? 'size-3.5 rotate-180 transition-transform' : 'size-3.5 transition-transform' }"
+                    @click="openSources[r.id] = !openSources[r.id]"
+                  >
+                    {{ openSources[r.id] ? 'Sembunyikan sumber' : 'Lihat sumber' }}
+                  </UButton>
+                </div>
+                <div
+                  v-show="openSources[r.id]"
+                  :id="`sumber-${r.id}`"
+                  class="pt-3"
                 >
-                  Lihat sumber
-                </ULink>
+                  <ul class="divide-y divide-default rounded-md border border-default bg-default">
+                    <li
+                      v-for="src in r.sources"
+                      :key="src.id"
+                      class="grid gap-1 px-3 py-2.5 sm:grid-cols-[150px_minmax(0,1fr)_auto] sm:gap-3"
+                    >
+                      <span class="text-xs text-muted">{{ formatDateShort(src.workDate) }} · <span class="font-mono">{{ formatTime(src.startTime) }}–{{ formatTime(src.endTime) }}</span></span>
+                      <span class="min-w-0">
+                        <NuxtLink
+                          :to="`/progres/${src.id}`"
+                          class="text-sm text-highlighted hover:underline"
+                        >{{ src.description }}</NuxtLink>
+                        <span class="block text-xs text-muted">{{ src.planName }} · realisasi {{ formatNumber(src.realization) }} {{ src.realization ? src.unit : '' }}</span>
+                      </span>
+                      <span
+                        class="text-xs whitespace-nowrap"
+                        :class="src.evidenceCount ? 'text-muted' : 'text-warning'"
+                      >
+                        {{ src.evidenceCount ? `${src.evidenceCount} bukti` : 'Belum ada bukti' }}
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <p
+                v-else
+                class="mt-3 text-xs text-muted"
+              >
+                Sumber: belum ada progres harian di periode ini.
               </p>
             </div>
 
@@ -228,7 +270,7 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
               :key="name"
               color="warning"
               variant="subtle"
-              icon="i-lucide-triangle-alert"
+              icon="i-ctm-warning"
               :title="`Rencana aksi “${name}” belum punya progres harian, jadi tidak dimasukkan ke draf realisasi.`"
             />
 
@@ -236,11 +278,7 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
               v-if="r.plans.length"
               :data="r.plans"
               :columns="columns"
-              class="rounded-md border border-default"
             >
-              <template #name-cell="{ row }">
-                <span class="whitespace-normal">{{ row.original.name }}</span>
-              </template>
               <template #target-cell="{ row }">
                 <span class="whitespace-nowrap tabular-nums">{{ formatNumber(row.original.target) }} {{ row.original.unit }}</span>
               </template>
@@ -260,7 +298,6 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
         <p class="text-xs text-muted">
           Draf personal. Narasi hanya berisi aktivitas dari progres harian yang kamu catat. Periksa kembali sebelum disalin ke e-Kinerja.
         </p>
-        <AppDisclaimer />
       </div>
       <UModal
         :open="!!editing"
@@ -282,16 +319,14 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
           <div class="flex w-full flex-wrap justify-between gap-2">
             <UButton
               v-if="editing?.finalText"
-              color="neutral"
               variant="ghost"
-              icon="i-lucide-rotate-ccw"
+              icon="i-ctm-undo"
               @click="saveEdit(true)"
             >
               Kembali ke draf
             </UButton>
             <div class="ml-auto flex gap-2">
               <UButton
-                color="neutral"
                 variant="ghost"
                 @click="editing = null"
               >

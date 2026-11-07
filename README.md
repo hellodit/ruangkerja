@@ -2,8 +2,6 @@
 
 Asisten kerja digital personal untuk ASN: susun **rencana aksi per RHK**, catat **progres harian** (ketik atau suara), kumpulkan **tautan bukti dukung**, lalu salin **draf realisasi** per periode ke e-Kinerja. Dibangun dengan Nuxt 4, [Nuxt UI 4](https://ui.nuxt.com) (tema design system *CTM Project*), Better Auth, dan Drizzle ORM + PostgreSQL.
 
-> RuangKerja adalah aplikasi independen, bukan aplikasi resmi pemerintah, tidak terhubung ke e-Kinerja BKN, dan tidak menggantikan penilaian resmi.
-
 ## Fitur Rilis 1.0
 
 | Area | Isi |

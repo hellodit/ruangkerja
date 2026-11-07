@@ -79,7 +79,7 @@ async function onSubmit(event: FormSubmitEvent<SkpInput>) {
     <UAlert
       color="neutral"
       variant="subtle"
-      icon="i-lucide-info"
+      icon="i-ctm-information"
       :title="`Periode berjalan: ${preview.label}`"
       :description="`${formatRange(preview.startDate, preview.endDate)} · batas pengisian ${formatDate(preview.submissionDeadline)}`"
     />

@@ -114,7 +114,7 @@ function submit(mode: 'done' | 'again') {
               v-if="noPlans"
               color="warning"
               variant="subtle"
-              icon="i-lucide-list-ordered"
+              icon="i-ctm-list-number"
               title="Belum ada rencana aksi di periode tanggal ini"
               description="Susun rencana aksi dulu di detail RHK."
               :actions="[{ label: 'Ke RHK saya', to: '/rhk', color: 'warning', variant: 'outline' }]"
@@ -141,6 +141,7 @@ function submit(mode: 'done' | 'again') {
               >
                 <UInput
                   v-model="state.workDate"
+                  trailing-icon="i-ctm-date"
                   type="date"
                 />
               </UFormField>
@@ -151,6 +152,7 @@ function submit(mode: 'done' | 'again') {
               >
                 <UInput
                   v-model="state.startTime"
+                  trailing-icon="i-ctm-clock"
                   type="time"
                 />
               </UFormField>
@@ -161,12 +163,13 @@ function submit(mode: 'done' | 'again') {
               >
                 <UInput
                   v-model="state.endTime"
+                  trailing-icon="i-ctm-clock"
                   type="time"
                 />
               </UFormField>
             </div>
           </fieldset>
-
+          <USeparator />
           <fieldset class="flex flex-col gap-3">
             <legend class="mb-4 text-base font-semibold text-highlighted">
               Uraian
@@ -175,9 +178,13 @@ function submit(mode: 'done' | 'again') {
               label="Apa yang kamu kerjakan?"
               name="description"
               required
-              :hint="`${state.description.length} / ${PROGRESS_DESCRIPTION_MAX}`"
-              help="Tulis apa adanya. Jangan memasukkan data rahasia atau data pribadi warga."
             >
+              <template #help>
+                <span class="flex justify-between gap-3">
+                  <span>Tulis apa adanya. Jangan memasukkan data rahasia atau data pribadi warga.</span>
+                  <span class="shrink-0 tabular-nums">{{ state.description.length }} / {{ PROGRESS_DESCRIPTION_MAX }}</span>
+                </span>
+              </template>
               <UTextarea
                 v-model="state.description"
                 :rows="3"
@@ -189,7 +196,7 @@ function submit(mode: 'done' | 'again') {
             <div class="flex flex-wrap items-center gap-2">
               <UButton
                 v-if="speech.supported.value"
-                :icon="speech.listening.value ? 'i-lucide-square' : 'i-lucide-mic'"
+                :icon="speech.listening.value ? 'i-lucide-square' : 'i-ctm-mic'"
                 :color="speech.listening.value ? 'error' : 'neutral'"
                 variant="outline"
                 size="sm"
@@ -207,7 +214,7 @@ function submit(mode: 'done' | 'again') {
               >{{ speech.error.value }}</span>
             </div>
           </fieldset>
-
+          <USeparator />
           <fieldset class="flex flex-col gap-4">
             <legend class="mb-4 text-base font-semibold text-highlighted">
               Hasil dan bukti
@@ -223,6 +230,8 @@ function submit(mode: 'done' | 'again') {
                   v-model="state.realization"
                   :min="0"
                   :step="1"
+                  :increment="false"
+                  :decrement="false"
                   :format-options="{ maximumFractionDigits: 2 }"
                 />
               </UFormField>
@@ -232,14 +241,14 @@ function submit(mode: 'done' | 'again') {
               >
                 <UInput
                   :model-value="plan?.plan.unit ?? '—'"
-                  disabled
+                  readonly
                 />
               </UFormField>
             </div>
 
             <ProgressResults v-model="state.results" />
           </fieldset>
-
+          <USeparator />
           <fieldset class="flex flex-col gap-4">
             <legend class="mb-4 text-base font-semibold text-highlighted">
               Status
@@ -259,37 +268,37 @@ function submit(mode: 'done' | 'again') {
               label="Tandai rencana aksi ini selesai"
             />
           </fieldset>
+          <USeparator />
+          <div class="flex flex-wrap items-center gap-3">
+            <UButton
+              to="/progres"
+              variant="ghost"
+              class="mr-auto"
+            >
+              Batal
+            </UButton>
+            <slot name="actions" />
+            <UButton
+              v-if="!progressId"
+              color="neutral"
+              variant="outline"
+              :loading="saving && next === 'again'"
+              @click="submit('again')"
+            >
+              Simpan dan tambah lagi
+            </UButton>
+            <UButton
+              :loading="saving && next === 'done'"
+              @click="submit('done')"
+            >
+              {{ progressId ? 'Simpan perubahan' : 'Simpan progres' }}
+            </UButton>
+          </div>
         </div>
       </UCard>
-
-      <div class="flex flex-wrap justify-end gap-2">
-        <slot name="actions" />
-        <UButton
-          to="/progres"
-          color="neutral"
-          variant="ghost"
-        >
-          Batal
-        </UButton>
-        <UButton
-          v-if="!progressId"
-          color="neutral"
-          variant="outline"
-          :loading="saving && next === 'again'"
-          @click="submit('again')"
-        >
-          Simpan dan tambah lagi
-        </UButton>
-        <UButton
-          :loading="saving && next === 'done'"
-          @click="submit('done')"
-        >
-          {{ progressId ? 'Simpan perubahan' : 'Simpan progres' }}
-        </UButton>
-      </div>
     </UForm>
 
-    <aside class="flex flex-col gap-6 lg:sticky lg:top-4">
+    <aside class="flex flex-col gap-6 lg:sticky lg:top-0">
       <UCard v-if="plan">
         <div class="flex flex-col gap-4">
           <div class="flex flex-wrap items-center gap-2">
@@ -334,7 +343,7 @@ function submit(mode: 'done' | 'again') {
           <UAlert
             color="neutral"
             variant="subtle"
-            icon="i-lucide-info"
+            icon="i-ctm-information"
             title="Setelah progres ini disimpan:"
             :description="`${formatNumber(afterSave)} dari ${formatNumber(plan.plan.target)} ${plan.plan.unit} (${achievementPercent(afterSave, plan.plan.target)}%)`"
           />

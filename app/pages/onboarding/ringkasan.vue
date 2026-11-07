@@ -46,10 +46,10 @@ const employment = computed(() => {
 })
 const firstRhkId = computed(() => rhks.value[0]?.id)
 const steps = [
-  { icon: 'i-lucide-list-ordered', title: '1. Susun rencana aksi', text: 'Di awal periode, tentukan rencana aksi untuk tiap RHK.' },
-  { icon: 'i-lucide-notebook-pen', title: '2. Catat progres harian', text: 'Tulis apa yang dikerjakan hari itu beserta realisasinya.' },
-  { icon: 'i-lucide-link', title: '3. Lengkapi bukti dukung', text: 'Tambahkan tautan bukti untuk tiap progres.' },
-  { icon: 'i-lucide-files', title: '4. Susun realisasi', text: 'Di akhir periode, draf realisasi disusun dari progres harian.' }
+  { icon: 'i-ctm-list-number', title: '1. Susun rencana aksi', text: 'Di awal periode, tentukan rencana aksi untuk tiap RHK.' },
+  { icon: 'i-ctm-notes', title: '2. Catat progres harian', text: 'Tulis apa yang dikerjakan hari itu beserta realisasinya.' },
+  { icon: 'i-ctm-link', title: '3. Lengkapi bukti dukung', text: 'Tambahkan tautan bukti untuk tiap progres.' },
+  { icon: 'i-ctm-files-01', title: '4. Susun realisasi', text: 'Di akhir periode, draf realisasi disusun dari progres harian.' }
 ]
 </script>
 
@@ -217,13 +217,12 @@ const steps = [
         color="neutral"
         variant="outline"
         size="lg"
-        icon="i-lucide-chevron-left"
+        icon="i-ctm-chevron-left"
       >
         Kembali
       </UButton>
       <span class="flex-1 text-sm text-muted">Langkah 3 dari 3</span>
       <UButton
-        color="neutral"
         variant="ghost"
         size="lg"
         :loading="finishing"

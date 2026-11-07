@@ -84,14 +84,14 @@ async function onSubmit(event: FormSubmitEvent<z.output<typeof formSchema>>) {
           <UInput
             v-model="state.evidenceUrl"
             inputmode="url"
-            icon="i-lucide-link"
+            icon="i-ctm-link"
             placeholder="Tempel tautan Google Drive"
           />
         </UFormField>
         <UAlert
           color="warning"
           variant="subtle"
-          icon="i-lucide-shield-alert"
+          icon="i-ctm-warning"
           title="Jangan menautkan dokumen rahasia atau data pribadi warga."
         />
       </UForm>
@@ -99,7 +99,6 @@ async function onSubmit(event: FormSubmitEvent<z.output<typeof formSchema>>) {
     <template #footer>
       <div class="flex w-full justify-end gap-2">
         <UButton
-          color="neutral"
           variant="ghost"
           @click="open = false"
         >

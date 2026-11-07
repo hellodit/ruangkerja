@@ -66,14 +66,14 @@ async function setStatus(p: Plan, status: ActionPlanStatus) {
 
 function rowActions(p: Plan): DropdownMenuItem[][] {
   return [[
-    { label: 'Tambah progres', icon: 'i-lucide-notebook-pen', to: `/progres/tambah?actionPlanId=${p.id}` },
-    { label: 'Ubah', icon: 'i-lucide-pencil', onSelect: () => openEdit(p) }
+    { label: 'Tambah progres', icon: 'i-ctm-notes', to: `/progres/tambah?actionPlanId=${p.id}` },
+    { label: 'Ubah', icon: 'i-ctm-edit', onSelect: () => openEdit(p) }
   ], [
     p.status === 'selesai'
-      ? { label: 'Tandai berjalan', icon: 'i-lucide-rotate-ccw', onSelect: () => setStatus(p, 'berjalan') }
-      : { label: 'Tandai selesai', icon: 'i-lucide-check', onSelect: () => setStatus(p, 'selesai') }
+      ? { label: 'Tandai berjalan', icon: 'i-ctm-undo', onSelect: () => setStatus(p, 'berjalan') }
+      : { label: 'Tandai selesai', icon: 'i-ctm-check', onSelect: () => setStatus(p, 'selesai') }
   ], [
-    { label: 'Hapus', icon: 'i-lucide-trash-2', color: 'error', onSelect: () => { deleting.value = p } }
+    { label: 'Hapus', icon: 'i-ctm-delete', color: 'error', onSelect: () => { deleting.value = p } }
   ]]
 }
 
@@ -118,16 +118,16 @@ async function copyPrevious() {
         <template #leading>
           <UButton
             to="/rhk"
-            icon="i-lucide-chevron-left"
-            color="neutral"
+            icon="i-ctm-chevron-left"
             variant="ghost"
+            class="w-11 justify-center px-0"
             aria-label="Kembali ke RHK saya"
           />
         </template>
         <template #title>
           <div class="flex flex-col">
-            <span class="text-xs text-muted">RHK saya</span>
-            <h1 class="text-xl font-semibold text-highlighted">
+            <span class="text-xs/4 text-toned">RHK saya</span>
+            <h1 class="text-xl/7 font-semibold tracking-[-0.2px] text-highlighted">
               RHK {{ data?.rhk.number }}
             </h1>
           </div>
@@ -138,28 +138,27 @@ async function copyPrevious() {
     <template #body>
       <div
         v-if="data"
-        class="mx-auto flex w-full max-w-6xl flex-col gap-6"
+        class="flex w-full max-w-[1200px] flex-col gap-6"
       >
         <UCard>
           <div class="flex flex-col gap-5">
-            <div class="flex flex-wrap items-start justify-between gap-3">
-              <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+            <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+              <div class="flex min-w-0 flex-1 basis-96 flex-col gap-2">
                 <div class="flex flex-wrap items-center gap-2">
                   <RhkTag :number="data.rhk.number" />
                   <UBadge
                     color="neutral"
                     variant="subtle"
-                    size="sm"
                   >
                     {{ RHK_TYPE_LABELS[data.rhk.type] }}
                   </UBadge>
                 </div>
-                <h2 class="text-xl font-semibold text-highlighted">
+                <h2 class="text-[22px]/[30px] font-bold text-highlighted">
                   {{ data.rhk.statement }}
                 </h2>
                 <p
                   v-if="data.rhk.supervisorRhk"
-                  class="text-sm text-muted"
+                  class="text-sm text-toned"
                 >
                   Mendukung RHK atasan: {{ data.rhk.supervisorRhk }}
                 </p>
@@ -169,48 +168,48 @@ async function copyPrevious() {
                 color="neutral"
                 variant="outline"
                 size="sm"
-                icon="i-lucide-pencil"
+                icon="i-ctm-edit"
               >
                 Ubah RHK
               </UButton>
             </div>
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div class="rounded-md bg-muted p-4">
-                <p class="text-sm text-muted">
+            <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              <div class="flex flex-col gap-1 rounded-md bg-muted px-4 py-3.5">
+                <p class="text-xs/4 text-toned">
                   Rencana aksi {{ data.period.label }}
                 </p>
-                <p class="text-2xl font-bold text-highlighted tabular-nums">
-                  {{ data.stats.plans }} <span class="text-sm font-normal text-muted">· {{ data.stats.done }} selesai</span>
+                <p class="text-[22px]/7 font-bold text-highlighted tabular-nums">
+                  {{ data.stats.plans }} <span class="text-[13px] font-medium text-toned">· {{ data.stats.done }} selesai</span>
                 </p>
               </div>
-              <div class="rounded-md bg-muted p-4">
-                <p class="text-sm text-muted">
+              <div class="flex flex-col gap-1 rounded-md bg-muted px-4 py-3.5">
+                <p class="text-xs/4 text-toned">
                   Progres harian periode ini
                 </p>
-                <p class="text-2xl font-bold text-highlighted tabular-nums">
-                  {{ data.stats.progress }} <span class="text-sm font-normal text-muted">catatan</span>
+                <p class="text-[22px]/7 font-bold text-highlighted tabular-nums">
+                  {{ data.stats.progress }} <span class="text-[13px] font-medium text-toned">catatan</span>
                 </p>
               </div>
-              <div class="rounded-md bg-muted p-4">
-                <p class="text-sm text-muted">
+              <div class="flex flex-col gap-1 rounded-md bg-muted px-4 py-3.5">
+                <p class="text-xs/4 text-toned">
                   Lewat tenggat
                 </p>
                 <p
-                  class="text-2xl font-bold tabular-nums"
+                  class="text-[22px]/7 font-bold tabular-nums"
                   :class="data.stats.overdue ? 'text-error' : 'text-highlighted'"
                 >
-                  {{ data.stats.overdue }} <span class="text-sm font-normal text-muted">rencana aksi</span>
+                  {{ data.stats.overdue }} <span class="text-[13px] font-medium text-toned">rencana aksi</span>
                 </p>
               </div>
-              <div class="rounded-md bg-muted p-4">
-                <p class="text-sm text-muted">
+              <div class="flex flex-col gap-1 rounded-md bg-muted px-4 py-3.5">
+                <p class="text-xs/4 text-toned">
                   Progres tanpa bukti
                 </p>
                 <p
-                  class="text-2xl font-bold tabular-nums"
+                  class="text-[22px]/7 font-bold tabular-nums"
                   :class="data.stats.missingEvidence ? 'text-warning' : 'text-highlighted'"
                 >
-                  {{ data.stats.missingEvidence }} <span class="text-sm font-normal text-muted">catatan</span>
+                  {{ data.stats.missingEvidence }} <span class="text-[13px] font-medium text-toned">catatan</span>
                 </p>
               </div>
             </div>
@@ -219,28 +218,28 @@ async function copyPrevious() {
 
         <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
           <div class="flex min-w-0 flex-col gap-6">
-            <UCard :ui="{ body: 'p-0 sm:p-0' }">
+            <UCard :ui="{ header: 'px-0 pt-0 pb-0 sm:px-0 sm:pt-0', body: 'p-0 sm:p-0' }">
               <template #header>
-                <div class="flex flex-col gap-4">
-                  <div class="flex flex-wrap items-center justify-between gap-3">
-                    <h2 class="text-lg font-semibold text-highlighted">
+                <div class="flex flex-col">
+                  <div class="flex flex-wrap items-center gap-3 px-5 pt-5 pb-3 sm:px-6">
+                    <h2 class="flex-1 basis-40 text-lg/[26px] font-semibold text-highlighted">
                       Rencana aksi
                     </h2>
-                    <div class="flex flex-wrap items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-3">
                       <USelect
                         v-model="selectedPeriod"
                         :items="periodItems"
-                        icon="i-lucide-calendar"
+                        icon="i-ctm-date"
                         size="sm"
-                        class="w-52"
+                        class="w-auto"
+                        :ui="{ base: 'h-7 rounded-[6px] px-3 gap-2 text-xs/4 font-semibold text-highlighted', leadingIcon: 'size-4', trailingIcon: 'size-4' }"
                         aria-label="Pilih periode"
                       />
                       <UButton
                         v-if="data.previousPeriod"
-                        color="neutral"
                         variant="ghost"
                         size="sm"
-                        icon="i-lucide-copy"
+                        icon="i-ctm-copy"
                         :loading="copying"
                         @click="copyPrevious"
                       >
@@ -248,7 +247,7 @@ async function copyPrevious() {
                       </UButton>
                       <UButton
                         size="sm"
-                        icon="i-lucide-plus"
+                        icon="i-ctm-plus"
                         @click="openAdd"
                       >
                         Tambah rencana aksi
@@ -260,7 +259,8 @@ async function copyPrevious() {
                     :items="tabs"
                     variant="link"
                     :content="false"
-                    size="sm"
+                    class="px-5 sm:px-6"
+                    :ui="{ list: 'border-default' }"
                     aria-label="Filter status rencana aksi"
                   />
                 </div>
@@ -268,7 +268,7 @@ async function copyPrevious() {
 
               <UEmpty
                 v-if="!shown.length"
-                icon="i-lucide-list-ordered"
+                icon="i-ctm-list-number"
                 :title="plans.length ? 'Tidak ada rencana aksi dengan status ini' : `Belum ada rencana aksi di ${data.period.label}`"
                 description="Susun rencana aksi di awal periode untuk RHK ini."
                 variant="naked"
@@ -280,14 +280,14 @@ async function copyPrevious() {
                 :columns="columns"
               >
                 <template #name-cell="{ row }">
-                  <span class="block max-w-72 font-medium whitespace-normal text-highlighted">{{ row.original.name }}</span>
+                  <span class="block max-w-72 font-semibold text-highlighted">{{ row.original.name }}</span>
                 </template>
                 <template #realization-cell="{ row }">
                   <div class="flex w-36 flex-col gap-1.5">
-                    <span class="text-xs text-muted tabular-nums">{{ formatNumber(row.original.realization) }} dari {{ formatNumber(row.original.target) }} {{ row.original.unit }}</span>
+                    <span class="text-[13px] text-highlighted tabular-nums">{{ formatNumber(row.original.realization) }} dari {{ formatNumber(row.original.target) }} {{ row.original.unit }}</span>
                     <UProgress
                       :model-value="row.original.achievement"
-                      size="xs"
+                      size="sm"
                       :aria-label="`Realisasi ${row.original.name}`"
                     />
                   </div>
@@ -295,7 +295,7 @@ async function copyPrevious() {
                 <template #progressCount-cell="{ row }">
                   <ULink
                     :to="`/progres?rhkId=${id}`"
-                    class="text-sm text-info whitespace-nowrap"
+                    class="whitespace-nowrap text-blue-600 underline underline-offset-2 hover:text-blue-700 dark:text-blue-400"
                   >
                     {{ row.original.progressCount }} catatan
                   </ULink>
@@ -303,7 +303,7 @@ async function copyPrevious() {
                 <template #dueDate-cell="{ row }">
                   <span
                     class="whitespace-nowrap"
-                    :class="row.original.overdue && 'font-medium text-error'"
+                    :class="row.original.overdue && 'text-error'"
                   >
                     {{ formatDayMonth(row.original.dueDate) }}<template v-if="row.original.overdue"> · lewat</template>
                   </span>
@@ -317,8 +317,7 @@ async function copyPrevious() {
                     :content="{ align: 'end' }"
                   >
                     <UButton
-                      icon="i-lucide-ellipsis-vertical"
-                      color="neutral"
+                      icon="i-ctm-more-vertical"
                       variant="ghost"
                       size="sm"
                       :aria-label="`Menu rencana aksi ${row.original.name}`"
@@ -336,7 +335,7 @@ async function copyPrevious() {
                   </h2>
                   <ULink
                     :to="`/progres?rhkId=${id}`"
-                    class="text-sm font-medium text-info"
+                    class="text-sm font-semibold text-blue-600 underline underline-offset-2 hover:text-blue-700 dark:text-blue-400"
                   >
                     Lihat semua progres RHK {{ data.rhk.number }}
                   </ULink>
@@ -350,25 +349,28 @@ async function copyPrevious() {
               </p>
               <ul
                 v-else
-                class="divide-y divide-default"
+                class="divide-y divide-default border-t border-default"
               >
                 <li
                   v-for="p in data.recentProgress"
                   :key="p.id"
-                  class="grid gap-1 py-3 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4"
+                  class="grid gap-1 py-3 sm:grid-cols-[132px_minmax(0,1fr)] sm:gap-4"
                 >
-                  <span class="text-sm text-muted">{{ formatDateShort(p.workDate) }}</span>
+                  <div class="flex flex-col gap-0.5 text-[13px]/5 text-toned">
+                    <span>{{ formatDateShort(p.workDate) }}</span>
+                    <span class="font-mono text-xs">{{ formatTime(p.startTime) }}–{{ formatTime(p.endTime) }}</span>
+                  </div>
                   <div class="flex flex-col gap-1">
-                    <span class="text-xs text-muted"><span class="font-mono">{{ formatTime(p.startTime) }}–{{ formatTime(p.endTime) }}</span> · {{ p.planName }}</span>
+                    <span class="text-[13px]/5 font-semibold text-highlighted">{{ p.planName }}</span>
                     <NuxtLink
                       :to="`/progres/${p.id}`"
-                      class="text-sm hover:underline"
+                      class="text-[13px]/5 text-toned hover:underline"
                     >{{ p.description }}</NuxtLink>
                     <span
                       v-if="!p.hasEvidence"
                       class="flex items-center gap-1 text-xs text-warning"
                     ><UIcon
-                      name="i-lucide-triangle-alert"
+                      name="i-ctm-warning"
                       class="size-3.5"
                     />Belum ada bukti</span>
                   </div>
@@ -384,13 +386,13 @@ async function copyPrevious() {
                   Indikator kinerja
                 </h2>
               </template>
-              <ul class="flex flex-col gap-4">
+              <ul class="flex flex-col divide-y divide-default border-t border-default">
                 <li
                   v-for="ind in data.rhk.indicators"
                   :key="ind.id"
-                  class="flex flex-col gap-0.5"
+                  class="flex flex-col gap-0.5 py-3"
                 >
-                  <span class="text-xs font-semibold text-muted">{{ ASPECT_LABELS[ind.aspect] }} · target {{ formatNumber(ind.target) }} {{ ind.unit }}</span>
+                  <span class="text-xs text-toned">{{ ASPECT_LABELS[ind.aspect] }} · target {{ formatNumber(ind.target) }} {{ ind.unit }}</span>
                   <span class="text-sm text-highlighted">{{ ind.indicator }}</span>
                 </li>
                 <li
@@ -410,28 +412,29 @@ async function copyPrevious() {
                   </h2>
                   <ULink
                     :to="`/bukti?rhkId=${id}`"
-                    class="text-sm font-medium text-info"
+                    class="text-sm font-semibold text-blue-600 underline underline-offset-2 hover:text-blue-700 dark:text-blue-400"
                   >
                     Lihat semua
                   </ULink>
                 </div>
               </template>
-              <ul class="flex flex-col gap-2">
+              <ul class="flex flex-col divide-y divide-default border-t border-default">
                 <li
                   v-for="e in data.evidence"
                   :key="e.id"
+                  class="py-2.5"
                 >
                   <ULink
                     :to="e.url!"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="flex items-center gap-2 text-sm text-info"
+                    class="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
                   >
                     <UIcon
-                      name="i-lucide-link"
+                      name="i-ctm-link"
                       class="size-4 shrink-0"
                     />
-                    <span class="truncate">{{ e.name }}</span>
+                    <span class="truncate underline underline-offset-2">{{ e.name }}</span>
                   </ULink>
                 </li>
                 <li
@@ -443,10 +446,10 @@ async function copyPrevious() {
               </ul>
               <p
                 v-if="data.stats.missingEvidence"
-                class="mt-3 flex items-center gap-1.5 text-sm text-warning"
+                class="flex items-center gap-1.5 border-t border-default pt-2.5 text-[13px] text-warning"
               >
                 <UIcon
-                  name="i-lucide-triangle-alert"
+                  name="i-ctm-warning"
                   class="size-4"
                 />{{ data.stats.missingEvidence }} progres harian belum punya bukti
               </p>
@@ -458,19 +461,15 @@ async function copyPrevious() {
                   Realisasi periode
                 </h2>
               </template>
-              <p class="text-sm text-muted">
+              <p class="text-sm text-toned">
                 Draf realisasi {{ data.period.label }} untuk RHK ini disusun dari progres harian di atas. Batas pengisian {{ formatDate(data.period.submissionDeadline) }}.
               </p>
-              <UButton
+              <ULink
                 :to="`/realisasi?periodId=${data.period.id}`"
-                color="neutral"
-                variant="ghost"
-                size="sm"
-                trailing-icon="i-lucide-chevron-right"
-                class="mt-3 -ml-2.5"
+                class="mt-1 inline-block text-sm font-semibold text-blue-600 underline underline-offset-2 hover:text-blue-700 dark:text-blue-400"
               >
                 Lihat draf realisasi
-              </UButton>
+              </ULink>
             </UCard>
           </div>
         </div>
@@ -493,7 +492,6 @@ async function copyPrevious() {
         <template #footer>
           <div class="flex w-full justify-end gap-2">
             <UButton
-              color="neutral"
               variant="ghost"
               @click="deleting = null"
             >

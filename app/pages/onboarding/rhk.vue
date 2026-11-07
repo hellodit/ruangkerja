@@ -113,9 +113,8 @@ function onPeriodSaved() {
           </h2>
           <UButton
             v-if="skp?.skp"
-            color="neutral"
             variant="ghost"
-            icon="i-lucide-clipboard-paste"
+            icon="i-ctm-copy"
             @click="bulkOpen = true"
           >
             Tempel beberapa RHK
@@ -126,7 +125,7 @@ function onPeriodSaved() {
           v-if="!skp?.skp"
           color="warning"
           variant="subtle"
-          icon="i-lucide-calendar"
+          icon="i-ctm-date"
           title="Simpan periode evaluasi dulu"
           description="RHK disimpan untuk tahun SKP yang dipilih."
         />
@@ -142,7 +141,7 @@ function onPeriodSaved() {
           >
             <template #leading="{ item }">
               <UIcon
-                :name="rhks.find(r => r.id === item.value)?.indicators.length ? 'i-lucide-circle-check' : 'i-lucide-clock'"
+                :name="rhks.find(r => r.id === item.value)?.indicators.length ? 'i-ctm-checkmark-circle' : 'i-ctm-clock'"
                 class="size-5 shrink-0"
                 :class="rhks.find(r => r.id === item.value)?.indicators.length ? 'text-success' : 'text-warning'"
               />
@@ -205,7 +204,7 @@ function onPeriodSaved() {
           v-if="skp?.skp && !adding"
           color="neutral"
           variant="outline"
-          icon="i-lucide-plus"
+          icon="i-ctm-plus"
           class="self-start"
           @click="startAdding"
         >
@@ -235,7 +234,6 @@ function onPeriodSaved() {
       <template #footer>
         <div class="flex w-full justify-end gap-2">
           <UButton
-            color="neutral"
             variant="ghost"
             @click="bulkOpen = false"
           >
@@ -258,7 +256,7 @@ function onPeriodSaved() {
         color="neutral"
         variant="outline"
         size="lg"
-        icon="i-lucide-chevron-left"
+        icon="i-ctm-chevron-left"
       >
         Kembali
       </UButton>
@@ -267,7 +265,6 @@ function onPeriodSaved() {
         <template v-else>{{ rhks.length }} RHK tersimpan. RHK lain bisa ditambah kapan saja dari menu RHK saya.</template>
       </span>
       <UButton
-        color="neutral"
         variant="ghost"
         size="lg"
         @click="notify.success('Tersimpan', 'Lanjutkan kapan saja.')"
@@ -277,7 +274,7 @@ function onPeriodSaved() {
       <UButton
         to="/onboarding/ringkasan"
         size="lg"
-        trailing-icon="i-lucide-chevron-right"
+        trailing-icon="i-ctm-chevron-right"
         :disabled="!canContinue"
       >
         Lanjut

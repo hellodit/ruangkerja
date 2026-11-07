@@ -1,7 +1,7 @@
 import { AlignmentType, Document, HeadingLevel, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx'
 import { eq } from 'drizzle-orm'
 
-/** RLS-03: real .docx (opens cleanly in Word and WPS) with the independence statement. */
+/** RLS-03: real .docx (opens cleanly in Word and WPS) with a privacy-policy footer. */
 export default defineEventHandler(async (event) => {
   const { user, today, timezone } = await requireWorkspaceUser(event)
   const ws = await requireWorkspace(user.id, today)
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
 
   children.push(new Paragraph({
     alignment: AlignmentType.LEFT,
-    children: [new TextRun({ text: 'Draf personal disusun dari progres harian yang dicatat pengguna. RuangKerja adalah aplikasi independen, bukan aplikasi resmi pemerintah, tidak terhubung ke e-Kinerja BKN, dan tidak menggantikan penilaian resmi.', size: 16, italics: true })]
+    children: [new TextRun({ text: `Draf personal disusun dari progres harian yang dicatat pengguna. Kebijakan privasi: ${useRuntimeConfig().public.siteUrl.replace(/\/+$/, '')}/privasi`, size: 16, italics: true })]
   }))
 
   const doc = new Document({

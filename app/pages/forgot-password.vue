@@ -43,7 +43,7 @@ async function onSubmit(event: FormSubmitEvent<ForgotPasswordInput>) {
     class="space-y-5 text-center"
   >
     <UIcon
-      name="i-lucide-mail-check"
+      name="i-ctm-email-notification"
       class="mx-auto size-10 text-brand-ink"
     />
     <p class="text-muted">
@@ -74,7 +74,7 @@ async function onSubmit(event: FormSubmitEvent<ForgotPasswordInput>) {
           v-if="formError"
           color="error"
           variant="subtle"
-          icon="i-lucide-circle-alert"
+          icon="i-ctm-alert-circle"
           :title="formError"
         />
         <CaptchaField

@@ -130,8 +130,7 @@ async function onSubmit(event: FormSubmitEvent<ReturnType<typeof rhkSchema.parse
               />
             </UFormField>
             <UButton
-              icon="i-lucide-trash-2"
-              color="neutral"
+              icon="i-ctm-delete"
               variant="ghost"
               :aria-label="`Hapus indikator ${i + 1}`"
               :disabled="state.indicators.length === 1"
@@ -141,8 +140,7 @@ async function onSubmit(event: FormSubmitEvent<ReturnType<typeof rhkSchema.parse
         </div>
       </div>
       <UButton
-        icon="i-lucide-plus"
-        color="neutral"
+        icon="i-ctm-plus"
         variant="ghost"
         class="self-start"
         :disabled="state.indicators.length >= 10"
@@ -155,7 +153,6 @@ async function onSubmit(event: FormSubmitEvent<ReturnType<typeof rhkSchema.parse
     <div class="flex flex-wrap justify-end gap-2 border-t border-default pt-4">
       <UButton
         v-if="cancelable"
-        color="neutral"
         variant="ghost"
         @click="emit('cancel')"
       >

@@ -12,8 +12,8 @@ const client = useAuthClient()
 const token = computed(() => (typeof route.query.token === 'string' ? route.query.token : ''))
 const invalid = computed(() => !token.value || typeof route.query.error === 'string')
 const fields: AuthFormField[] = [
-  { name: 'password', type: 'password', label: 'Kata sandi baru', autocomplete: 'new-password', required: true },
-  { name: 'confirmPassword', type: 'password', label: 'Konfirmasi kata sandi', autocomplete: 'new-password', required: true }
+  { name: 'password', type: 'password', icon: 'i-ctm-square-lock-01', label: 'Kata sandi baru', autocomplete: 'new-password', required: true },
+  { name: 'confirmPassword', type: 'password', icon: 'i-ctm-square-lock-01', label: 'Konfirmasi kata sandi', autocomplete: 'new-password', required: true }
 ]
 const loading = ref(false)
 const formError = ref('')
@@ -38,7 +38,7 @@ async function onSubmit(event: FormSubmitEvent<ResetPasswordInput>) {
     class="space-y-5 text-center"
   >
     <UIcon
-      name="i-lucide-link-2-off"
+      name="i-ctm-link"
       class="mx-auto size-10 text-error"
     />
     <p class="text-muted">
@@ -66,7 +66,7 @@ async function onSubmit(event: FormSubmitEvent<ResetPasswordInput>) {
         v-if="formError"
         color="error"
         variant="subtle"
-        icon="i-lucide-circle-alert"
+        icon="i-ctm-alert-circle"
         :title="formError"
       />
     </template>

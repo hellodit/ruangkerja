@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TableColumn } from '@nuxt/ui'
+import type { DropdownMenuItem, TableColumn } from '@nuxt/ui'
 import type { InternalApi } from 'nitropack'
 
 useSeoMeta({ title: 'Bukti dukung' })
@@ -71,6 +71,13 @@ async function removeLink(item: Item) {
     notify.error(err)
   }
 }
+function evidenceMenu(item: Item): DropdownMenuItem[][] {
+  return [
+    [{ label: 'Ubah', icon: 'i-ctm-edit', onSelect: () => startEdit(item) }, { label: 'Buka progres', icon: 'i-ctm-notes', to: `/progres/${item.progressId}` }],
+    [{ label: 'Hapus tautan', icon: 'i-ctm-delete', color: 'error', onSelect: () => removeLink(item) }]
+  ]
+}
+
 function host(url: string) {
   try {
     return `${new URL(url).hostname}/…`
@@ -83,61 +90,19 @@ function host(url: string) {
 <template>
   <UDashboardPanel id="bukti">
     <template #header>
-      <UDashboardNavbar title="Bukti dukung">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
-      </UDashboardNavbar>
-      <UDashboardToolbar>
-        <template #left>
-          <UInput
-            v-model="q"
-            icon="i-lucide-search"
-            placeholder="Cari nama dokumen atau rencana aksi"
-            size="sm"
-            class="w-72"
-            aria-label="Cari bukti"
-          />
-          <div
-            role="group"
-            aria-label="Filter RHK"
-            class="flex flex-wrap gap-1.5"
-          >
-            <UButton
-              v-for="c in rhkChips"
-              :key="c.label"
-              size="sm"
-              :color="rhkId === c.id ? 'primary' : 'neutral'"
-              :variant="rhkId === c.id ? 'soft' : 'outline'"
-              class="rounded-full"
-              :aria-pressed="rhkId === c.id"
-              @click="rhkId = c.id"
-            >
-              {{ c.label }}
-            </UButton>
-          </div>
-        </template>
-        <template #right>
-          <UButton
-            icon="i-lucide-plus"
-            @click="addFor()"
-          >
-            Tambah bukti
-          </UButton>
-        </template>
-      </UDashboardToolbar>
+      <UDashboardNavbar title="Bukti dukung" />
     </template>
 
     <template #body>
       <StartFromRhk v-if="me && !me.rhkCount" />
       <div
         v-else
-        class="mx-auto flex w-full max-w-6xl flex-col gap-6"
+        class="flex w-full max-w-[1200px] flex-col gap-6"
       >
         <UAlert
           color="info"
           variant="subtle"
-          icon="i-lucide-info"
+          icon="i-ctm-information"
           description="Bukti disimpan sebagai nama dokumen dan tautan. File tetap di Google Drive atau penyimpanan instansi, dan tautannya perlu bisa dibuka atasan. Jangan menautkan dokumen rahasia atau data pribadi warga."
         />
 
@@ -150,25 +115,21 @@ function host(url: string) {
                 </h2>
                 <p
                   v-if="data?.period"
-                  class="text-sm text-muted"
+                  class="text-sm text-toned"
                 >
                   Lengkapi sebelum batas pengisian {{ formatDate(data.period.submissionDeadline) }}.
                 </p>
               </div>
-              <UBadge
-                color="warning"
-                variant="subtle"
-                size="lg"
-              >
+              <StatusChip color="warning">
                 {{ missing.length }} progres
-              </UBadge>
+              </StatusChip>
             </div>
           </template>
-          <ul class="divide-y divide-default">
+          <ul class="divide-y divide-default border-t border-default">
             <li
               v-for="m in missing"
               :key="m.id"
-              class="flex flex-wrap items-center gap-3 py-3"
+              class="flex flex-wrap items-center gap-3 py-5"
             >
               <div class="min-w-60 flex-1">
                 <p class="text-sm text-highlighted">
@@ -182,7 +143,7 @@ function host(url: string) {
                 color="neutral"
                 variant="outline"
                 size="sm"
-                icon="i-lucide-link"
+                icon="i-ctm-link"
                 @click="addFor(m.id)"
               >
                 Tambah tautan
@@ -191,33 +152,124 @@ function host(url: string) {
           </ul>
         </UCard>
 
-        <UCard :ui="{ body: 'p-0 sm:p-0' }">
+        <UCard :ui="{ body: 'flex flex-col gap-4' }">
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-3">
+            <UInput
+              v-model="q"
+              icon="i-ctm-search"
+              placeholder="Cari nama dokumen atau rencana aksi"
+              class="w-full sm:w-100"
+              aria-label="Cari bukti"
+            />
+            <div
+              role="group"
+              aria-label="Filter RHK"
+              class="flex flex-wrap gap-2"
+            >
+              <UButton
+                v-for="c in rhkChips"
+                :key="c.label"
+                color="neutral"
+                variant="outline"
+                class="h-[30px] rounded-full px-3 text-sm/5 font-normal ring-default"
+                :class="rhkId === c.id && 'bg-brand-100 text-brand-ink ring-brand-700 hover:bg-brand-100 dark:bg-brand-950/50'"
+                :aria-pressed="rhkId === c.id"
+                @click="rhkId = c.id"
+              >
+                {{ c.label }}
+              </UButton>
+            </div>
+            <UButton
+              icon="i-ctm-plus"
+              size="lg"
+              class="ml-auto"
+              @click="addFor()"
+            >
+              Tambah bukti
+            </UButton>
+          </div>
+          <ul
+            class="flex flex-col gap-3 min-[740px]:hidden"
+            aria-label="Daftar bukti dukung"
+          >
+            <li v-if="!items.length">
+              <UEmpty
+                icon="i-ctm-link"
+                title="Belum ada bukti dukung"
+                description="Tambahkan tautan bukti dari form progres harian atau tombol Tambah bukti."
+              />
+            </li>
+            <li
+              v-for="item in items"
+              :key="item.id"
+            >
+              <UCard :ui="{ body: 'p-4 sm:p-4' }">
+                <div class="flex items-start gap-3">
+                  <UIcon
+                    name="i-ctm-files-01"
+                    class="mt-0.5 size-5 shrink-0 text-muted"
+                  />
+                  <div class="flex min-w-0 flex-1 flex-col gap-1">
+                    <span class="text-sm font-semibold text-highlighted">{{ item.name }}</span>
+                    <span class="text-xs text-muted">{{ formatDayMonth(item.workDate) }} · RHK {{ item.rhk.number }} · {{ item.planName }}</span>
+                    <ULink
+                      :to="item.url"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="truncate text-sm text-info"
+                    >
+                      {{ host(item.url) }}
+                    </ULink>
+                  </div>
+                  <UButton
+                    icon="i-ctm-copy"
+                    variant="ghost"
+                    size="sm"
+                    aria-label="Salin tautan"
+                    @click="copy(item.url, 'Tautan disalin')"
+                  />
+                  <UDropdownMenu
+                    :items="evidenceMenu(item)"
+                    :content="{ align: 'end' }"
+                  >
+                    <UButton
+                      icon="i-ctm-more-vertical"
+                      variant="ghost"
+                      size="sm"
+                      aria-label="Menu bukti"
+                    />
+                  </UDropdownMenu>
+                </div>
+              </UCard>
+            </li>
+          </ul>
           <UTable
+            class="rounded-md border border-default max-[739px]:hidden"
             :data="items"
             :columns="columns"
             :loading="status === 'pending'"
           >
             <template #empty>
               <UEmpty
-                icon="i-lucide-link"
+                icon="i-ctm-link"
                 title="Belum ada bukti dukung"
                 description="Tambahkan tautan bukti dari form progres harian atau tombol Tambah bukti."
                 variant="naked"
               />
             </template>
             <template #name-cell="{ row }">
-              <div class="flex max-w-64 items-center gap-2">
+              <div class="flex max-w-80 items-center gap-2.5">
                 <UIcon
-                  name="i-lucide-file-text"
-                  class="size-4 shrink-0 text-muted"
+                  name="i-ctm-files-01"
+                  class="size-5 shrink-0 text-toned"
                 />
-                <span class="text-sm font-medium whitespace-normal text-highlighted">{{ row.original.name }}</span>
+                <span class="text-sm font-semibold text-highlighted">{{ row.original.name }}</span>
               </div>
             </template>
             <template #planName-cell="{ row }">
-              <div class="flex max-w-60 flex-col gap-1">
-                <span class="text-sm whitespace-normal">{{ row.original.planName }}</span>
-                <span><RhkTag :number="row.original.rhk.number" /></span>
+              <div class="flex max-w-80 flex-col gap-0.5">
+                <span class="text-sm text-highlighted">{{ row.original.planName }}</span>
+                <span class="text-xs text-muted">RHK {{ row.original.rhk.number }}</span>
               </div>
             </template>
             <template #workDate-cell="{ row }">
@@ -228,7 +280,7 @@ function host(url: string) {
                 :to="row.original.url"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-sm text-info"
+                class="text-sm text-blue-600 underline underline-offset-2 hover:text-blue-700 dark:text-blue-400"
               >
                 {{ host(row.original.url) }}
               </ULink>
@@ -237,8 +289,7 @@ function host(url: string) {
               <div class="flex justify-end gap-1">
                 <UTooltip text="Salin tautan">
                   <UButton
-                    icon="i-lucide-copy"
-                    color="neutral"
+                    icon="i-ctm-copy"
                     variant="ghost"
                     size="sm"
                     aria-label="Salin tautan"
@@ -246,12 +297,11 @@ function host(url: string) {
                   />
                 </UTooltip>
                 <UDropdownMenu
-                  :items="[[{ label: 'Ubah', icon: 'i-lucide-pencil', onSelect: () => startEdit(row.original) }, { label: 'Buka progres', icon: 'i-lucide-notebook-pen', to: `/progres/${row.original.progressId}` }], [{ label: 'Hapus tautan', icon: 'i-lucide-trash-2', color: 'error', onSelect: () => removeLink(row.original) }]]"
+                  :items="[[{ label: 'Ubah', icon: 'i-ctm-edit', onSelect: () => startEdit(row.original) }, { label: 'Buka progres', icon: 'i-ctm-notes', to: `/progres/${row.original.progressId}` }], [{ label: 'Hapus tautan', icon: 'i-ctm-delete', color: 'error', onSelect: () => removeLink(row.original) }]]"
                   :content="{ align: 'end' }"
                 >
                   <UButton
-                    icon="i-lucide-ellipsis-vertical"
-                    color="neutral"
+                    icon="i-ctm-more-vertical"
                     variant="ghost"
                     size="sm"
                     aria-label="Menu bukti"
@@ -260,6 +310,9 @@ function host(url: string) {
               </div>
             </template>
           </UTable>
+          <p class="text-sm text-toned">
+            Menampilkan {{ items.length }} bukti dukung
+          </p>
         </UCard>
       </div>
       <EvidenceModal
@@ -289,7 +342,7 @@ function host(url: string) {
               <UInput
                 v-model="editState.evidenceUrl"
                 inputmode="url"
-                icon="i-lucide-link"
+                icon="i-ctm-link"
               />
             </UFormField>
           </div>
@@ -297,7 +350,6 @@ function host(url: string) {
         <template #footer>
           <div class="flex w-full justify-end gap-2">
             <UButton
-              color="neutral"
               variant="ghost"
               @click="editing = null"
             >

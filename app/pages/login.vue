@@ -11,13 +11,13 @@ const client = useAuthClient()
 
 const mode = ref<'password' | 'link'>('password')
 const tabs: TabsItem[] = [
-  { label: 'Kata sandi', value: 'password', icon: 'i-lucide-key-round' },
-  { label: 'Tautan ke email', value: 'link', icon: 'i-lucide-mail' }
+  { label: 'Kata sandi', value: 'password', icon: 'i-ctm-key' },
+  { label: 'Tautan ke email', value: 'link', icon: 'i-ctm-email-notification' }
 ]
 
 const passwordFields: AuthFormField[] = [
   { name: 'email', type: 'email', label: 'Email', placeholder: 'nama@instansi.go.id', autocomplete: 'email', required: true },
-  { name: 'password', type: 'password', label: 'Kata sandi', placeholder: 'Masukkan kata sandi', autocomplete: 'current-password', required: true },
+  { name: 'password', type: 'password', icon: 'i-ctm-square-lock-01', label: 'Kata sandi', placeholder: 'Masukkan kata sandi', autocomplete: 'current-password', required: true },
   { name: 'remember', type: 'checkbox', label: 'Ingat saya', defaultValue: true }
 ]
 const linkFields: AuthFormField[] = [
@@ -116,7 +116,7 @@ const providers = [{ label: 'Lanjutkan dengan Google', icon: 'i-simple-icons-goo
       class="space-y-4 text-center"
     >
       <UIcon
-        name="i-lucide-mail-check"
+        name="i-ctm-email-notification"
         class="mx-auto size-10 text-brand-ink"
       />
       <h1 class="text-xl font-semibold text-highlighted">
@@ -178,7 +178,7 @@ const providers = [{ label: 'Lanjutkan dengan Google', icon: 'i-simple-icons-goo
               v-if="formError || oauthError"
               color="error"
               variant="subtle"
-              icon="i-lucide-circle-alert"
+              icon="i-ctm-alert-circle"
               :title="formError || oauthError"
             />
             <CaptchaField
@@ -205,7 +205,7 @@ const providers = [{ label: 'Lanjutkan dengan Google', icon: 'i-simple-icons-goo
               v-if="formError || oauthError"
               color="error"
               variant="subtle"
-              icon="i-lucide-circle-alert"
+              icon="i-ctm-alert-circle"
               :title="formError || oauthError"
             />
             <CaptchaField

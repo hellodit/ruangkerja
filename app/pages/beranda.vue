@@ -31,14 +31,12 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
   <UDashboardPanel id="beranda">
     <template #header>
       <UDashboardNavbar title="Beranda">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
         <template #right>
           <DeadlineBadge
             v-if="d"
             :deadline="d.period.submissionDeadline"
             :today="d.today"
+            class="hidden sm:inline-flex"
           />
         </template>
       </UDashboardNavbar>
@@ -48,14 +46,14 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
       <StartFromRhk v-if="!d" />
       <div
         v-else
-        class="mx-auto flex w-full max-w-6xl flex-col gap-6"
+        class="flex w-full max-w-[1200px] flex-col gap-6"
       >
         <div class="flex flex-col gap-1">
           <span class="text-xs font-semibold tracking-[1.1px] text-muted uppercase">{{ formatDateLong(d.today) }}</span>
-          <h2 class="text-2xl font-bold text-highlighted sm:text-3xl">
+          <h2 class="text-2xl font-bold tracking-[-0.15px] text-highlighted sm:text-[28px]/9">
             Halo, {{ firstName }}
           </h2>
-          <p class="text-muted">
+          <p class="text-base text-toned">
             {{ attention }}
           </p>
         </div>
@@ -63,26 +61,26 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <KpiCard
             label="Rencana aksi periode ini"
-            icon="i-lucide-list-ordered"
+            icon="i-ctm-list-number"
             :value="d.plans.total"
             :note="`${d.plans.done} selesai · ${d.plans.running} berjalan · ${d.plans.notStarted} belum dimulai`"
           />
           <KpiCard
             label="Progres harian minggu ini"
-            icon="i-lucide-notebook-pen"
+            icon="i-ctm-notes"
             :value="d.week.count"
             :note="`Tercatat di ${d.week.daysWithEntries} dari ${d.week.workdaysSoFar} hari kerja`"
           />
           <KpiCard
             label="Bukti dukung terkumpul"
-            icon="i-lucide-link"
+            icon="i-ctm-link"
             :value="d.evidence.count"
             :note="d.evidence.missing ? `${d.evidence.missing} progres belum ada tautan` : 'Semua progres punya bukti'"
             :tone="d.evidence.missing ? 'warning' : 'default'"
           />
           <KpiCard
             label="Menuju batas pengisian"
-            icon="i-lucide-calendar"
+            icon="i-ctm-date"
             :value="`${Math.max(0, d.daysToDeadline)} hari`"
             :note="formatDateLong(d.period.submissionDeadline)"
           />
@@ -97,16 +95,15 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                     <h3 class="text-lg font-semibold text-highlighted">
                       Progres harian minggu ini
                     </h3>
-                    <p class="text-sm text-muted">
+                    <p class="text-sm text-toned">
                       {{ formatRange(d.week.start, d.week.end) }} · {{ d.week.count }} catatan · rata-rata {{ formatNumber(Math.round(avg * 10) / 10) }} per hari kerja
                     </p>
                   </div>
                   <UButton
                     to="/progres"
-                    color="neutral"
                     variant="ghost"
                     size="sm"
-                    trailing-icon="i-lucide-chevron-right"
+                    trailing-icon="i-ctm-chevron-right"
                   >
                     Lihat progres harian
                   </UButton>
@@ -154,10 +151,9 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                   </h3>
                   <UButton
                     to="/rhk"
-                    color="neutral"
                     variant="ghost"
                     size="sm"
-                    trailing-icon="i-lucide-chevron-right"
+                    trailing-icon="i-ctm-chevron-right"
                   >
                     Lihat semua
                   </UButton>
@@ -171,12 +167,12 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
               </p>
               <ul
                 v-else
-                class="divide-y divide-default"
+                class="divide-y divide-default border-t border-default"
               >
                 <li
                   v-for="p in d.priority"
                   :key="p.id"
-                  class="flex flex-wrap items-center gap-x-4 gap-y-2 py-3.5"
+                  class="flex flex-wrap items-center gap-x-4 gap-y-2 py-4"
                 >
                   <div class="flex min-w-60 flex-1 flex-col gap-0.5">
                     <NuxtLink
@@ -223,7 +219,7 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                 </p>
                 <UButton
                   to="/progres/tambah"
-                  icon="i-lucide-plus"
+                  icon="i-ctm-plus"
                   size="sm"
                 >
                   Tambah progres
@@ -240,7 +236,7 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                 >
                   <span class="font-mono text-xs leading-5 text-muted">{{ formatTime(e.startTime) }}–{{ formatTime(e.endTime) }}</span>
                   <div class="flex flex-col gap-1">
-                    <span class="text-sm">{{ e.description }}</span>
+                    <span class="text-sm text-highlighted">{{ e.description }}</span>
                     <span
                       class="text-xs"
                       :class="e.evidenceCount ? 'text-muted' : 'text-warning'"
@@ -250,8 +246,7 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                   </div>
                   <UTooltip text="Salin untuk e-Kinerja">
                     <UButton
-                      icon="i-lucide-copy"
-                      color="neutral"
+                      icon="i-ctm-copy"
                       variant="ghost"
                       size="sm"
                       aria-label="Salin untuk e-Kinerja"
@@ -279,9 +274,9 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                       :to="`/rhk/${r.id}`"
                       class="font-semibold text-highlighted hover:underline"
                     >RHK {{ r.number }}</NuxtLink>
-                    <span class="text-muted tabular-nums">{{ r.done }} dari {{ r.total }}</span>
+                    <span class="text-highlighted tabular-nums">{{ r.done }} dari {{ r.total }}</span>
                   </div>
-                  <span class="text-xs text-muted">{{ r.statement }}</span>
+                  <span class="text-xs text-toned">{{ r.statement }}</span>
                   <UProgress
                     :model-value="r.total ? Math.round(r.done / r.total * 100) : 0"
                     size="sm"
@@ -292,7 +287,6 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
             </UCard>
           </div>
         </div>
-        <AppDisclaimer />
       </div>
     </template>
   </UDashboardPanel>

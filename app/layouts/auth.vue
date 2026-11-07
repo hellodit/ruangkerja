@@ -17,7 +17,12 @@
       </UCard>
     </main>
     <footer class="mx-auto w-full max-w-2xl px-6 pb-6 text-center">
-      <AppDisclaimer />
+      <ULink
+        to="/privasi"
+        class="text-xs text-muted underline underline-offset-2 hover:text-default"
+      >
+        Kebijakan privasi
+      </ULink>
     </footer>
   </div>
 </template>

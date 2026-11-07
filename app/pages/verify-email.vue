@@ -12,7 +12,7 @@ await auth.refresh()
 <template>
   <div class="space-y-5 text-center">
     <UIcon
-      :name="failed ? 'i-lucide-circle-x' : 'i-lucide-badge-check'"
+      :name="failed ? 'i-ctm-alert-circle' : 'i-ctm-checkmark-circle'"
       class="mx-auto size-12"
       :class="failed ? 'text-error' : 'text-success'"
     />
