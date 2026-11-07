@@ -3,6 +3,7 @@ import type { TableColumn } from '@nuxt/ui'
 import type { InternalApi } from 'nitropack'
 import { ADMIN_USER_FILTERS, type AdminUserFilter } from '#shared/schemas/admin'
 
+definePageMeta({ layout: 'admin' })
 useSeoMeta({ title: 'Pengguna · Admin' })
 type AdminUser = InternalApi['/api/admin/users']['get']['users'][number]
 
