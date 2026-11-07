@@ -293,7 +293,6 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
             </UCard>
           </div>
         </div>
-        <AppDisclaimer />
       </div>
     </template>
   </UDashboardPanel>

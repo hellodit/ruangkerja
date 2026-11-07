@@ -353,7 +353,6 @@ async function deleteAccount() {
             </div>
           </div>
         </UCard>
-        <AppDisclaimer />
       </div>
       <UModal
         v-model:open="deleteOpen"

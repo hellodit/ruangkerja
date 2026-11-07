@@ -120,7 +120,6 @@ const userItems = computed<DropdownMenuItem[][]>(() => [
           v-if="!collapsed"
           class="text-[11px]/4 text-muted"
         >
-          Aplikasi independen. Bukan aplikasi resmi BKN atau e-Kinerja.
           <ULink
             to="/privasi"
             class="underline underline-offset-2 hover:text-default"

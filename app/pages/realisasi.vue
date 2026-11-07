@@ -297,7 +297,6 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
         <p class="text-xs text-muted">
           Draf personal. Narasi hanya berisi aktivitas dari progres harian yang kamu catat. Periksa kembali sebelum disalin ke e-Kinerja.
         </p>
-        <AppDisclaimer />
       </div>
       <UModal
         :open="!!editing"

@@ -97,9 +97,7 @@ async function signUpWithGoogle() {
           target="_blank"
           class="font-medium text-brand-ink"
         >
-          kebijakan privasi
-        </ULink>
-        dan memahami bahwa RuangKerja adalah alat bantu personal yang independen, bukan aplikasi resmi pemerintah. Jangan memasukkan data rahasia atau data warga.
+          kebijakan privasi</ULink>. Jangan memasukkan data rahasia atau data warga.
       </p>
     </template>
   </UAuthForm>

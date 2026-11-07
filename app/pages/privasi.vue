@@ -17,7 +17,7 @@ const sections = [
   {
     title: 'Tentang RuangKerja',
     body: [
-      'RuangKerja adalah alat bantu kerja personal untuk ASN. RuangKerja adalah aplikasi independen, bukan aplikasi resmi pemerintah, tidak terhubung ke e-Kinerja BKN maupun sistem pemerintah lain, dan tidak mengirim data ke sistem tersebut.',
+      'RuangKerja adalah alat bantu kerja personal untuk ASN. RuangKerja tidak terhubung ke e-Kinerja BKN maupun sistem pemerintah lain, dan tidak mengirim data Anda ke sistem tersebut.',
       'Kebijakan ini disusun dengan mengacu pada Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP).'
     ]
   },
@@ -159,6 +159,5 @@ const sections = [
         Kembali
       </UButton>
     </div>
-    <AppDisclaimer />
   </article>
 </template>
