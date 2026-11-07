@@ -38,7 +38,7 @@ function remove(index: number) {
       <div class="flex items-center justify-between">
         <span class="text-sm font-semibold text-highlighted">Hasil {{ index + 1 }}</span>
         <UButton
-          icon="i-lucide-trash-2"
+          icon="i-ctm-delete"
           color="neutral"
           variant="ghost"
           size="sm"
@@ -58,19 +58,20 @@ function remove(index: number) {
         />
       </UFormField>
       <UFormField
-        label="Tautan bukti (opsional)"
+        label="Tautan bukti"
+        hint="Opsional"
         :name="`results.${index}.evidenceUrl`"
       >
         <UInput
           v-model="item.evidenceUrl"
           inputmode="url"
-          icon="i-lucide-link"
+          icon="i-ctm-link"
           placeholder="Contoh: tautan Google Drive"
         />
       </UFormField>
     </div>
     <UButton
-      icon="i-lucide-plus"
+      icon="i-ctm-plus"
       color="neutral"
       variant="ghost"
       class="self-start"

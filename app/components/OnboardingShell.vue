@@ -4,9 +4,9 @@ import type { StepperItem } from '@nuxt/ui'
 /** ONB-01: three steps; actions live in the bottom bar, never in the header. */
 const props = defineProps<{ step: 1 | 2 | 3 }>()
 const items: StepperItem[] = [
-  { title: 'Isi profil', icon: 'i-lucide-user' },
-  { title: 'RHK', icon: 'i-lucide-target' },
-  { title: 'Ringkasan', icon: 'i-lucide-check' }
+  { title: 'Isi profil', icon: 'i-ctm-user' },
+  { title: 'RHK', icon: 'i-ctm-policy' },
+  { title: 'Ringkasan', icon: 'i-ctm-check' }
 ]
 // UStepper's model value is the 0-based index of the active step.
 const current = computed(() => props.step - 1)

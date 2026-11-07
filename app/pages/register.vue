@@ -12,8 +12,8 @@ const toast = useToast()
 const fields: AuthFormField[] = [
   { name: 'name', type: 'text', label: 'Nama lengkap', placeholder: 'Nama sesuai data kepegawaian', autocomplete: 'name', required: true },
   { name: 'email', type: 'email', label: 'Email', placeholder: 'nama@instansi.go.id', autocomplete: 'email', required: true },
-  { name: 'password', type: 'password', label: 'Kata sandi', description: 'Minimal 8 karakter.', autocomplete: 'new-password', required: true },
-  { name: 'confirmPassword', type: 'password', label: 'Konfirmasi kata sandi', autocomplete: 'new-password', required: true }
+  { name: 'password', type: 'password', icon: 'i-ctm-square-lock-01', label: 'Kata sandi', description: 'Minimal 8 karakter.', autocomplete: 'new-password', required: true },
+  { name: 'confirmPassword', type: 'password', icon: 'i-ctm-square-lock-01', label: 'Konfirmasi kata sandi', autocomplete: 'new-password', required: true }
 ]
 
 const captcha = ref('')
@@ -40,7 +40,7 @@ async function onSubmit(event: FormSubmitEvent<SignUpInput>) {
     formError.value = authErrorMessage(error)
     return
   }
-  toast.add({ title: 'Akun berhasil dibuat', description: 'Tautan verifikasi sudah dikirim ke email Anda.', color: 'success', icon: 'i-lucide-mail-check' })
+  toast.add({ title: 'Akun berhasil dibuat', description: 'Tautan verifikasi sudah dikirim ke email Anda.', color: 'success', icon: 'i-ctm-email-notification' })
   await auth.refresh()
   clearNuxtState('me')
   await navigateTo(auth.loggedIn.value ? '/onboarding/profil' : '/login')
@@ -80,7 +80,7 @@ async function signUpWithGoogle() {
           v-if="formError"
           color="error"
           variant="subtle"
-          icon="i-lucide-circle-alert"
+          icon="i-ctm-alert-circle"
           :title="formError"
         />
         <CaptchaField

@@ -2,11 +2,11 @@
 /** NFR Mobile: below 740 px the main menu is a bottom navigation bar. */
 const route = useRoute()
 const items = [
-  { label: 'Beranda', icon: 'i-lucide-house', to: '/beranda' },
-  { label: 'RHK', icon: 'i-lucide-target', to: '/rhk' },
-  { label: 'Progres', icon: 'i-lucide-notebook-pen', to: '/progres' },
-  { label: 'Bukti', icon: 'i-lucide-link', to: '/bukti' },
-  { label: 'Realisasi', icon: 'i-lucide-chart-column', to: '/realisasi' }
+  { label: 'Beranda', icon: 'i-ctm-home', to: '/beranda' },
+  { label: 'RHK', icon: 'i-ctm-policy', to: '/rhk' },
+  { label: 'Progres', icon: 'i-ctm-notes', to: '/progres' },
+  { label: 'Bukti', icon: 'i-ctm-link', to: '/bukti' },
+  { label: 'Realisasi', icon: 'i-ctm-analytics', to: '/realisasi' }
 ]
 const isActive = (to: string) => route.path === to || route.path.startsWith(`${to}/`)
 </script>

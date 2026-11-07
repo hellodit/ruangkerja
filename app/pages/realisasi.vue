@@ -78,7 +78,7 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
           <USelect
             v-model="selectedPeriod"
             :items="periodItems"
-            icon="i-lucide-calendar"
+            icon="i-ctm-date"
             class="w-56"
             aria-label="Pilih periode"
           />
@@ -90,12 +90,12 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
             download
             color="neutral"
             variant="outline"
-            icon="i-lucide-download"
+            icon="i-ctm-upload"
           >
             Unduh Word
           </UButton>
           <UButton
-            icon="i-lucide-copy"
+            icon="i-ctm-copy"
             @click="copyRealization()"
           >
             Salin semua realisasi
@@ -113,7 +113,7 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
         <UAlert
           :color="data.daysToDeadline <= 3 ? 'error' : 'warning'"
           variant="subtle"
-          icon="i-lucide-clock"
+          icon="i-ctm-clock"
           :title="`Batas pengisian ${data.period.label}: ${formatDateLong(data.period.submissionDeadline)} · ${data.daysToDeadline >= 0 ? `${data.daysToDeadline} hari lagi` : `lewat ${-data.daysToDeadline} hari`}`"
           description="Isi realisasi dan tautan bukti dukung di e-Kinerja sebelum tanggal ini. Setelah itu atasan melakukan evaluasi periode."
         />
@@ -168,7 +168,7 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
                   color="neutral"
                   variant="ghost"
                   size="sm"
-                  icon="i-lucide-pencil"
+                  icon="i-ctm-edit"
                   @click="startEdit(r)"
                 >
                   Ubah
@@ -177,7 +177,7 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
                   color="neutral"
                   variant="outline"
                   size="sm"
-                  icon="i-lucide-copy"
+                  icon="i-ctm-copy"
                   :disabled="!(r.finalText || r.draftText)"
                   @click="copyRealization(r.rhk.id)"
                 >
@@ -221,7 +221,7 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
                   color="neutral"
                   variant="link"
                   size="xs"
-                  trailing-icon="i-lucide-chevron-down"
+                  trailing-icon="i-ctm-chevron-down"
                   class="-ml-2.5 group"
                   :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform' }"
                 >
@@ -265,7 +265,7 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
               :key="name"
               color="warning"
               variant="subtle"
-              icon="i-lucide-triangle-alert"
+              icon="i-ctm-warning"
               :title="`Rencana aksi “${name}” belum punya progres harian, jadi tidak dimasukkan ke draf realisasi.`"
             />
 
@@ -321,7 +321,7 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
               v-if="editing?.finalText"
               color="neutral"
               variant="ghost"
-              icon="i-lucide-rotate-ccw"
+              icon="i-ctm-undo"
               @click="saveEdit(true)"
             >
               Kembali ke draf

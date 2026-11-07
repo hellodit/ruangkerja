@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+/* CTM: blue focus ring only while navigating with the keyboard (set by plugins/focus-mode.client.ts). */
+@custom-variant keyboard (&:where(html[data-focus-mode="keyboard"] *));
+
 /* CTM Project design system — self-hosted fonts (SIL OFL, see /fonts/RethinkSans-OFL.txt) */
 @font-face {
   font-family: 'Rethink Sans';
@@ -80,4 +83,21 @@
   @variant dark {
     color: var(--color-brand-400);
   }
+}
+
+/* CTM Field: date/time inputs show the CTM trailing icon (ic-date / ic-clock);
+   the browser's native picker button sits invisibly on top of it. */
+input[type="date"],
+input[type="time"] {
+  position: relative;
+}
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 0.75rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
 }

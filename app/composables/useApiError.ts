@@ -11,8 +11,8 @@ export function apiErrorMessage(err: unknown, fallback = 'Terjadi kesalahan. Sil
 export function useNotify() {
   const toast = useToast()
   return {
-    success: (title: string, description?: string) => toast.add({ title, description, color: 'success', icon: 'i-lucide-circle-check' }),
-    error: (err: unknown, fallback?: string) => toast.add({ title: apiErrorMessage(err, fallback), color: 'error', icon: 'i-lucide-circle-alert' })
+    success: (title: string, description?: string) => toast.add({ title, description, color: 'success', icon: 'i-ctm-checkmark-circle' }),
+    error: (err: unknown, fallback?: string) => toast.add({ title: apiErrorMessage(err, fallback), color: 'error', icon: 'i-ctm-alert-circle' })
   }
 }
 
@@ -22,7 +22,7 @@ export function useCopyText() {
   return async (text: string, title = 'Teks disalin') => {
     try {
       await navigator.clipboard.writeText(text)
-      toast.add({ title, description: 'Tempel di e-Kinerja.', color: 'success', icon: 'i-lucide-clipboard-check' })
+      toast.add({ title, description: 'Tempel di e-Kinerja.', color: 'success', icon: 'i-ctm-check' })
       return true
     } catch {
       toast.add({ title: 'Gagal menyalin', description: 'Izinkan akses clipboard di browser.', color: 'error' })

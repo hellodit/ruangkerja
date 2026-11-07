@@ -100,6 +100,7 @@ async function onSubmit(event: FormSubmitEvent<z.output<typeof formSchema>>) {
           >
             <UInput
               v-model="state.dueDate"
+              trailing-icon="i-ctm-date"
               type="date"
             />
           </UFormField>

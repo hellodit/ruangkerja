@@ -15,7 +15,7 @@ async function onSaved(id: string) {
         <template #leading>
           <UButton
             to="/rhk"
-            icon="i-lucide-chevron-left"
+            icon="i-ctm-chevron-left"
             color="neutral"
             variant="ghost"
             aria-label="Kembali ke RHK saya"

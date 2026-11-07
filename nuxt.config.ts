@@ -73,13 +73,16 @@ export default defineNuxtConfig({
     }
   },
 
-  // Icons picked at runtime (ternaries) are not found by the bundle scanner.
+  // CTM Project icon set (24x24, 1.5px stroke), extracted from the design
+  // system into app/assets/icons/ctm → used as i-ctm-<name>.
   icon: {
+    customCollections: [{ prefix: 'ctm', dir: './app/assets/icons/ctm' }],
     clientBundle: {
       scan: true,
+      // Icons picked at runtime (ternaries) are not found by the scanner.
       icons: [
-        'lucide:mic', 'lucide:square', 'lucide:circle-check', 'lucide:clock', 'lucide:sun', 'lucide:moon',
-        'lucide:badge-check', 'lucide:circle-x', 'lucide:file-text', 'lucide:triangle-alert'
+        'ctm:mic', 'ctm:checkmark-circle', 'ctm:clock', 'ctm:alert-circle', 'ctm:files-01',
+        'ctm:warning', 'ctm:email-notification', 'lucide:square', 'lucide:sun', 'lucide:moon'
       ]
     }
   }

@@ -5,10 +5,10 @@ defineProps<{ title?: string, description?: string }>()
 
 <template>
   <UEmpty
-    icon="i-lucide-target"
+    icon="i-ctm-policy"
     :title="title ?? 'Mulai dari RHK'"
     :description="description ?? 'Semua rencana aksi, progres harian, dan bukti menempel ke RHK. Masukkan RHK dari SKP yang sudah disetujui.'"
-    :actions="[{ label: 'Mulai dari RHK', to: '/rhk', icon: 'i-lucide-arrow-right' }]"
+    :actions="[{ label: 'Mulai dari RHK', to: '/rhk', icon: 'i-ctm-next-01' }]"
     variant="naked"
     class="py-16"
   />

@@ -21,8 +21,8 @@ const noEvidence = ref(route.query.bukti === 'kosong')
 const { data: settings } = await useFetch('/api/settings', { key: 'settings' })
 const view = ref<'list' | 'calendar'>(settings.value?.progressView ?? 'list')
 const viewTabs: TabsItem[] = [
-  { label: 'Daftar', value: 'list', icon: 'i-lucide-list' },
-  { label: 'Kalender', value: 'calendar', icon: 'i-lucide-calendar' }
+  { label: 'Daftar', value: 'list', icon: 'i-ctm-list-bullet' },
+  { label: 'Kalender', value: 'calendar', icon: 'i-ctm-date' }
 ]
 watch(view, v => $fetch('/api/settings', { method: 'PATCH', body: { progressView: v } }).catch(() => {}))
 
@@ -132,7 +132,7 @@ function addEvidence(id: string) {
           />
           <div class="flex items-center gap-1">
             <UButton
-              icon="i-lucide-chevron-left"
+              icon="i-ctm-chevron-left"
               color="neutral"
               variant="ghost"
               aria-label="Minggu sebelumnya"
@@ -140,7 +140,7 @@ function addEvidence(id: string) {
             />
             <span class="min-w-36 text-center text-sm font-medium text-highlighted">{{ formatRange(weekStart, weekEnd) }}</span>
             <UButton
-              icon="i-lucide-chevron-right"
+              icon="i-ctm-chevron-right"
               color="neutral"
               variant="ghost"
               aria-label="Minggu berikutnya"
@@ -167,7 +167,7 @@ function addEvidence(id: string) {
             :color="noEvidence ? 'warning' : 'neutral'"
             :variant="noEvidence ? 'soft' : 'outline'"
             size="sm"
-            icon="i-lucide-triangle-alert"
+            icon="i-ctm-warning"
             :aria-pressed="noEvidence"
             @click="noEvidence = !noEvidence"
           >
@@ -178,7 +178,7 @@ function addEvidence(id: string) {
           <span class="hidden text-sm text-muted md:inline">{{ shown.length }} catatan · {{ formatDuration(totalMinutes) }}</span>
           <UButton
             to="/progres/tambah"
-            icon="i-lucide-plus"
+            icon="i-ctm-plus"
           >
             Tambah progres
           </UButton>
@@ -208,7 +208,7 @@ function addEvidence(id: string) {
           </UButton>
           <UButton
             size="sm"
-            icon="i-lucide-copy"
+            icon="i-ctm-copy"
             @click="copyEntries(selectedIds)"
           >
             Salin untuk e-Kinerja
@@ -222,10 +222,10 @@ function addEvidence(id: string) {
         >
           <li v-if="!shown.length">
             <UEmpty
-              icon="i-lucide-notebook-pen"
+              icon="i-ctm-notes"
               title="Belum ada catatan minggu ini"
               description="Catat pekerjaan hari ini dalam beberapa kalimat."
-              :actions="[{ label: 'Tambah progres', to: '/progres/tambah', icon: 'i-lucide-plus' }]"
+              :actions="[{ label: 'Tambah progres', to: '/progres/tambah', icon: 'i-ctm-plus' }]"
             />
           </li>
           <li
@@ -256,7 +256,7 @@ function addEvidence(id: string) {
                       v-if="e.hasEvidence"
                       class="flex items-center gap-1 text-info"
                     ><UIcon
-                      name="i-lucide-link"
+                      name="i-ctm-link"
                       class="size-3.5"
                     />{{ e.results.filter(r => r.evidenceUrl).length }} bukti</span>
                     <UButton
@@ -264,7 +264,7 @@ function addEvidence(id: string) {
                       color="warning"
                       variant="ghost"
                       size="xs"
-                      icon="i-lucide-triangle-alert"
+                      icon="i-ctm-warning"
                       class="-my-1"
                       @click="addEvidence(e.id)"
                     >
@@ -274,7 +274,7 @@ function addEvidence(id: string) {
                 </div>
                 <div class="flex flex-col gap-1">
                   <UButton
-                    icon="i-lucide-copy"
+                    icon="i-ctm-copy"
                     color="neutral"
                     variant="ghost"
                     size="sm"
@@ -283,7 +283,7 @@ function addEvidence(id: string) {
                   />
                   <UButton
                     :to="`/progres/${e.id}`"
-                    icon="i-lucide-pencil"
+                    icon="i-ctm-edit"
                     color="neutral"
                     variant="ghost"
                     size="sm"
@@ -310,10 +310,10 @@ function addEvidence(id: string) {
           >
             <template #empty>
               <UEmpty
-                icon="i-lucide-notebook-pen"
+                icon="i-ctm-notes"
                 title="Belum ada catatan minggu ini"
                 description="Catat pekerjaan hari ini dalam beberapa kalimat."
-                :actions="[{ label: 'Tambah progres', to: '/progres/tambah', icon: 'i-lucide-plus' }]"
+                :actions="[{ label: 'Tambah progres', to: '/progres/tambah', icon: 'i-ctm-plus' }]"
                 variant="naked"
               />
             </template>
@@ -344,7 +344,7 @@ function addEvidence(id: string) {
                 class="flex items-center gap-1 text-sm whitespace-nowrap text-info"
               >
                 <UIcon
-                  name="i-lucide-link"
+                  name="i-ctm-link"
                   class="size-4"
                 />{{ row.original.results.filter(r => r.evidenceUrl).length }} bukti
               </ULink>
@@ -353,7 +353,7 @@ function addEvidence(id: string) {
                 color="warning"
                 variant="ghost"
                 size="xs"
-                icon="i-lucide-triangle-alert"
+                icon="i-ctm-warning"
                 @click="addEvidence(row.original.id)"
               >
                 Belum ada
@@ -363,7 +363,7 @@ function addEvidence(id: string) {
               <div class="flex justify-end gap-1">
                 <UTooltip text="Salin untuk e-Kinerja">
                   <UButton
-                    icon="i-lucide-copy"
+                    icon="i-ctm-copy"
                     color="neutral"
                     variant="ghost"
                     size="sm"
@@ -374,7 +374,7 @@ function addEvidence(id: string) {
                 <UTooltip text="Ubah">
                   <UButton
                     :to="`/progres/${row.original.id}`"
-                    icon="i-lucide-pencil"
+                    icon="i-ctm-edit"
                     color="neutral"
                     variant="ghost"
                     size="sm"
@@ -396,7 +396,7 @@ function addEvidence(id: string) {
           />
           <div class="flex flex-wrap items-center justify-between gap-2 text-sm text-muted">
             <span class="flex items-center gap-1.5"><UIcon
-              name="i-lucide-info"
+              name="i-ctm-information"
               class="size-4"
             />Klik catatan untuk melihat detailnya. Klik slot kosong untuk menambah progres pada jam itu.</span>
             <span>{{ shown.length }} catatan · {{ formatDuration(totalMinutes) }}<template v-if="missingCount"> · <span class="text-warning">{{ missingCount }} belum ada bukti</span></template></span>

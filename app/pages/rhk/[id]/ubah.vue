@@ -48,7 +48,7 @@ async function remove() {
         <template #leading>
           <UButton
             :to="`/rhk/${id}`"
-            icon="i-lucide-chevron-left"
+            icon="i-ctm-chevron-left"
             color="neutral"
             variant="ghost"
             aria-label="Kembali ke detail RHK"
@@ -58,7 +58,7 @@ async function remove() {
           <UButton
             color="error"
             variant="ghost"
-            icon="i-lucide-trash-2"
+            icon="i-ctm-delete"
             @click="deleteOpen = true"
           >
             Hapus RHK
@@ -71,7 +71,7 @@ async function remove() {
         <UAlert
           color="neutral"
           variant="subtle"
-          icon="i-lucide-info"
+          icon="i-ctm-information"
           title="Perubahan di RuangKerja tidak mengubah SKP resmi di e-Kinerja."
         />
         <UCard>

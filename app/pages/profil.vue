@@ -117,7 +117,7 @@ async function deleteAccount() {
           v-if="me && !me.onboardingCompleted"
           color="info"
           variant="subtle"
-          icon="i-lucide-route"
+          icon="i-ctm-workflow-01"
           title="Persiapan belum selesai"
           :actions="[{ label: 'Lanjutkan persiapan', to: '/onboarding/profil' }]"
         />
@@ -135,7 +135,7 @@ async function deleteAccount() {
                 v-if="auth.user.value?.emailVerified"
                 color="success"
                 variant="subtle"
-                icon="i-lucide-badge-check"
+                icon="i-ctm-checkmark-circle"
               >
                 Email terverifikasi
               </UBadge>
@@ -143,7 +143,7 @@ async function deleteAccount() {
                 <UBadge
                   color="warning"
                   variant="subtle"
-                  icon="i-lucide-mail-warning"
+                  icon="i-ctm-email-notification"
                 >
                   Email belum diverifikasi
                 </UBadge>
@@ -211,6 +211,7 @@ async function deleteAccount() {
             >
               <UInput
                 v-model="prefs.remindDailyTime"
+                trailing-icon="i-ctm-clock"
                 type="time"
               />
             </UFormField>
@@ -249,6 +250,7 @@ async function deleteAccount() {
               <UInput
                 v-model="pw.currentPassword"
                 type="password"
+                icon="i-ctm-square-lock-01"
                 autocomplete="current-password"
               />
             </UFormField>
@@ -261,6 +263,7 @@ async function deleteAccount() {
                 <UInput
                   v-model="pw.newPassword"
                   type="password"
+                  icon="i-ctm-square-lock-01"
                   autocomplete="new-password"
                 />
               </UFormField>
@@ -272,6 +275,7 @@ async function deleteAccount() {
                 <UInput
                   v-model="pw.confirmPassword"
                   type="password"
+                  icon="i-ctm-square-lock-01"
                   autocomplete="new-password"
                 />
               </UFormField>
@@ -295,7 +299,7 @@ async function deleteAccount() {
             v-else
             color="info"
             variant="subtle"
-            icon="i-lucide-info"
+            icon="i-ctm-information"
             title="Akun ini masuk dengan Google atau tautan email"
             description="Gunakan “Lupa kata sandi” di halaman masuk bila ingin membuat kata sandi."
           />
@@ -323,7 +327,7 @@ async function deleteAccount() {
                 download
                 color="neutral"
                 variant="outline"
-                icon="i-lucide-download"
+                icon="i-ctm-upload"
               >
                 Ekspor data
               </UButton>
@@ -341,7 +345,7 @@ async function deleteAccount() {
               <UButton
                 color="error"
                 variant="outline"
-                icon="i-lucide-trash-2"
+                icon="i-ctm-delete"
                 @click="deleteOpen = true"
               >
                 Hapus akun

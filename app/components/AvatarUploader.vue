@@ -19,9 +19,9 @@ async function onChange(event: Event) {
   try {
     await upload('avatar', file)
     await Promise.all([auth.refresh(), refresh()])
-    toast.add({ title: 'Foto profil diperbarui', color: 'success', icon: 'i-lucide-check' })
+    toast.add({ title: 'Foto profil diperbarui', color: 'success', icon: 'i-ctm-check' })
   } catch (err) {
-    toast.add({ title: err instanceof UploadError ? err.message : 'Gagal mengunggah foto', color: 'error', icon: 'i-lucide-circle-alert' })
+    toast.add({ title: err instanceof UploadError ? err.message : 'Gagal mengunggah foto', color: 'error', icon: 'i-ctm-alert-circle' })
   }
 }
 </script>
@@ -35,7 +35,7 @@ async function onChange(event: Event) {
     />
     <div class="space-y-2">
       <UButton
-        icon="i-lucide-camera"
+        icon="i-ctm-image-02"
         color="neutral"
         variant="outline"
         :loading="uploading"

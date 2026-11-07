@@ -80,7 +80,7 @@ async function copyEntry() {
                 class="flex items-center gap-2 text-sm text-info"
               >
                 <UIcon
-                  name="i-lucide-link"
+                  name="i-ctm-link"
                   class="size-4 shrink-0"
                 /><span class="truncate">{{ r.name }}</span>
               </ULink>
@@ -90,10 +90,10 @@ async function copyEntry() {
             v-else
             color="warning"
             variant="subtle"
-            icon="i-lucide-triangle-alert"
+            icon="i-ctm-warning"
             title="Progres ini belum punya tautan bukti."
             description="Tambahkan supaya bisa dilihat atasan."
-            :actions="[{ label: 'Tambah bukti', icon: 'i-lucide-link', onClick: () => emit('addEvidence', entry!.id) }]"
+            :actions="[{ label: 'Tambah bukti', icon: 'i-ctm-link', onClick: () => emit('addEvidence', entry!.id) }]"
           />
         </div>
       </div>
@@ -110,7 +110,7 @@ async function copyEntry() {
         <UButton
           color="neutral"
           variant="outline"
-          icon="i-lucide-copy"
+          icon="i-ctm-copy"
           @click="copyEntry"
         >
           Salin untuk e-Kinerja
@@ -118,7 +118,7 @@ async function copyEntry() {
         <UButton
           v-if="entry"
           :to="`/progres/${entry.id}`"
-          icon="i-lucide-pencil"
+          icon="i-ctm-edit"
         >
           Ubah
         </UButton>

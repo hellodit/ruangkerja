@@ -70,12 +70,13 @@ async function onSubmit(event: FormSubmitEvent<ReturnType<typeof profileSchema.p
           <UInput
             :model-value="state.email"
             type="email"
-            disabled
+            readonly
           />
         </UFormField>
         <UFormField
           label="Nomor WhatsApp"
           name="phoneWhatsapp"
+          hint="Opsional"
         >
           <UInput
             v-model="state.phoneWhatsapp"
@@ -87,15 +88,18 @@ async function onSubmit(event: FormSubmitEvent<ReturnType<typeof profileSchema.p
         <UFormField
           label="Tanggal lahir"
           name="birthDate"
+          hint="Opsional"
         >
           <UInput
             v-model="state.birthDate"
+            trailing-icon="i-ctm-date"
             type="date"
           />
         </UFormField>
         <UFormField
           label="Jenis kelamin"
           name="gender"
+          hint="Opsional"
         >
           <URadioGroup
             v-model="state.gender"
@@ -106,6 +110,7 @@ async function onSubmit(event: FormSubmitEvent<ReturnType<typeof profileSchema.p
         <UFormField
           label="Alamat"
           name="address"
+          hint="Opsional"
           class="sm:col-span-2"
         >
           <UTextarea
@@ -140,6 +145,7 @@ async function onSubmit(event: FormSubmitEvent<ReturnType<typeof profileSchema.p
         <UFormField
           label="Status kepegawaian"
           name="employmentStatus"
+          hint="Opsional"
         >
           <URadioGroup
             v-model="state.employmentStatus"
@@ -150,6 +156,7 @@ async function onSubmit(event: FormSubmitEvent<ReturnType<typeof profileSchema.p
         <UFormField
           label="Pangkat/golongan"
           name="rankGrade"
+          hint="Opsional"
         >
           <UInput
             v-model="state.rankGrade"
@@ -202,12 +209,14 @@ async function onSubmit(event: FormSubmitEvent<ReturnType<typeof profileSchema.p
         <UFormField
           label="Nama atasan"
           name="supervisorName"
+          hint="Opsional"
         >
           <UInput v-model="state.supervisorName" />
         </UFormField>
         <UFormField
           label="Jabatan atasan"
           name="supervisorTitle"
+          hint="Opsional"
         >
           <UInput v-model="state.supervisorTitle" />
         </UFormField>

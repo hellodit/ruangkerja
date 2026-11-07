@@ -151,7 +151,7 @@ const sections = [
 
     <div class="flex flex-wrap gap-3">
       <UButton
-        icon="i-lucide-arrow-left"
+        icon="i-ctm-back-01"
         color="neutral"
         variant="outline"
         @click="goBack"

@@ -29,7 +29,7 @@ async function onSaved(mode: 'done' | 'again') {
         <template #leading>
           <UButton
             to="/progres"
-            icon="i-lucide-chevron-left"
+            icon="i-ctm-chevron-left"
             color="neutral"
             variant="ghost"
             aria-label="Kembali ke daftar progres harian"

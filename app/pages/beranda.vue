@@ -64,26 +64,26 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <KpiCard
             label="Rencana aksi periode ini"
-            icon="i-lucide-list-ordered"
+            icon="i-ctm-list-number"
             :value="d.plans.total"
             :note="`${d.plans.done} selesai · ${d.plans.running} berjalan · ${d.plans.notStarted} belum dimulai`"
           />
           <KpiCard
             label="Progres harian minggu ini"
-            icon="i-lucide-notebook-pen"
+            icon="i-ctm-notes"
             :value="d.week.count"
             :note="`Tercatat di ${d.week.daysWithEntries} dari ${d.week.workdaysSoFar} hari kerja`"
           />
           <KpiCard
             label="Bukti dukung terkumpul"
-            icon="i-lucide-link"
+            icon="i-ctm-link"
             :value="d.evidence.count"
             :note="d.evidence.missing ? `${d.evidence.missing} progres belum ada tautan` : 'Semua progres punya bukti'"
             :tone="d.evidence.missing ? 'warning' : 'default'"
           />
           <KpiCard
             label="Menuju batas pengisian"
-            icon="i-lucide-calendar"
+            icon="i-ctm-date"
             :value="`${Math.max(0, d.daysToDeadline)} hari`"
             :note="formatDateLong(d.period.submissionDeadline)"
           />
@@ -107,7 +107,7 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                     color="neutral"
                     variant="ghost"
                     size="sm"
-                    trailing-icon="i-lucide-chevron-right"
+                    trailing-icon="i-ctm-chevron-right"
                   >
                     Lihat progres harian
                   </UButton>
@@ -158,7 +158,7 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                     color="neutral"
                     variant="ghost"
                     size="sm"
-                    trailing-icon="i-lucide-chevron-right"
+                    trailing-icon="i-ctm-chevron-right"
                   >
                     Lihat semua
                   </UButton>
@@ -224,7 +224,7 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                 </p>
                 <UButton
                   to="/progres/tambah"
-                  icon="i-lucide-plus"
+                  icon="i-ctm-plus"
                   size="sm"
                 >
                   Tambah progres
@@ -251,7 +251,7 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                   </div>
                   <UTooltip text="Salin untuk e-Kinerja">
                     <UButton
-                      icon="i-lucide-copy"
+                      icon="i-ctm-copy"
                       color="neutral"
                       variant="ghost"
                       size="sm"

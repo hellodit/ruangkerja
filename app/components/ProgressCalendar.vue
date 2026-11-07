@@ -122,7 +122,7 @@ function slotLink(d: string, hour: number) {
               v-if="!e.hasEvidence"
               class="flex items-center gap-1 text-[11px] text-warning"
             ><UIcon
-              name="i-lucide-triangle-alert"
+              name="i-ctm-warning"
               class="size-3"
             />Belum ada bukti</span>
           </button>

@@ -47,7 +47,7 @@ function submit(mode: 'continue' | 'later') {
       </UButton>
       <UButton
         size="lg"
-        trailing-icon="i-lucide-chevron-right"
+        trailing-icon="i-ctm-chevron-right"
         @click="submit('continue')"
       >
         Lanjut

@@ -54,7 +54,7 @@ async function onSaved() {
         <template #leading>
           <UButton
             to="/progres"
-            icon="i-lucide-chevron-left"
+            icon="i-ctm-chevron-left"
             color="neutral"
             variant="ghost"
             aria-label="Kembali ke daftar progres harian"
@@ -71,7 +71,7 @@ async function onSaved() {
         <template #right>
           <UButton
             v-if="data"
-            icon="i-lucide-copy"
+            icon="i-ctm-copy"
             color="neutral"
             variant="outline"
             @click="copy(data.ekinerjaText)"
@@ -95,7 +95,7 @@ async function onSaved() {
             <UButton
               color="error"
               variant="ghost"
-              icon="i-lucide-trash-2"
+              icon="i-ctm-delete"
               class="mr-auto"
               @click="deleteOpen = true"
             >

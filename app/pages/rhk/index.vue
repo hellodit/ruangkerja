@@ -66,7 +66,7 @@ async function onPeriodSaved() {
           <UButton
             color="neutral"
             variant="outline"
-            icon="i-lucide-calendar"
+            icon="i-ctm-date"
             @click="periodOpen = true"
           >
             Ubah periode evaluasi
@@ -74,14 +74,14 @@ async function onPeriodSaved() {
           <UButton
             color="neutral"
             variant="ghost"
-            icon="i-lucide-clipboard-paste"
+            icon="i-ctm-copy"
             @click="bulkOpen = true"
           >
             Tempel beberapa RHK
           </UButton>
           <UButton
             to="/rhk/tambah"
-            icon="i-lucide-plus"
+            icon="i-ctm-plus"
           >
             Tambah RHK
           </UButton>
@@ -93,17 +93,17 @@ async function onPeriodSaved() {
       <div class="mx-auto flex w-full max-w-5xl flex-col gap-4">
         <UEmpty
           v-if="!data?.skp"
-          icon="i-lucide-calendar"
+          icon="i-ctm-date"
           title="Atur periode evaluasi"
           description="Pilih tahun SKP dan periode penilaian sebelum memasukkan RHK."
           :actions="[{ label: 'Atur periode evaluasi', onClick: () => { periodOpen = true } }]"
         />
         <UEmpty
           v-else-if="!rhks.length"
-          icon="i-lucide-target"
+          icon="i-ctm-policy"
           title="Belum ada RHK"
           description="Masukkan RHK dari SKP yang sudah disetujui atasan."
-          :actions="[{ label: 'Tambah RHK', to: '/rhk/tambah', icon: 'i-lucide-plus' }]"
+          :actions="[{ label: 'Tambah RHK', to: '/rhk/tambah', icon: 'i-ctm-plus' }]"
         />
 
         <UCard
@@ -140,7 +140,7 @@ async function onPeriodSaved() {
               </div>
               <UButton
                 :to="`/rhk/${r.id}/ubah`"
-                icon="i-lucide-pencil"
+                icon="i-ctm-edit"
                 color="neutral"
                 variant="ghost"
                 size="sm"
@@ -154,7 +154,7 @@ async function onPeriodSaved() {
               v-if="!r.indicators.length"
               color="warning"
               variant="subtle"
-              icon="i-lucide-triangle-alert"
+              icon="i-ctm-warning"
               title="Belum ada indikator"
               description="Tambahkan indikator dan target tahunan lewat tombol Ubah."
             />
@@ -184,7 +184,7 @@ async function onPeriodSaved() {
                 color="neutral"
                 variant="ghost"
                 size="sm"
-                trailing-icon="i-lucide-chevron-right"
+                trailing-icon="i-ctm-chevron-right"
               >
                 Buka detail RHK
               </UButton>

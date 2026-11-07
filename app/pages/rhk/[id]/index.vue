@@ -66,14 +66,14 @@ async function setStatus(p: Plan, status: ActionPlanStatus) {
 
 function rowActions(p: Plan): DropdownMenuItem[][] {
   return [[
-    { label: 'Tambah progres', icon: 'i-lucide-notebook-pen', to: `/progres/tambah?actionPlanId=${p.id}` },
-    { label: 'Ubah', icon: 'i-lucide-pencil', onSelect: () => openEdit(p) }
+    { label: 'Tambah progres', icon: 'i-ctm-notes', to: `/progres/tambah?actionPlanId=${p.id}` },
+    { label: 'Ubah', icon: 'i-ctm-edit', onSelect: () => openEdit(p) }
   ], [
     p.status === 'selesai'
-      ? { label: 'Tandai berjalan', icon: 'i-lucide-rotate-ccw', onSelect: () => setStatus(p, 'berjalan') }
-      : { label: 'Tandai selesai', icon: 'i-lucide-check', onSelect: () => setStatus(p, 'selesai') }
+      ? { label: 'Tandai berjalan', icon: 'i-ctm-undo', onSelect: () => setStatus(p, 'berjalan') }
+      : { label: 'Tandai selesai', icon: 'i-ctm-check', onSelect: () => setStatus(p, 'selesai') }
   ], [
-    { label: 'Hapus', icon: 'i-lucide-trash-2', color: 'error', onSelect: () => { deleting.value = p } }
+    { label: 'Hapus', icon: 'i-ctm-delete', color: 'error', onSelect: () => { deleting.value = p } }
   ]]
 }
 
@@ -118,7 +118,7 @@ async function copyPrevious() {
         <template #leading>
           <UButton
             to="/rhk"
-            icon="i-lucide-chevron-left"
+            icon="i-ctm-chevron-left"
             color="neutral"
             variant="ghost"
             aria-label="Kembali ke RHK saya"
@@ -169,7 +169,7 @@ async function copyPrevious() {
                 color="neutral"
                 variant="outline"
                 size="sm"
-                icon="i-lucide-pencil"
+                icon="i-ctm-edit"
               >
                 Ubah RHK
               </UButton>
@@ -230,7 +230,7 @@ async function copyPrevious() {
                       <USelect
                         v-model="selectedPeriod"
                         :items="periodItems"
-                        icon="i-lucide-calendar"
+                        icon="i-ctm-date"
                         size="sm"
                         class="w-52"
                         aria-label="Pilih periode"
@@ -240,7 +240,7 @@ async function copyPrevious() {
                         color="neutral"
                         variant="ghost"
                         size="sm"
-                        icon="i-lucide-copy"
+                        icon="i-ctm-copy"
                         :loading="copying"
                         @click="copyPrevious"
                       >
@@ -248,7 +248,7 @@ async function copyPrevious() {
                       </UButton>
                       <UButton
                         size="sm"
-                        icon="i-lucide-plus"
+                        icon="i-ctm-plus"
                         @click="openAdd"
                       >
                         Tambah rencana aksi
@@ -268,7 +268,7 @@ async function copyPrevious() {
 
               <UEmpty
                 v-if="!shown.length"
-                icon="i-lucide-list-ordered"
+                icon="i-ctm-list-number"
                 :title="plans.length ? 'Tidak ada rencana aksi dengan status ini' : `Belum ada rencana aksi di ${data.period.label}`"
                 description="Susun rencana aksi di awal periode untuk RHK ini."
                 variant="naked"
@@ -317,7 +317,7 @@ async function copyPrevious() {
                     :content="{ align: 'end' }"
                   >
                     <UButton
-                      icon="i-lucide-ellipsis-vertical"
+                      icon="i-ctm-more-vertical"
                       color="neutral"
                       variant="ghost"
                       size="sm"
@@ -368,7 +368,7 @@ async function copyPrevious() {
                       v-if="!p.hasEvidence"
                       class="flex items-center gap-1 text-xs text-warning"
                     ><UIcon
-                      name="i-lucide-triangle-alert"
+                      name="i-ctm-warning"
                       class="size-3.5"
                     />Belum ada bukti</span>
                   </div>
@@ -428,7 +428,7 @@ async function copyPrevious() {
                     class="flex items-center gap-2 text-sm text-info"
                   >
                     <UIcon
-                      name="i-lucide-link"
+                      name="i-ctm-link"
                       class="size-4 shrink-0"
                     />
                     <span class="truncate">{{ e.name }}</span>
@@ -446,7 +446,7 @@ async function copyPrevious() {
                 class="mt-3 flex items-center gap-1.5 text-sm text-warning"
               >
                 <UIcon
-                  name="i-lucide-triangle-alert"
+                  name="i-ctm-warning"
                   class="size-4"
                 />{{ data.stats.missingEvidence }} progres harian belum punya bukti
               </p>
@@ -466,7 +466,7 @@ async function copyPrevious() {
                 color="neutral"
                 variant="ghost"
                 size="sm"
-                trailing-icon="i-lucide-chevron-right"
+                trailing-icon="i-ctm-chevron-right"
                 class="mt-3 -ml-2.5"
               >
                 Lihat draf realisasi
