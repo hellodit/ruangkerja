@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
+import type { FormSubmitEvent } from '@nuxt/ui'
 import { forgotPasswordSchema, type ForgotPasswordInput } from '#shared/schemas/auth'
 
 definePageMeta({ layout: 'auth' })
 useSeoMeta({ title: 'Lupa kata sandi' })
 
 const client = useAuthClient()
-const fields: AuthFormField[] = [
-  { name: 'email', type: 'email', label: 'Email', placeholder: 'nama@instansi.go.id', autocomplete: 'email', required: true }
-]
 
+const state = reactive({ email: '' })
 const captcha = ref('')
 const captchaField = useTemplateRef<{ reset: () => void }>('captchaField')
 const loading = ref(false)
@@ -40,56 +38,84 @@ async function onSubmit(event: FormSubmitEvent<ForgotPasswordInput>) {
 <template>
   <div
     v-if="sent"
-    class="space-y-5 text-center"
+    class="flex flex-col gap-5"
   >
-    <UIcon
-      name="i-ctm-email-notification"
-      class="mx-auto size-10 text-brand-ink"
+    <AuthHeader
+      title="Cek email Anda"
+      description="Jika email tersebut terdaftar, tautan untuk mengatur ulang kata sandi sudah dikirim. Tautan berlaku 1 jam."
     />
-    <p class="text-muted">
-      Jika email tersebut terdaftar, tautan untuk mengatur ulang kata sandi sudah dikirim. Tautan berlaku 1 jam.
-    </p>
     <UButton
       to="/login"
       color="neutral"
       variant="outline"
+      size="lg"
       block
+      class="h-12 text-sm/5 font-semibold"
     >
       Kembali ke halaman masuk
     </UButton>
   </div>
-  <UAuthForm
+
+  <div
     v-else
-    :schema="forgotPasswordSchema"
-    :fields="fields"
-    title="Lupa kata sandi"
-    description="Masukkan email akun Anda. Kami kirim tautan untuk mengatur ulang kata sandi."
-    :submit="{ label: 'Kirim tautan', block: true }"
-    :loading="loading"
-    @submit="onSubmit"
+    class="flex flex-col gap-5"
   >
-    <template #validation>
-      <div class="space-y-3">
-        <UAlert
-          v-if="formError"
-          color="error"
-          variant="subtle"
-          icon="i-ctm-alert-circle"
-          :title="formError"
+    <AuthHeader
+      title="Lupa kata sandi"
+      description="Masukkan email akun Anda. Kami kirim tautan untuk mengatur ulang kata sandi."
+    />
+
+    <UForm
+      novalidate
+      :schema="forgotPasswordSchema"
+      :state="state"
+      class="flex flex-col gap-5"
+      @submit="onSubmit"
+    >
+      <UFormField
+        label="Email"
+        name="email"
+      >
+        <UInput
+          v-model="state.email"
+          type="email"
+          autocomplete="email"
+          placeholder="nama@instansi.go.id"
+          class="w-full"
         />
-        <CaptchaField
-          ref="captchaField"
-          v-model="captcha"
-        />
-      </div>
-    </template>
-    <template #footer>
+      </UFormField>
+
+      <UAlert
+        v-if="formError"
+        color="error"
+        variant="subtle"
+        icon="i-ctm-alert-circle"
+        :title="formError"
+      />
+      <CaptchaField
+        ref="captchaField"
+        v-model="captcha"
+      />
+
+      <UButton
+        type="submit"
+        size="lg"
+        block
+        class="h-12 text-sm/5 font-semibold"
+        :loading="loading"
+      >
+        Kirim tautan
+      </UButton>
+    </UForm>
+
+    <p class="text-center text-xs/[18px] text-muted">
+      Ingat kata sandi Anda?
       <ULink
         to="/login"
-        class="text-sm font-medium text-brand-ink"
+        class="font-semibold text-blue-600 hover:underline dark:text-blue-400"
       >
-        Kembali ke halaman masuk
+        Masuk
       </ULink>
-    </template>
-  </UAuthForm>
+    </p>
+  </div>
 </template>

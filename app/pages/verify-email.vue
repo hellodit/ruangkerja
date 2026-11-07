@@ -10,21 +10,23 @@ await auth.refresh()
 </script>
 
 <template>
-  <div class="space-y-5 text-center">
-    <UIcon
-      :name="failed ? 'i-ctm-alert-circle' : 'i-ctm-checkmark-circle'"
-      class="mx-auto size-12"
-      :class="failed ? 'text-error' : 'text-success'"
+  <div class="flex flex-col gap-5">
+    <AuthHeader
+      eyebrow="Verifikasi email"
+      :title="failed ? 'Verifikasi gagal' : 'Email terverifikasi'"
+      :description="failed ? 'Tautan verifikasi tidak valid atau sudah kedaluwarsa.' : 'Email Anda berhasil diverifikasi.'"
     />
-    <h1 class="text-xl font-semibold text-highlighted">
-      Verifikasi email
-    </h1>
-    <p class="text-muted">
-      {{ failed ? 'Tautan verifikasi tidak valid atau sudah kedaluwarsa.' : 'Email Anda berhasil diverifikasi.' }}
-    </p>
+    <UAlert
+      :color="failed ? 'error' : 'success'"
+      variant="subtle"
+      :icon="failed ? 'i-ctm-alert-circle' : 'i-ctm-checkmark-circle'"
+      :title="failed ? 'Minta tautan verifikasi baru dari halaman Profil setelah masuk.' : 'Akun Anda siap dipakai.'"
+    />
     <UButton
       :to="auth.loggedIn.value ? '/beranda' : '/login'"
+      size="lg"
       block
+      class="h-12 text-sm/5 font-semibold"
     >
       {{ auth.loggedIn.value ? 'Buka RuangKerja' : 'Ke halaman masuk' }}
     </UButton>

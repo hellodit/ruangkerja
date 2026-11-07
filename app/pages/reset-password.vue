@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
-import { resetPasswordSchema, type ResetPasswordInput } from '#shared/schemas/auth'
+import type { FormSubmitEvent } from '@nuxt/ui'
+import { PASSWORD_MIN, resetPasswordSchema, type ResetPasswordInput } from '#shared/schemas/auth'
 
 definePageMeta({ layout: 'auth' })
 useSeoMeta({ title: 'Atur ulang kata sandi', robots: 'noindex' })
@@ -11,10 +11,7 @@ const client = useAuthClient()
 
 const token = computed(() => (typeof route.query.token === 'string' ? route.query.token : ''))
 const invalid = computed(() => !token.value || typeof route.query.error === 'string')
-const fields: AuthFormField[] = [
-  { name: 'password', type: 'password', icon: 'i-ctm-square-lock-01', label: 'Kata sandi baru', autocomplete: 'new-password', required: true },
-  { name: 'confirmPassword', type: 'password', icon: 'i-ctm-square-lock-01', label: 'Konfirmasi kata sandi', autocomplete: 'new-password', required: true }
-]
+const state = reactive({ password: '', confirmPassword: '' })
 const loading = ref(false)
 const formError = ref('')
 
@@ -35,33 +32,60 @@ async function onSubmit(event: FormSubmitEvent<ResetPasswordInput>) {
 <template>
   <div
     v-if="invalid"
-    class="space-y-5 text-center"
+    class="flex flex-col gap-5"
   >
-    <UIcon
-      name="i-ctm-link"
-      class="mx-auto size-10 text-error"
+    <AuthHeader
+      title="Tautan tidak berlaku"
+      description="Tautan tidak valid atau sudah kedaluwarsa. Silakan minta tautan baru."
     />
-    <p class="text-muted">
-      Tautan tidak valid atau sudah kedaluwarsa. Silakan minta tautan baru.
-    </p>
     <UButton
       to="/forgot-password"
+      size="lg"
       block
+      class="h-12 text-sm/5 font-semibold"
     >
       Minta tautan baru
     </UButton>
   </div>
-  <UAuthForm
+
+  <div
     v-else
-    :schema="resetPasswordSchema"
-    :fields="fields"
-    title="Atur ulang kata sandi"
-    description="Masukkan kata sandi baru Anda."
-    :submit="{ label: 'Simpan kata sandi', block: true }"
-    :loading="loading"
-    @submit="onSubmit"
+    class="flex flex-col gap-5"
   >
-    <template #validation>
+    <AuthHeader
+      title="Atur ulang kata sandi"
+      description="Masukkan kata sandi baru Anda."
+    />
+
+    <UForm
+      novalidate
+      :schema="resetPasswordSchema"
+      :state="state"
+      class="flex flex-col gap-5"
+      @submit="onSubmit"
+    >
+      <UFormField
+        label="Kata sandi baru"
+        name="password"
+        :help="`Minimal ${PASSWORD_MIN} karakter.`"
+      >
+        <PasswordInput
+          v-model="state.password"
+          autocomplete="new-password"
+          placeholder="Buat kata sandi baru"
+        />
+      </UFormField>
+      <UFormField
+        label="Konfirmasi kata sandi"
+        name="confirmPassword"
+      >
+        <PasswordInput
+          v-model="state.confirmPassword"
+          autocomplete="new-password"
+          placeholder="Ulangi kata sandi"
+        />
+      </UFormField>
+
       <UAlert
         v-if="formError"
         color="error"
@@ -69,6 +93,16 @@ async function onSubmit(event: FormSubmitEvent<ResetPasswordInput>) {
         icon="i-ctm-alert-circle"
         :title="formError"
       />
-    </template>
-  </UAuthForm>
+
+      <UButton
+        type="submit"
+        size="lg"
+        block
+        class="h-12 text-sm/5 font-semibold"
+        :loading="loading"
+      >
+        Simpan kata sandi
+      </UButton>
+    </UForm>
+  </div>
 </template>

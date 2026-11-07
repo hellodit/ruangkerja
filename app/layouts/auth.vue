@@ -1,28 +1,20 @@
 <template>
-  <div class="flex min-h-screen flex-col bg-muted">
-    <header class="px-6 py-5 sm:px-8">
-      <NuxtLink
-        to="/login"
-        aria-label="RuangKerja"
-      >
-        <AppLogo />
-      </NuxtLink>
-    </header>
-    <main class="flex flex-1 items-start justify-center px-4 pb-12 sm:items-center">
-      <UCard
-        class="w-full max-w-md"
-        :ui="{ body: 'p-6 sm:p-8' }"
-      >
-        <slot />
-      </UCard>
-    </main>
-    <footer class="mx-auto w-full max-w-2xl px-6 pb-6 text-center">
-      <ULink
-        to="/privasi"
-        class="text-xs text-muted underline underline-offset-2 hover:text-default"
-      >
-        Kebijakan privasi
-      </ULink>
-    </footer>
+  <div class="grid min-h-screen bg-default lg:grid-cols-[1.4fr_1fr]">
+    <AuthHero class="hidden lg:flex" />
+    <div class="flex min-h-screen flex-col">
+      <main class="flex flex-1 items-center justify-center px-4 py-10 sm:px-12">
+        <div class="w-full max-w-[380px]">
+          <slot />
+        </div>
+      </main>
+      <footer class="px-6 pb-6 text-center">
+        <ULink
+          to="/privasi"
+          class="text-xs text-muted underline underline-offset-2 hover:text-default"
+        >
+          Kebijakan privasi
+        </ULink>
+      </footer>
+    </div>
   </div>
 </template>
