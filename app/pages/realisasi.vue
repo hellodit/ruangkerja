@@ -63,7 +63,7 @@ async function saveEdit(reset = false) {
   }
 }
 
-const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodId=${data.value.period.id}` : '#'))
+const exportUrl = (format: 'docx' | 'pdf') => (data.value ? `/api/realizations/export?periodId=${data.value.period.id}&format=${format}` : '#')
 </script>
 
 <template>
@@ -88,7 +88,7 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
             aria-label="Pilih periode"
           />
           <UButton
-            :to="exportUrl"
+            :to="exportUrl('docx')"
             external
             download
             color="neutral"
@@ -97,6 +97,16 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
             class="ml-auto"
           >
             Unduh Word
+          </UButton>
+          <UButton
+            :to="exportUrl('pdf')"
+            external
+            download
+            color="neutral"
+            variant="outline"
+            icon="i-ctm-upload"
+          >
+            Unduh PDF
           </UButton>
           <UButton
             icon="i-ctm-copy"
