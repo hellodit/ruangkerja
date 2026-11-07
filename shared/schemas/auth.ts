@@ -15,7 +15,7 @@ export const nameField = () => z.string().trim()
   .min(NAME_MIN, `Nama minimal ${NAME_MIN} karakter`)
   .max(NAME_MAX, `Nama maksimal ${NAME_MAX} karakter`)
 
-const passwordsMatch = { message: 'Konfirmasi kata sandi tidak cocok', path: ['confirmPassword'] }
+const passwordsMatch = { message: 'Kata sandi tidak sama. Ketik ulang dengan teliti.', path: ['confirmPassword'] }
 
 export const signInSchema = z.object({
   email: emailField(),
@@ -31,8 +31,8 @@ export const signUpSchema = z.object({
   name: nameField(),
   email: emailField(),
   password: passwordField(),
-  confirmPassword: z.string()
-}).refine(d => d.password === d.confirmPassword, passwordsMatch)
+  agree: z.boolean().refine(v => v, 'Setujui kebijakan privasi untuk melanjutkan')
+})
 
 export const forgotPasswordSchema = z.object({
   email: emailField()

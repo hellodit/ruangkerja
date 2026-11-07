@@ -11,10 +11,10 @@ describe('auth schemas', () => {
     expect(signInSchema.safeParse({ email: 'nope', password: 'x' }).success).toBe(false)
   })
 
-  it('rejects sign up with mismatched confirmation and trims name', () => {
-    const r = signUpSchema.safeParse({ name: 'Budi', email: 'a@b.co', password: 'secret123', confirmPassword: 'secret124' })
-    expect(r.error?.issues[0]?.path).toEqual(['confirmPassword'])
-    expect(signUpSchema.parse({ name: '  Budi  ', email: 'A@B.co', password: 'secret123', confirmPassword: 'secret123' })).toMatchObject({ name: 'Budi', email: 'a@b.co' })
+  it('requires privacy consent on sign up and trims name', () => {
+    const r = signUpSchema.safeParse({ name: 'Budi', email: 'a@b.co', password: 'secret123', agree: false })
+    expect(r.error?.issues[0]?.path).toEqual(['agree'])
+    expect(signUpSchema.parse({ name: '  Budi  ', email: 'A@B.co', password: 'secret123', agree: true })).toMatchObject({ name: 'Budi', email: 'a@b.co' })
   })
 
   it('validates forgot/reset/change password', () => {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-/** CTM Field "Password": lock icon on the left, show/hide eye on the right. */
+/** CTM Field "Password": masked input with a show/hide eye on the right. */
 const model = defineModel<string>({ default: '' })
 defineProps<{ autocomplete?: string, placeholder?: string }>()
 const shown = ref(false)
@@ -9,7 +9,6 @@ const shown = ref(false)
   <UInput
     v-model="model"
     :type="shown ? 'text' : 'password'"
-    icon="i-ctm-square-lock-01"
     :autocomplete="autocomplete"
     :placeholder="placeholder"
     class="w-full"

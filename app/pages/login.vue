@@ -9,13 +9,17 @@ const route = useRoute()
 const auth = useAuthSession()
 const client = useAuthClient()
 
-const state = reactive({ email: '', password: '' })
+const state = reactive({ email: '', password: '', remember: true })
 const captcha = ref('')
 const captchaField = useTemplateRef<{ reset: () => void }>('captchaField')
 const loading = ref(false)
+/** Wrong email or password: banner plus a red password field. */
+const wrongCredentials = ref(false)
 const formError = ref('')
 
 const redirectTo = computed(() => safeRedirect(route.query.redirect, '/beranda'))
+// Set by the reset-password page after a successful change.
+const passwordChanged = computed(() => route.query.status === 'sandi-baru')
 
 const oauthError = computed(() => {
   const err = route.query.error
@@ -29,8 +33,13 @@ const oauthError = computed(() => {
 })
 const errorText = computed(() => formError.value || oauthError.value)
 
+watch(() => [state.email, state.password], () => {
+  wrongCredentials.value = false
+})
+
 async function onSubmit(event: FormSubmitEvent<SignInInput>) {
   formError.value = ''
+  wrongCredentials.value = false
   if (!captcha.value) {
     formError.value = 'Selesaikan verifikasi keamanan terlebih dahulu'
     return
@@ -39,12 +48,16 @@ async function onSubmit(event: FormSubmitEvent<SignInInput>) {
   const { error } = await client.signIn.email({
     email: event.data.email,
     password: event.data.password,
-    rememberMe: true
+    rememberMe: event.data.remember ?? true
   }, { headers: { 'x-captcha-response': captcha.value } })
   captchaField.value?.reset()
   loading.value = false
   if (error) {
-    formError.value = authErrorMessage(error)
+    if (error.code === 'INVALID_EMAIL_OR_PASSWORD') {
+      wrongCredentials.value = true
+    } else {
+      formError.value = authErrorMessage(error)
+    }
     return
   }
   await auth.refresh()
@@ -62,17 +75,44 @@ async function signInWithGoogle() {
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
+  <div class="flex flex-col gap-6">
     <AuthHeader
-      eyebrow="Masuk ke"
-      title="Ruang kerja Anda"
+      title="Masuk ke RuangKerja"
+      description="Pakai email yang kamu daftarkan."
+    />
+
+    <UAlert
+      v-if="wrongCredentials"
+      color="error"
+      variant="subtle"
+      icon="i-ctm-alert-circle"
+      title="Email atau kata sandi salah"
+      description="Periksa lagi, atau atur ulang kata sandi lewat tautan Lupa kata sandi."
+      role="alert"
+    />
+    <UAlert
+      v-else-if="errorText"
+      color="error"
+      variant="subtle"
+      icon="i-ctm-alert-circle"
+      :title="errorText"
+      role="alert"
+    />
+    <UAlert
+      v-else-if="passwordChanged"
+      color="success"
+      variant="subtle"
+      icon="i-ctm-checkmark-circle"
+      title="Kata sandi berhasil diubah"
+      description="Masuk dengan kata sandi barumu."
+      role="status"
     />
 
     <UForm
       novalidate
       :schema="signInSchema"
       :state="state"
-      class="flex flex-col gap-5"
+      class="flex flex-col gap-4"
       @submit="onSubmit"
     >
       <UFormField
@@ -91,12 +131,13 @@ async function signInWithGoogle() {
       <UFormField
         label="Kata sandi"
         name="password"
+        :error="wrongCredentials || undefined"
         :ui="{ labelWrapper: 'justify-between', hint: 'contents' }"
       >
         <template #hint>
           <ULink
             to="/forgot-password"
-            class="text-sm/5 font-medium whitespace-nowrap text-blue-600 hover:underline dark:text-blue-400"
+            class="text-sm/5 font-medium whitespace-nowrap text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
           >
             Lupa kata sandi?
           </ULink>
@@ -108,13 +149,11 @@ async function signInWithGoogle() {
         />
       </UFormField>
 
-      <UAlert
-        v-if="errorText"
-        color="error"
-        variant="subtle"
-        icon="i-ctm-alert-circle"
-        :title="errorText"
+      <UCheckbox
+        v-model="state.remember"
+        label="Tetap masuk di perangkat ini"
       />
+
       <CaptchaField
         ref="captchaField"
         v-model="captcha"
@@ -124,7 +163,7 @@ async function signInWithGoogle() {
         type="submit"
         size="lg"
         block
-        class="h-12 text-sm/5 font-semibold"
+        :class="AUTH_BUTTON"
         :loading="loading"
       >
         Masuk
@@ -138,18 +177,18 @@ async function signInWithGoogle() {
       variant="outline"
       size="lg"
       block
-      class="h-12 text-sm/5 font-semibold"
+      :class="AUTH_BUTTON"
       icon="i-simple-icons-google"
       @click="signInWithGoogle"
     >
       Lanjutkan dengan Google
     </UButton>
 
-    <p class="text-center text-xs/[18px] text-muted">
+    <p class="border-t border-default pt-6 text-center text-sm/5 text-toned">
       Belum punya akun?
       <ULink
         to="/register"
-        class="font-semibold text-blue-600 hover:underline dark:text-blue-400"
+        :class="AUTH_LINK"
       >
         Daftar
       </ULink>

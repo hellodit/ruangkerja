@@ -3,14 +3,15 @@ import type { FormSubmitEvent } from '@nuxt/ui'
 import { PASSWORD_MIN, resetPasswordSchema, type ResetPasswordInput } from '#shared/schemas/auth'
 
 definePageMeta({ layout: 'auth' })
-useSeoMeta({ title: 'Atur ulang kata sandi', robots: 'noindex' })
+useSeoMeta({ title: 'Buat kata sandi baru', robots: 'noindex' })
 
 const route = useRoute()
-const toast = useToast()
 const client = useAuthClient()
 
 const token = computed(() => (typeof route.query.token === 'string' ? route.query.token : ''))
-const invalid = computed(() => !token.value || typeof route.query.error === 'string')
+/** Set when the API rejects the token (used or past its 1-hour limit). */
+const tokenRejected = ref(false)
+const expired = computed(() => tokenRejected.value || !token.value || typeof route.query.error === 'string')
 const state = reactive({ password: '', confirmPassword: '' })
 const loading = ref(false)
 const formError = ref('')
@@ -21,53 +22,78 @@ async function onSubmit(event: FormSubmitEvent<ResetPasswordInput>) {
   const { error } = await client.resetPassword({ newPassword: event.data.password, token: token.value })
   loading.value = false
   if (error) {
-    formError.value = authErrorMessage(error)
+    if (error.code === 'INVALID_TOKEN' || error.code === 'TOKEN_EXPIRED') {
+      tokenRejected.value = true
+    } else {
+      formError.value = authErrorMessage(error)
+    }
     return
   }
-  toast.add({ title: 'Kata sandi berhasil diubah', description: 'Silakan masuk dengan kata sandi baru.', color: 'success' })
-  await navigateTo('/login')
+  await navigateTo({ path: '/login', query: { status: 'sandi-baru' } })
 }
 </script>
 
 <template>
   <div
-    v-if="invalid"
-    class="flex flex-col gap-5"
+    v-if="expired"
+    class="flex flex-col gap-6"
   >
+    <AuthIconTile
+      icon="i-ctm-clock"
+      tone="warning"
+    />
     <AuthHeader
-      title="Tautan tidak berlaku"
-      description="Tautan tidak valid atau sudah kedaluwarsa. Silakan minta tautan baru."
+      title="Tautan sudah tidak berlaku"
+      description="Tautan atur ulang hanya bisa dipakai sekali dan punya batas waktu. Minta tautan baru untuk melanjutkan."
     />
     <UButton
       to="/forgot-password"
       size="lg"
       block
-      class="h-12 text-sm/5 font-semibold"
+      :class="AUTH_BUTTON"
+      icon="i-ctm-send"
     >
       Minta tautan baru
     </UButton>
+    <p class="text-center text-sm/5">
+      <ULink
+        to="/login"
+        :class="AUTH_LINK"
+      >
+        Kembali ke halaman masuk
+      </ULink>
+    </p>
   </div>
 
   <div
     v-else
-    class="flex flex-col gap-5"
+    class="flex flex-col gap-6"
   >
     <AuthHeader
-      title="Atur ulang kata sandi"
-      description="Masukkan kata sandi baru Anda."
+      title="Buat kata sandi baru"
+      description="Setelah disimpan, kamu keluar dari semua perangkat dan masuk lagi dengan kata sandi baru."
+    />
+
+    <UAlert
+      v-if="formError"
+      color="error"
+      variant="subtle"
+      icon="i-ctm-alert-circle"
+      :title="formError"
+      role="alert"
     />
 
     <UForm
       novalidate
       :schema="resetPasswordSchema"
       :state="state"
-      class="flex flex-col gap-5"
+      class="flex flex-col gap-4"
       @submit="onSubmit"
     >
       <UFormField
         label="Kata sandi baru"
         name="password"
-        :help="`Minimal ${PASSWORD_MIN} karakter.`"
+        :help="`Minimal ${PASSWORD_MIN} karakter. Jangan pakai kata sandi akun lain.`"
       >
         <PasswordInput
           v-model="state.password"
@@ -76,29 +102,21 @@ async function onSubmit(event: FormSubmitEvent<ResetPasswordInput>) {
         />
       </UFormField>
       <UFormField
-        label="Konfirmasi kata sandi"
+        label="Ulangi kata sandi baru"
         name="confirmPassword"
       >
         <PasswordInput
           v-model="state.confirmPassword"
           autocomplete="new-password"
-          placeholder="Ulangi kata sandi"
+          placeholder="Ketik ulang kata sandi baru"
         />
       </UFormField>
-
-      <UAlert
-        v-if="formError"
-        color="error"
-        variant="subtle"
-        icon="i-ctm-alert-circle"
-        :title="formError"
-      />
 
       <UButton
         type="submit"
         size="lg"
         block
-        class="h-12 text-sm/5 font-semibold"
+        :class="AUTH_BUTTON"
         :loading="loading"
       >
         Simpan kata sandi

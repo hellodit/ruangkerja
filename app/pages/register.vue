@@ -9,14 +9,21 @@ const auth = useAuthSession()
 const client = useAuthClient()
 const toast = useToast()
 
-const state = reactive({ name: '', email: '', password: '', confirmPassword: '' })
+const state = reactive({ name: '', email: '', password: '', agree: false })
 const captcha = ref('')
 const captchaField = useTemplateRef<{ reset: () => void }>('captchaField')
 const loading = ref(false)
 const formError = ref('')
+/** The email already has an account: red field with links to sign in or reset. */
+const emailTaken = ref(false)
+
+watch(() => state.email, () => {
+  emailTaken.value = false
+})
 
 async function onSubmit(event: FormSubmitEvent<SignUpInput>) {
   formError.value = ''
+  emailTaken.value = false
   if (!captcha.value) {
     formError.value = 'Selesaikan verifikasi keamanan terlebih dahulu'
     return
@@ -31,10 +38,14 @@ async function onSubmit(event: FormSubmitEvent<SignUpInput>) {
   captchaField.value?.reset()
   loading.value = false
   if (error) {
-    formError.value = authErrorMessage(error)
+    if (error.code === 'USER_ALREADY_EXISTS' || error.code === 'USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL') {
+      emailTaken.value = true
+    } else {
+      formError.value = authErrorMessage(error)
+    }
     return
   }
-  toast.add({ title: 'Akun berhasil dibuat', description: 'Tautan verifikasi sudah dikirim ke email Anda.', color: 'success', icon: 'i-ctm-email-notification' })
+  toast.add({ title: 'Akun berhasil dibuat', description: 'Tautan verifikasi sudah dikirim ke emailmu.', color: 'success', icon: 'i-ctm-email-notification' })
   await auth.refresh()
   clearNuxtState('me')
   await navigateTo(auth.loggedIn.value ? '/onboarding/profil' : '/login')
@@ -50,17 +61,26 @@ async function signUpWithGoogle() {
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
+  <div class="flex flex-col gap-6">
     <AuthHeader
-      eyebrow="Mulai pakai RuangKerja"
       title="Buat akun"
+      description="Satu akun untuk satu ruang kerja pribadi. Setelah daftar, kamu menyiapkan profil dan RHK."
+    />
+
+    <UAlert
+      v-if="formError"
+      color="error"
+      variant="subtle"
+      icon="i-ctm-alert-circle"
+      :title="formError"
+      role="alert"
     />
 
     <UForm
       novalidate
       :schema="signUpSchema"
       :state="state"
-      class="flex flex-col gap-5"
+      class="flex flex-col gap-4"
       @submit="onSubmit"
     >
       <UFormField
@@ -77,6 +97,8 @@ async function signUpWithGoogle() {
       <UFormField
         label="Email"
         name="email"
+        help="Dipakai untuk masuk dan menerima tautan verifikasi."
+        :error="emailTaken || undefined"
       >
         <UInput
           v-model="state.email"
@@ -85,6 +107,21 @@ async function signUpWithGoogle() {
           placeholder="nama@instansi.go.id"
           class="w-full"
         />
+        <template
+          v-if="emailTaken"
+          #error
+        >
+          Email ini sudah terdaftar.
+          <ULink
+            to="/login"
+            :class="AUTH_LINK"
+          >Masuk</ULink>
+          atau
+          <ULink
+            to="/forgot-password"
+            :class="AUTH_LINK"
+          >atur ulang kata sandi</ULink>.
+        </template>
       </UFormField>
       <UFormField
         label="Kata sandi"
@@ -97,24 +134,23 @@ async function signUpWithGoogle() {
           placeholder="Buat kata sandi"
         />
       </UFormField>
-      <UFormField
-        label="Konfirmasi kata sandi"
-        name="confirmPassword"
-      >
-        <PasswordInput
-          v-model="state.confirmPassword"
-          autocomplete="new-password"
-          placeholder="Ulangi kata sandi"
-        />
+
+      <UFormField name="agree">
+        <UCheckbox
+          v-model="state.agree"
+          :ui="{ wrapper: 'text-sm/5' }"
+        >
+          <template #label>
+            Saya menyetujui
+            <ULink
+              to="/privasi"
+              target="_blank"
+              :class="AUTH_LINK"
+            >Kebijakan privasi</ULink>.
+          </template>
+        </UCheckbox>
       </UFormField>
 
-      <UAlert
-        v-if="formError"
-        color="error"
-        variant="subtle"
-        icon="i-ctm-alert-circle"
-        :title="formError"
-      />
       <CaptchaField
         ref="captchaField"
         v-model="captcha"
@@ -124,10 +160,11 @@ async function signUpWithGoogle() {
         type="submit"
         size="lg"
         block
-        class="h-12 text-sm/5 font-semibold"
+        :class="AUTH_BUTTON"
+        :disabled="!state.agree"
         :loading="loading"
       >
-        Daftar
+        Buat akun
       </UButton>
     </UForm>
 
@@ -138,32 +175,29 @@ async function signUpWithGoogle() {
       variant="outline"
       size="lg"
       block
-      class="h-12 text-sm/5 font-semibold"
+      :class="AUTH_BUTTON"
       icon="i-simple-icons-google"
       @click="signUpWithGoogle"
     >
       Daftar dengan Google
     </UButton>
+    <p class="-mt-3 text-center text-xs/[18px] text-muted">
+      Daftar lewat Google berarti kamu menyetujui
+      <ULink
+        to="/privasi"
+        target="_blank"
+        :class="AUTH_LINK"
+      >Kebijakan privasi</ULink>.
+    </p>
 
-    <div class="flex flex-col gap-2 text-center text-xs/[18px] text-muted">
-      <p>
-        Sudah punya akun?
-        <ULink
-          to="/login"
-          class="font-semibold text-blue-600 hover:underline dark:text-blue-400"
-        >
-          Masuk
-        </ULink>
-      </p>
-      <p>
-        Dengan mendaftar, Anda menyetujui
-        <ULink
-          to="/privasi"
-          target="_blank"
-          class="font-semibold text-blue-600 hover:underline dark:text-blue-400"
-        >
-          kebijakan privasi</ULink>. Jangan memasukkan data rahasia atau data warga.
-      </p>
-    </div>
+    <p class="border-t border-default pt-6 text-center text-sm/5 text-toned">
+      Sudah punya akun?
+      <ULink
+        to="/login"
+        :class="AUTH_LINK"
+      >
+        Masuk
+      </ULink>
+    </p>
   </div>
 </template>

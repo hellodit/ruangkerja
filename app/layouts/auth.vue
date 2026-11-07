@@ -1,20 +1,18 @@
+<!-- Auth layout: form on the right, brand panel on the left; the panel wraps below the form on narrow screens. -->
 <template>
-  <div class="grid min-h-screen bg-default lg:grid-cols-[1.4fr_1fr]">
-    <AuthHero class="hidden lg:flex" />
-    <div class="flex min-h-screen flex-col">
-      <main class="flex flex-1 items-center justify-center px-4 py-10 sm:px-12">
-        <div class="w-full max-w-[380px]">
-          <slot />
-        </div>
-      </main>
-      <footer class="px-6 pb-6 text-center">
-        <ULink
-          to="/privasi"
-          class="text-xs text-muted underline underline-offset-2 hover:text-default"
+  <div class="flex min-h-screen flex-row-reverse flex-wrap bg-default text-highlighted">
+    <main class="flex min-w-0 flex-[2_1_560px] items-center justify-center px-4 py-14 sm:px-8">
+      <div class="flex w-full max-w-[400px] flex-col gap-6">
+        <NuxtLink
+          to="/login"
+          class="self-start min-[1040px]:hidden"
+          aria-label="RuangKerja, ke halaman masuk"
         >
-          Kebijakan privasi
-        </ULink>
-      </footer>
-    </div>
+          <AppLogo :subtitle="false" />
+        </NuxtLink>
+        <slot />
+      </div>
+    </main>
+    <AuthAside />
   </div>
 </template>
