@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { AuthFormField, FormSubmitEvent, TabsItem } from '@nuxt/ui'
-import { magicLinkSchema, signInSchema, type MagicLinkInput, type SignInInput } from '#shared/schemas/auth'
+import type { FormSubmitEvent } from '@nuxt/ui'
+import { signInSchema, type SignInInput } from '#shared/schemas/auth'
 
 definePageMeta({ layout: 'auth' })
 useSeoMeta({ title: 'Masuk' })
@@ -9,28 +9,17 @@ const route = useRoute()
 const auth = useAuthSession()
 const client = useAuthClient()
 
-const mode = ref<'password' | 'link'>('password')
-const tabs: TabsItem[] = [
-  { label: 'Kata sandi', value: 'password', icon: 'i-ctm-key' },
-  { label: 'Tautan ke email', value: 'link', icon: 'i-ctm-email-notification' }
-]
-
-const passwordFields: AuthFormField[] = [
-  { name: 'email', type: 'email', label: 'Email', placeholder: 'nama@instansi.go.id', autocomplete: 'email', required: true },
-  { name: 'password', type: 'password', icon: 'i-ctm-square-lock-01', label: 'Kata sandi', placeholder: 'Masukkan kata sandi', autocomplete: 'current-password', required: true },
-  { name: 'remember', type: 'checkbox', label: 'Ingat saya', defaultValue: true }
-]
-const linkFields: AuthFormField[] = [
-  { name: 'email', type: 'email', label: 'Email', placeholder: 'nama@instansi.go.id', autocomplete: 'email', required: true }
-]
-
+const state = reactive({ email: '', password: '', remember: true })
 const captcha = ref('')
 const captchaField = useTemplateRef<{ reset: () => void }>('captchaField')
 const loading = ref(false)
+/** Wrong email or password: banner plus a red password field. */
+const wrongCredentials = ref(false)
 const formError = ref('')
-const linkSent = ref(false)
 
 const redirectTo = computed(() => safeRedirect(route.query.redirect, '/beranda'))
+// Set by the reset-password page after a successful change.
+const passwordChanged = computed(() => route.query.status === 'sandi-baru')
 
 const oauthError = computed(() => {
   const err = route.query.error
@@ -40,26 +29,19 @@ const oauthError = computed(() => {
   if (err.replace(/\s+/g, '_').toLowerCase() === 'account_not_linked') {
     return 'Email ini sudah terdaftar dengan kata sandi tetapi belum diverifikasi. Masuk dengan kata sandi lalu verifikasi email, atau atur ulang kata sandi, sebelum memakai Google.'
   }
-  return /token|expired/i.test(err) ? 'Tautan masuk tidak valid atau sudah kedaluwarsa. Minta tautan baru.' : 'Gagal masuk. Silakan coba lagi.'
+  return /token|expired/i.test(err) ? 'Tautan tidak valid atau sudah kedaluwarsa.' : 'Gagal masuk. Silakan coba lagi.'
+})
+const errorText = computed(() => formError.value || oauthError.value)
+
+watch(() => [state.email, state.password], () => {
+  wrongCredentials.value = false
 })
 
-function needCaptcha() {
+async function onSubmit(event: FormSubmitEvent<SignInInput>) {
+  formError.value = ''
+  wrongCredentials.value = false
   if (!captcha.value) {
     formError.value = 'Selesaikan verifikasi keamanan terlebih dahulu'
-    return true
-  }
-  return false
-}
-
-async function afterSignIn() {
-  await auth.refresh()
-  clearNuxtState('me')
-  await navigateTo(redirectTo.value)
-}
-
-async function onPassword(event: FormSubmitEvent<SignInInput>) {
-  formError.value = ''
-  if (needCaptcha()) {
     return
   }
   loading.value = true
@@ -71,31 +53,16 @@ async function onPassword(event: FormSubmitEvent<SignInInput>) {
   captchaField.value?.reset()
   loading.value = false
   if (error) {
-    formError.value = authErrorMessage(error)
+    if (error.code === 'INVALID_EMAIL_OR_PASSWORD') {
+      wrongCredentials.value = true
+    } else {
+      formError.value = authErrorMessage(error)
+    }
     return
   }
-  await afterSignIn()
-}
-
-async function onMagicLink(event: FormSubmitEvent<MagicLinkInput>) {
-  formError.value = ''
-  if (needCaptcha()) {
-    return
-  }
-  loading.value = true
-  const { error } = await client.signIn.magicLink({
-    email: event.data.email,
-    callbackURL: redirectTo.value,
-    errorCallbackURL: '/login'
-  }, { headers: { 'x-captcha-response': captcha.value } })
-  captchaField.value?.reset()
-  loading.value = false
-  if (error && (error.status === 429 || error.status === 400 || error.status === 403)) {
-    formError.value = authErrorMessage(error)
-    return
-  }
-  // Same message whether or not the email is registered.
-  linkSent.value = true
+  await auth.refresh()
+  clearNuxtState('me')
+  await navigateTo(redirectTo.value)
 }
 
 async function signInWithGoogle() {
@@ -105,116 +72,126 @@ async function signInWithGoogle() {
     formError.value = authErrorMessage(error)
   }
 }
-
-const providers = [{ label: 'Lanjutkan dengan Google', icon: 'i-simple-icons-google', color: 'neutral' as const, variant: 'outline' as const, block: true, onClick: signInWithGoogle }]
 </script>
 
 <template>
-  <div class="space-y-6">
-    <div
-      v-if="linkSent"
-      class="space-y-4 text-center"
+  <div class="flex flex-col gap-6">
+    <AuthHeader
+      title="Masuk ke RuangKerja"
+      description="Pakai email yang kamu daftarkan."
+    />
+
+    <UAlert
+      v-if="wrongCredentials"
+      color="error"
+      variant="subtle"
+      icon="i-ctm-alert-circle"
+      title="Email atau kata sandi salah"
+      description="Periksa lagi, atau atur ulang kata sandi lewat tautan Lupa kata sandi."
+      role="alert"
+    />
+    <UAlert
+      v-else-if="errorText"
+      color="error"
+      variant="subtle"
+      icon="i-ctm-alert-circle"
+      :title="errorText"
+      role="alert"
+    />
+    <UAlert
+      v-else-if="passwordChanged"
+      color="success"
+      variant="subtle"
+      icon="i-ctm-checkmark-circle"
+      title="Kata sandi berhasil diubah"
+      description="Masuk dengan kata sandi barumu."
+      role="status"
+    />
+
+    <UForm
+      novalidate
+      :schema="signInSchema"
+      :state="state"
+      class="flex flex-col gap-4"
+      @submit="onSubmit"
     >
-      <UIcon
-        name="i-ctm-email-notification"
-        class="mx-auto size-10 text-brand-ink"
-      />
-      <h1 class="text-xl font-semibold text-highlighted">
-        Cek email Anda
-      </h1>
-      <p class="text-muted">
-        Jika email tersebut terdaftar, tautan masuk sudah dikirim. Tautan berlaku 15 menit.
-      </p>
-      <UButton
-        color="neutral"
-        variant="outline"
-        block
-        @click="linkSent = false"
+      <UFormField
+        label="Email"
+        name="email"
       >
-        Kembali
-      </UButton>
-    </div>
+        <UInput
+          v-model="state.email"
+          type="email"
+          autocomplete="email"
+          placeholder="nama@instansi.go.id"
+          class="w-full"
+        />
+      </UFormField>
 
-    <template v-else>
-      <UTabs
-        v-model="mode"
-        :items="tabs"
-        :content="false"
-        class="w-full"
-      />
-
-      <UAuthForm
-        v-if="mode === 'password'"
-        :schema="signInSchema"
-        :fields="passwordFields"
-        title="Masuk ke RuangKerja"
-        :providers="providers"
-        separator="atau"
-        :submit="{ label: 'Masuk', block: true }"
-        :loading="loading"
-        @submit="onPassword"
+      <UFormField
+        label="Kata sandi"
+        name="password"
+        :error="wrongCredentials || undefined"
+        :ui="{ labelWrapper: 'justify-between', hint: 'contents' }"
       >
-        <template #description>
-          Belum punya akun?
-          <ULink
-            to="/register"
-            class="font-medium text-brand-ink"
-          >
-            Daftar
-          </ULink>
-        </template>
-        <template #password-hint>
+        <template #hint>
           <ULink
             to="/forgot-password"
-            class="text-sm font-medium text-brand-ink"
-            tabindex="-1"
+            class="text-sm/5 font-medium whitespace-nowrap text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
           >
             Lupa kata sandi?
           </ULink>
         </template>
-        <template #validation>
-          <div class="space-y-3">
-            <UAlert
-              v-if="formError || oauthError"
-              color="error"
-              variant="subtle"
-              icon="i-ctm-alert-circle"
-              :title="formError || oauthError"
-            />
-            <CaptchaField
-              ref="captchaField"
-              v-model="captcha"
-            />
-          </div>
-        </template>
-      </UAuthForm>
+        <PasswordInput
+          v-model="state.password"
+          autocomplete="current-password"
+          placeholder="Masukkan kata sandi"
+        />
+      </UFormField>
 
-      <UAuthForm
-        v-else
-        :schema="magicLinkSchema"
-        :fields="linkFields"
-        title="Masuk lewat tautan"
-        description="Kami kirim tautan masuk sekali pakai ke email Anda."
-        :submit="{ label: 'Kirim tautan masuk', block: true }"
+      <UCheckbox
+        v-model="state.remember"
+        label="Tetap masuk di perangkat ini"
+      />
+
+      <CaptchaField
+        ref="captchaField"
+        v-model="captcha"
+      />
+
+      <UButton
+        type="submit"
+        size="lg"
+        block
+        :class="AUTH_BUTTON"
         :loading="loading"
-        @submit="onMagicLink"
       >
-        <template #validation>
-          <div class="space-y-3">
-            <UAlert
-              v-if="formError || oauthError"
-              color="error"
-              variant="subtle"
-              icon="i-ctm-alert-circle"
-              :title="formError || oauthError"
-            />
-            <CaptchaField
-              ref="captchaField"
-              v-model="captcha"
-            />
-          </div>
-        </template>
-      </UAuthForm>
-    </template>
+        Masuk
+      </UButton>
+    </UForm>
+
+    <USeparator label="atau" />
+
+    <UButton
+      color="neutral"
+      variant="outline"
+      size="lg"
+      block
+      :class="AUTH_BUTTON"
+      icon="i-simple-icons-google"
+      @click="signInWithGoogle"
+    >
+      Lanjutkan dengan Google
+    </UButton>
+
+    <p class="border-t border-default pt-6 text-center text-sm/5 text-toned">
+      Belum punya akun?
+      <ULink
+        to="/register"
+        :class="AUTH_LINK"
+      >
+        Daftar
+      </ULink>
+    </p>
   </div>
 </template>
