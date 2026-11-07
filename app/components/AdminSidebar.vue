@@ -8,7 +8,6 @@ import type { DropdownMenuItem, NavigationMenuItem } from '@nuxt/ui'
  */
 const { me } = useMe()
 const auth = useAuthSession()
-const colorMode = useColorMode()
 
 const links = computed<NavigationMenuItem[][]>(() => [
   [
@@ -28,14 +27,7 @@ const initials = computed(() => (me.value?.user.name ?? '').split(/\s+/).filter(
 const userItems = computed<DropdownMenuItem[][]>(() => [
   [{ label: me.value?.user.name ?? '', description: me.value?.user.email ?? '', type: 'label' }],
   [
-    { label: 'Ruang kerja saya', icon: 'i-ctm-home', to: '/beranda' },
-    {
-      label: colorMode.value === 'dark' ? 'Tampilan terang' : 'Tampilan gelap',
-      icon: colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon',
-      onSelect: () => {
-        colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
-      }
-    }
+    { label: 'Ruang kerja saya', icon: 'i-ctm-home', to: '/beranda' }
   ],
   [{
     label: 'Keluar',
@@ -48,11 +40,11 @@ const userItems = computed<DropdownMenuItem[][]>(() => [
   }]
 ])
 
-// Inverted Menu Tree: slate text on ink, gold for the current page.
+// Inverted Menu Tree on the logo navy: slate text, light blue for the current page.
 const navUi = {
   label: 'text-slate-500',
-  link: 'text-slate-300 hover:text-white hover:before:bg-white/5 data-active:text-brand-300 data-active:before:bg-brand-400/15',
-  linkLeadingIcon: 'text-slate-400 group-hover:text-white group-data-active:text-brand-300'
+  link: 'text-slate-300 hover:text-white hover:before:bg-white/5 data-active:text-white data-active:before:bg-white/10',
+  linkLeadingIcon: 'text-slate-400 group-hover:text-white group-data-active:text-accent'
 }
 </script>
 
@@ -63,12 +55,12 @@ const navUi = {
     :min-size="15"
     :max-size="15"
     :ui="{
-      root: 'bg-[#111216] text-slate-200 border-e border-white/10',
-      content: 'bg-[#111216] text-slate-200 divide-white/10',
+      root: 'bg-brand-950 text-slate-200 border-e border-white/10',
+      content: 'bg-brand-950 text-slate-200 divide-white/10',
       toggle: 'text-slate-300 hover:bg-white/5 hover:text-white active:bg-white/10',
       header: 'h-auto px-5 pt-5 pb-0',
       body: 'gap-5 px-3 pt-5 pb-6',
-      footer: 'border-t border-white/10 p-3'
+      footer: 'flex-col items-stretch gap-1 border-t border-white/10 p-3'
     }"
   >
     <template #header>
@@ -78,7 +70,7 @@ const navUi = {
         aria-label="Panel admin Ruang Kerja"
       >
         <AppLogo surface="dark" />
-        <span class="rounded-full bg-brand-400/20 px-2 text-[11px]/4 font-semibold text-brand-300">Admin</span>
+        <span class="rounded-full bg-accent/15 px-2 text-[11px]/4 font-semibold text-accent">Admin</span>
       </NuxtLink>
     </template>
 
@@ -99,6 +91,9 @@ const navUi = {
     </template>
 
     <template #footer>
+      <div class="flex px-2 py-1.5">
+        <ThemeSwitch inverted />
+      </div>
       <UDropdownMenu
         :items="userItems"
         :content="{ align: 'start', side: 'top', sideOffset: 8 }"
@@ -114,7 +109,7 @@ const navUi = {
             :alt="me?.user.name"
             :text="initials"
             size="lg"
-            :ui="{ root: 'shrink-0 bg-brand-800', fallback: 'text-xs font-semibold text-white' }"
+            :ui="{ root: 'shrink-0 bg-brand-600', fallback: 'text-xs font-semibold text-white' }"
           />
           <span class="flex min-w-0 flex-1 flex-col">
             <span class="truncate text-sm/5 font-semibold text-white">{{ me?.user.name }}</span>

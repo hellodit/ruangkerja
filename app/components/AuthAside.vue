@@ -10,7 +10,7 @@ const points = [
 <template>
   <aside
     aria-label="Tentang Ruang Kerja"
-    class="flex flex-[1_1_480px] flex-col justify-between gap-10 border-r border-brand-100 bg-brand-50 px-6 py-10 sm:px-12 dark:border-[#3a2f12] dark:bg-[#2e2a18]"
+    class="flex flex-[1_1_480px] flex-col justify-between gap-10 border-r border-brand-100 bg-brand-50 px-6 py-10 sm:px-12 dark:border-brand-900 dark:bg-brand-950/60"
   >
     <NuxtLink
       to="/login"
@@ -30,7 +30,7 @@ const points = [
           :key="p.icon"
           class="flex items-start gap-3"
         >
-          <span class="flex size-9 shrink-0 items-center justify-center rounded-[10px] border border-brand-100 bg-default text-brand-ink dark:border-[#3a2f12]">
+          <span class="flex size-9 shrink-0 items-center justify-center rounded-[10px] border border-brand-100 bg-default text-brand-ink dark:border-brand-900">
             <UIcon
               :name="p.icon"
               class="size-5"

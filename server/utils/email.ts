@@ -39,7 +39,7 @@ function renderActionEmail(e: ActionEmail) {
 <html lang="id"><body style="font-family:Arial,Helvetica,sans-serif;color:#0f172a;line-height:1.5;max-width:560px;margin:0 auto;padding:24px">
 <p>Halo ${name},</p>
 <p>${escapeHtml(e.intro)}</p>
-<p style="margin:32px 0"><a href="${url}" style="background:#ecbd56;color:#111216;padding:12px 20px;border-radius:6px;text-decoration:none;display:inline-block">${escapeHtml(e.actionLabel)}</a></p>
+<p style="margin:32px 0"><a href="${url}" style="background:#1d3a6e;color:#ffffff;padding:12px 20px;border-radius:6px;text-decoration:none;display:inline-block">${escapeHtml(e.actionLabel)}</a></p>
 <p style="font-size:13px;color:#475569">Jika tombol tidak berfungsi, salin tautan ini ke browser Anda:<br><span style="word-break:break-all">${url}</span></p>
 <p style="font-size:13px;color:#475569">${escapeHtml(e.outro)}</p>
 <p>— Ruang Kerja</p>

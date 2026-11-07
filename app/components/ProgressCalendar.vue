@@ -72,7 +72,7 @@ function slotLink(d: string, hour: number) {
             >{{ DAYS_SHORT_ID[dayOfWeek(d)] }}</span>
             <span
               v-if="d === today"
-              class="size-8 rounded-full bg-primary text-center text-lg/8 font-bold text-ink"
+              class="size-8 rounded-full bg-primary text-center text-lg/8 font-bold text-white"
             >{{ Number(d.slice(8)) }}</span>
             <span
               v-else

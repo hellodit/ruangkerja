@@ -31,28 +31,31 @@
   --font-sans: 'Rethink Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  /* c-brand-* (gold) */
-  --color-brand-50: #fbf0d6;
-  --color-brand-100: #f5e1b4;
-  --color-brand-200: #efce84;
-  --color-brand-300: #edc56c;
-  --color-brand-400: #ecbd56;
-  --color-brand-500: #ddaa3f;
-  --color-brand-600: #c4922a;
-  --color-brand-700: #a87b1c;
-  --color-brand-800: #8a6410;
-  --color-brand-900: #6b4d0a;
-  --color-brand-950: #4a3506;
+  /* c-brand-* (navy). 700 is the logo navy #1D3A6E (public/images/logo/README.md). */
+  --color-brand-50: #eef3fa;
+  --color-brand-100: #dbe5f4;
+  --color-brand-200: #b9cce9;
+  --color-brand-300: #8eabd9;
+  --color-brand-400: #6189c6;
+  --color-brand-500: #3f69ad;
+  --color-brand-600: #2c518f;
+  --color-brand-700: #1d3a6e;
+  --color-brand-800: #17305b;
+  --color-brand-900: #122649;
+  --color-brand-950: #0b1830;
 
-  /* text-on-brand: ink on gold (10.7:1) */
+  /* Logo accent (the check mark). Decorative only: 1.9:1 on white, never text. */
+  --color-accent: #f2b23a;
+
+  /* Near-black for text on light fills. */
   --color-ink: #111216;
 }
 
 :root {
   /* CTM radius scale: rounded-sm 8 (button md, chip) · rounded-md 12 (field, card, button lg) */
   --ui-radius: 0.5rem;
-  /* Gold is a light color: the brand fill is brand-400 in both themes. */
-  --ui-primary: var(--ui-color-primary-400);
+  /* Navy is dark: the fill is the logo navy (brand-700) with white text (11.2:1). */
+  --ui-primary: var(--ui-color-primary-700);
   --ui-bg: #ffffff;
   --ui-bg-muted: var(--ui-color-neutral-50);
   --ui-bg-elevated: var(--ui-color-neutral-100);
@@ -68,7 +71,8 @@
 }
 
 .dark {
-  --ui-primary: var(--ui-color-primary-400);
+  /* brand-500: white text 5.5:1, 3.1:1 against the dark page. */
+  --ui-primary: var(--ui-color-primary-500);
   --ui-bg: #1a1d21;
   --ui-bg-muted: #222529;
   --ui-bg-elevated: #292c30;
@@ -85,12 +89,12 @@
   --ui-error: var(--ui-color-error-400);
 }
 
-/* Brand-colored text on light surfaces must use brand-800 (5.4:1), never the fill. */
+/* Brand-colored text: logo navy on light surfaces (11.2:1), brand-300 on dark (7.2:1). */
 @utility text-brand-ink {
-  color: var(--color-brand-800);
+  color: var(--color-brand-700);
 
   @variant dark {
-    color: var(--color-brand-400);
+    color: var(--color-brand-300);
   }
 }
 
