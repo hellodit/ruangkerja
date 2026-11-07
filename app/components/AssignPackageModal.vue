@@ -34,14 +34,14 @@ const userOptions = computed<UserOption[]>(() => (userData.value?.users ?? []).m
 })))
 const userItems = computed(() => userOptions.value.map(u => ({ label: u.name, description: u.email, value: u.id })))
 
-const state = reactive<{ userId: string, packageId: string, amount: number | undefined, start: PeriodStart, reference: string, notes: string }>({
-  userId: '', packageId: '', amount: undefined, start: 'extend', reference: '', notes: ''
+const state = reactive<{ userId: string, packageId: string, amount: number | undefined, reference: string, notes: string }>({
+  userId: '', packageId: '', amount: undefined, reference: '', notes: ''
 })
 const pickedUser = ref<UserOption | null>(null)
 
 watch(open, async (v) => {
   if (!v) return
-  Object.assign(state, { userId: props.user?.id ?? '', packageId: '', amount: undefined, start: 'extend', reference: '', notes: '' })
+  Object.assign(state, { userId: props.user?.id ?? '', packageId: '', amount: undefined, reference: '', notes: '' })
   pickedUser.value = props.user ?? null
   searchTerm.value = ''
   await refreshPackages()
@@ -55,16 +55,19 @@ watch(selectedPackage, (p) => {
   if (p) state.amount = p.price
 })
 
+const longDate = (d: Date | string) => formatDateLong(todayInTimeZone('Asia/Jakarta', new Date(d)))
+// Same rule as the server: ends at the current end date (or today) + the package's duration.
 const preview = computed(() => {
   if (!selectedPackage.value) return null
-  const paidUntil = pickedUser.value?.paidUntil ? new Date(pickedUser.value.paidUntil) : null
-  const period = computePackagePeriod({ now: new Date(), currentEnd: paidUntil, durationDays: selectedPackage.value.durationDays, start: state.start })
-  const day = (d: Date) => formatDateLong(todayInTimeZone('Asia/Jakarta', d))
-  return `${day(period.start)} – ${day(period.end)}`
+  const currentEnd = pickedUser.value?.paidUntil ? new Date(pickedUser.value.paidUntil) : null
+  const days = selectedPackage.value.durationDays
+  const period = computePackagePeriod({ now: new Date(), currentEnd, durationDays: days })
+  const base = currentEnd && currentEnd > new Date() ? `Tanggal berakhir sekarang (${longDate(currentEnd)})` : 'Hari ini'
+  return { end: longDate(period.end), how: `${base} + ${days} hari (${formatDurationDays(days)})` }
 })
 const currentText = computed(() => {
   const until = pickedUser.value?.paidUntil
-  return until ? `Masa aktif sekarang sampai ${formatDateLong(todayInTimeZone('Asia/Jakarta', new Date(until)))}` : 'Belum punya paket aktif'
+  return until ? `Paket aktif sampai ${longDate(until)}` : 'Belum punya paket aktif'
 })
 
 const saving = ref(false)
@@ -168,19 +171,6 @@ async function onSubmit(event: FormSubmitEvent<AssignPackageInput>) {
         </div>
 
         <UFormField
-          label="Mulai masa aktif"
-          name="start"
-        >
-          <URadioGroup
-            v-model="state.start"
-            :items="[
-              { label: 'Lanjutkan setelah masa aktif sekarang', description: 'Tidak ada hari yang hilang saat perpanjang lebih awal.', value: 'extend' },
-              { label: 'Mulai hari ini', description: 'Misalnya saat ganti ke paket lain.', value: 'now' }
-            ]"
-          />
-        </UFormField>
-
-        <UFormField
           label="Catatan"
           name="notes"
           hint="Opsional"
@@ -198,8 +188,8 @@ async function onSubmit(event: FormSubmitEvent<AssignPackageInput>) {
           color="info"
           variant="subtle"
           icon="i-ctm-date"
-          :title="`Aktif ${preview}`"
-          :description="`${selectedPackage!.name} · ${formatRupiah(state.amount ?? 0)} · dicatat sebagai transaksi manual (lunas).`"
+          :title="`Paket berakhir ${preview.end}`"
+          :description="`${preview.how}. ${selectedPackage!.name} · ${formatRupiah(state.amount ?? 0)} · dicatat sebagai transaksi manual (lunas).`"
         />
       </UForm>
     </template>

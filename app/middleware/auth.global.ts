@@ -6,6 +6,8 @@ const PUBLIC = [...GUEST_ONLY, '/reset-password', '/verify-email', '/privasi']
  * - Everything else needs a session.
  * - Until onboarding is finished, the workspace redirects to it (ONB).
  * - /admin is for admins only.
+ * - Without an active package, everything except /subscription and /profil
+ *   redirects to /subscription (admins are exempt).
  */
 export default defineNuxtRouteMiddleware(async (to) => {
   const { ensure } = useAuthSession()
@@ -26,6 +28,14 @@ export default defineNuxtRouteMiddleware(async (to) => {
   // Admin panel: admins only (the API checks again); not gated by onboarding.
   if (to.path.startsWith('/admin')) {
     return me?.isAdmin ? undefined : navigateTo('/beranda')
+  }
+  // No active package: pay first. /profil stays open (account, export, delete).
+  const needsPackage = !!me && !me.isAdmin && !me.subscription
+  if (needsPackage && to.path !== '/subscription' && to.path !== '/profil') {
+    return navigateTo('/subscription')
+  }
+  if (to.path === '/subscription') {
+    return
   }
   const inOnboarding = to.path.startsWith('/onboarding')
   if (me && !me.onboardingCompleted && !inOnboarding && to.path !== '/profil') {

@@ -56,6 +56,14 @@ export default defineNuxtConfig({
       siteUrl: 'http://localhost:3000',
       // Shown on the privacy page (support owner is still an open PRD question)
       supportEmail: '',
+      // Manual bank transfer shown on /subscription until SingaPay checkout is live.
+      payment: {
+        bankName: '',
+        accountNumber: '',
+        accountName: '',
+        // International format without '+', e.g. 6281234567890 (wa.me link).
+        whatsapp: ''
+      },
       turnstile: {
         siteKey: ''
       }

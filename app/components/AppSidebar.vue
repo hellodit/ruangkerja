@@ -45,6 +45,12 @@ const userItems = computed<DropdownMenuItem[][]>(() => [
   [{ label: me.value?.user.name ?? '', description: me.value?.user.email ?? '', type: 'label', slot: 'account' as const }],
   [
     { label: 'Profil dan pengaturan', icon: 'i-ctm-user', to: '/profil' },
+    {
+      label: me.value?.subscription ? `Paket ${me.value.subscription.name}` : 'Pilih paket',
+      description: me.value?.subscription ? `Aktif sampai ${formatDateShort(todayInTimeZone('Asia/Jakarta', new Date(me.value.subscription.endsAt)))}` : undefined,
+      icon: 'i-ctm-product',
+      to: '/subscription'
+    },
     { label: 'Kebijakan privasi', icon: 'i-ctm-square-lock-01', to: '/privasi' },
     {
       label: colorMode.value === 'dark' ? 'Tampilan terang' : 'Tampilan gelap',

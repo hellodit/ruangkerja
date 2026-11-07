@@ -49,7 +49,7 @@ export const aiTargetTypeEnum = pgEnum('ai_target_type', ['progress_description'
 export const realizationStatusEnum = pgEnum('realization_status', ['draf', 'disalin'])
 export const uploadKindEnum = pgEnum('upload_kind', ['avatar'])
 export const transactionMethodEnum = pgEnum('transaction_method', ['manual', 'singapay'])
-export const transactionStatusEnum = pgEnum('transaction_status', ['pending', 'paid', 'failed', 'refunded'])
+export const transactionStatusEnum = pgEnum('transaction_status', ['pending', 'paid', 'failed', 'refunded', 'cancelled'])
 
 // ---------------------------------------------------------------------------
 // Better Auth core tables (plural names via modelName). Property names are what
@@ -332,6 +332,8 @@ export const packages = pgTable('packages', {
  */
 export const transactions = pgTable('transactions', {
   id: uuid('id').primaryKey().defaultRandom(),
+  /** Order code the user writes in the transfer note (self-checkout), e.g. RK-261107-7KQ2. */
+  code: text('code').unique(),
   userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
   userName: text('user_name').notNull(),
   userEmail: text('user_email').notNull(),

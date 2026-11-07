@@ -33,7 +33,6 @@ export const assignPackageSchema = z.object({
   userId: z.uuid('Pilih pengguna'),
   packageId: z.uuid('Pilih paket'),
   amount: z.number({ error: 'Nominal wajib diisi' }).int('Nominal dalam rupiah bulat').min(0, 'Nominal tidak boleh negatif').max(100_000_000, 'Nominal terlalu besar'),
-  start: z.enum(['extend', 'now']).default('extend'),
   reference: optionalText(120),
   notes: optionalText(500)
 })
@@ -45,6 +44,7 @@ export const TRANSACTION_METHODS = ['manual', 'singapay'] as const
 export const adminTransactionsQuery = z.object({
   q: z.string().trim().max(100).optional().transform(v => v || undefined),
   method: z.enum(['all', ...TRANSACTION_METHODS]).default('all'),
+  status: z.enum(['all', 'pending', 'paid']).default('all'),
   userId: z.uuid().optional(),
   page: z.coerce.number().int().min(1).max(10_000).default(1),
   pageSize: z.coerce.number().int().refine(n => [10, 25, 50].includes(n), 'Ukuran halaman tidak valid').default(25)
@@ -55,3 +55,6 @@ export const DASHBOARD_RANGES = [7, 30, 90] as const
 export const adminDashboardQuery = z.object({
   days: z.coerce.number().int().refine(n => (DASHBOARD_RANGES as readonly number[]).includes(n), 'Rentang tidak valid').default(30)
 })
+
+/** User self-checkout: pick a package to pay for. */
+export const checkoutSchema = z.object({ packageId: z.uuid('Pilih paket') })

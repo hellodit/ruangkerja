@@ -39,6 +39,8 @@ const week = weekRange(today)
 const day = (i: number) => addDays(week.start, i)
 
 await db.transaction(async (tx) => {
+  // Transactions keep a copy of the user (user_id is set null on delete), so clear them explicitly.
+  await tx.delete(schema.transactions).where(eq(schema.transactions.userEmail, email))
   await tx.delete(schema.users).where(eq(schema.users.email, email))
 
   const [user] = await tx.insert(schema.users).values({
@@ -66,6 +68,28 @@ await db.transaction(async (tx) => {
     supervisorTitle: 'Kepala Bidang Perekonomian'
   })
   await tx.insert(schema.userSettings).values({ userId })
+
+  // The workspace needs an active package: give the demo account a year.
+  let [demoPackage] = await tx.select().from(schema.packages).where(eq(schema.packages.name, 'Demo'))
+  if (!demoPackage) {
+    [demoPackage] = await tx.insert(schema.packages).values({ name: 'Demo', description: 'Paket untuk akun demo', price: 0, durationDays: 365, isActive: false }).returning()
+  }
+  const now = new Date()
+  await tx.insert(schema.transactions).values({
+    userId,
+    userName: user!.name,
+    userEmail: email,
+    packageId: demoPackage!.id,
+    packageName: demoPackage!.name,
+    durationDays: 365,
+    amount: 0,
+    method: 'manual',
+    status: 'paid',
+    periodStart: now,
+    periodEnd: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000),
+    notes: 'Akun demo (seed)',
+    paidAt: now
+  })
 
   const [skp] = await tx.insert(schema.skps).values({ userId, year, evaluationFrequency: 'monthly', submissionDeadlineDay: 5 }).returning()
   const periods = await tx.insert(schema.evaluationPeriods).values(generatePeriods(year, 'monthly', 5).map(p => ({ ...p, skpId: skp!.id }))).returning()

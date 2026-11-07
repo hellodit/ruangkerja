@@ -15,6 +15,7 @@ Asisten kerja digital personal untuk ASN: susun **rencana aksi per RHK**, catat 
 | Realisasi periode | Draf per RHK yang disusun **hanya** dari progres harian (rencana aksi tanpa progres ditandai, tidak diisi otomatis), bisa diubah, salin per RHK atau semua, unduh **.docx** asli. |
 | Profil | Data pribadi/kepegawaian/atasan, foto profil (R2), pengingat, ubah kata sandi, ekspor semua data (JSON), hapus akun permanen. |
 | Admin | Layout tersendiri (sidebar gelap), khusus admin. **Dashboard** (`/admin/dashboard`): angka utama, grafik pendaftaran dan pendapatan per hari (7/30/90 hari, WIB), paket aktif, transaksi terbaru, paket yang segera berakhir, pendaftar terbaru. **Pengguna** (`/admin/users`): statistik, pencarian, saringan, paket aktif tiap pengguna, assign paket. **Paket** (`/admin/packages`): tambah, ubah, nonaktifkan, arsipkan. **Transaksi** (`/admin/transactions`): riwayat dan pendapatan; assign paket manual mencatat transaksi lunas dan memperpanjang masa aktif. Hanya data akun dasar; NIP, tanggal lahir, alamat, nomor HP, dan isi pekerjaan tidak ditampilkan. |
+| Paket dan pembayaran | Ruang kerja butuh paket aktif (admin dikecualikan). Tanpa paket, semua halaman kecuali Profil diarahkan ke `/subscription`: pilih paket → pesanan berkode (RK-YYMMDD-XXXXXX) dengan instruksi transfer bank → admin mengonfirmasi lunas di Admin → Transaksi → paket aktif. API ruang kerja menjawab 402 tanpa paket aktif. Beranda menampilkan pengingat mulai 7 hari sebelum paket berakhir. Perpanjangan, konfirmasi, dan assign manual menambah durasi paket ke tanggal berakhir yang berjalan (atau hari ini). |
 
 Di luar Rilis 1.0 (sesuai PRD): fitur AI (rapikan kalimat, draf AI — Rilis 1.1), Alat bantu (Panduan kerja, Asisten AI, Draf SOP), pembayaran. Webhook SingaPay sudah tersedia untuk fase pembayaran.
 
@@ -95,7 +96,20 @@ Atur **CORS** di bucket tersebut (Settings → CORS policy), ganti origin dengan
 ]
 ```
 
-### 7. SingaPay
+### 7. Pembayaran paket (transfer bank)
+
+Sampai checkout SingaPay aktif, pengguna membayar lewat transfer bank dan admin mengonfirmasi di **Admin → Transaksi** (saringan *Menunggu* → *Konfirmasi lunas*). Isi rekening tujuan:
+
+```env
+NUXT_PUBLIC_PAYMENT_BANK_NAME=BCA
+NUXT_PUBLIC_PAYMENT_ACCOUNT_NUMBER=1234567890
+NUXT_PUBLIC_PAYMENT_ACCOUNT_NAME=PT Contoh
+NUXT_PUBLIC_PAYMENT_WHATSAPP=6281234567890   # opsional: tombol konfirmasi lewat WhatsApp
+```
+
+Akun demo dari `db:seed-demo` otomatis mendapat paket *Demo* selama setahun.
+
+### 8. SingaPay
 
 Di dashboard SingaPay, atur URL notifikasi (transaksi dan/atau disbursement) ke:
 

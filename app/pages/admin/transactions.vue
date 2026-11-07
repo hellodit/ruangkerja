@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TableColumn } from '@nuxt/ui'
+import type { DropdownMenuItem, TableColumn } from '@nuxt/ui'
 import type { InternalApi } from 'nitropack'
 
 definePageMeta({ layout: 'admin' })
@@ -14,18 +14,20 @@ const q = ref(typeof route.query.q === 'string' ? route.query.q : '')
 const qDebounced = refDebounced(q, 300)
 const METHODS = ['all', 'manual', 'singapay'] as const
 const method = ref<typeof METHODS[number]>(METHODS.find(m => m === route.query.method) ?? 'all')
+const STATUSES = ['all', 'pending', 'paid'] as const
+const statusFilter = ref<typeof STATUSES[number]>(STATUSES.find(m => m === route.query.status) ?? 'all')
 const page = ref(Math.max(1, Number(route.query.page) || 1))
 const pageSize = 25
 
-watch([qDebounced, method], () => {
+watch([qDebounced, method, statusFilter], () => {
   page.value = 1
 })
-watch([qDebounced, method, page], () => {
-  router.replace({ query: { ...(qDebounced.value ? { q: qDebounced.value } : {}), ...(method.value !== 'all' ? { method: method.value } : {}), ...(page.value > 1 ? { page: page.value } : {}) } })
+watch([qDebounced, method, statusFilter, page], () => {
+  router.replace({ query: { ...(qDebounced.value ? { q: qDebounced.value } : {}), ...(method.value !== 'all' ? { method: method.value } : {}), ...(statusFilter.value !== 'all' ? { status: statusFilter.value } : {}), ...(page.value > 1 ? { page: page.value } : {}) } })
 })
 
 const { data, status, refresh } = await useFetch('/api/admin/transactions', {
-  query: computed(() => ({ q: qDebounced.value || undefined, method: method.value, page: page.value, pageSize })),
+  query: computed(() => ({ q: qDebounced.value || undefined, method: method.value, status: statusFilter.value, page: page.value, pageSize })),
   key: 'admin-transactions'
 })
 const stats = computed(() => data.value?.stats)
@@ -39,17 +41,60 @@ const rangeText = computed(() => {
 
 const assignOpen = ref(false)
 
-const methodFilters = [
+const statusFilters = computed(() => [
   { id: 'all' as const, label: 'Semua' },
+  { id: 'pending' as const, label: stats.value?.pending ? `Menunggu · ${stats.value.pending}` : 'Menunggu' },
+  { id: 'paid' as const, label: 'Lunas' }
+])
+const methodFilters = [
+  { id: 'all' as const, label: 'Semua metode' },
   { id: 'manual' as const, label: 'Manual' },
   { id: 'singapay' as const, label: 'SingaPay' }
+]
+
+// Pending self-checkout orders: confirm the transfer arrived, or cancel.
+const notify = useNotify()
+const confirming = ref<Tx | null>(null)
+const confirmRef = ref('')
+const actionBusy = ref(false)
+function openConfirm(t: Tx) {
+  confirming.value = t
+  confirmRef.value = ''
+}
+async function confirmPaid() {
+  if (!confirming.value) return
+  actionBusy.value = true
+  try {
+    const res = await $fetch(`/api/admin/transactions/${confirming.value.id}/confirm`, { method: 'POST', body: { reference: confirmRef.value || null } })
+    notify.success(`Lunas. ${confirming.value.packageName} aktif sampai ${formatDateLong(day(res.periodEnd!))}`)
+    confirming.value = null
+    await refresh()
+  } catch (err) {
+    notify.error(err)
+  } finally {
+    actionBusy.value = false
+  }
+}
+async function cancelOrder(t: Tx) {
+  try {
+    await $fetch(`/api/admin/transactions/${t.id}/cancel`, { method: 'POST' })
+    notify.success(`Pesanan ${t.code ?? ''} dibatalkan`)
+    await refresh()
+  } catch (err) {
+    notify.error(err)
+  }
+}
+const pendingMenu = (t: Tx): DropdownMenuItem[][] => [
+  [{ label: 'Konfirmasi lunas', icon: 'i-ctm-checkmark-circle', onSelect: () => openConfirm(t) }],
+  [{ label: 'Batalkan pesanan', icon: 'i-ctm-close', color: 'error', onSelect: () => cancelOrder(t) }]
 ]
 const METHOD_LABEL: Record<Tx['method'], string> = { manual: 'Manual', singapay: 'SingaPay' }
 const STATUS: Record<Tx['status'], { label: string, color: 'success' | 'warning' | 'error' | 'neutral' }> = {
   paid: { label: 'Lunas', color: 'success' },
   pending: { label: 'Menunggu', color: 'warning' },
   failed: { label: 'Gagal', color: 'error' },
-  refunded: { label: 'Dikembalikan', color: 'neutral' }
+  refunded: { label: 'Dikembalikan', color: 'neutral' },
+  cancelled: { label: 'Dibatalkan', color: 'neutral' }
 }
 const day = (ts: string | Date) => todayInTimeZone('Asia/Jakarta', new Date(ts))
 const isRunning = (t: Tx) => t.status === 'paid' && !!t.periodStart && !!t.periodEnd && new Date(t.periodStart) <= new Date() && new Date(t.periodEnd) > new Date()
@@ -60,7 +105,8 @@ const columns: TableColumn<Tx>[] = [
   { id: 'package', header: 'Paket dan masa aktif' },
   { id: 'amount', header: 'Nominal' },
   { id: 'method', header: 'Metode' },
-  { id: 'note', header: 'Referensi dan catatan' }
+  { id: 'note', header: 'Referensi dan catatan' },
+  { id: 'actions', header: () => h('span', { class: 'sr-only' }, 'Aksi'), meta: { class: { th: 'w-12 px-2', td: 'px-2' } } }
 ]
 </script>
 
@@ -122,22 +168,28 @@ const columns: TableColumn<Tx>[] = [
             />
             <div
               role="group"
-              aria-label="Saring metode"
+              aria-label="Saring status"
               class="flex flex-wrap gap-2"
             >
               <UButton
-                v-for="f in methodFilters"
+                v-for="f in statusFilters"
                 :key="f.id"
                 color="neutral"
                 variant="outline"
                 class="h-[30px] rounded-full px-3 text-sm/5 font-normal ring-default"
-                :class="method === f.id && 'bg-brand-100 text-brand-ink ring-brand-700 hover:bg-brand-100 dark:bg-brand-950/50'"
-                :aria-pressed="method === f.id"
-                @click="method = f.id"
+                :class="statusFilter === f.id && 'bg-brand-100 text-brand-ink ring-brand-700 hover:bg-brand-100 dark:bg-brand-950/50'"
+                :aria-pressed="statusFilter === f.id"
+                @click="statusFilter = f.id"
               >
                 {{ f.label }}
               </UButton>
             </div>
+            <USelect
+              v-model="method"
+              :items="methodFilters.map(f => ({ label: f.label, value: f.id }))"
+              class="w-44"
+              aria-label="Saring metode"
+            />
             <UButton
               icon="i-ctm-plus"
               class="ml-auto"
@@ -213,11 +265,33 @@ const columns: TableColumn<Tx>[] = [
             </template>
             <template #note-cell="{ row }">
               <div class="flex max-w-60 flex-col">
-                <span class="text-highlighted">{{ row.original.reference || '—' }}</span>
+                <span
+                  v-if="row.original.code"
+                  class="font-mono text-[13px]/[18px] text-highlighted"
+                >{{ row.original.code }}</span>
+                <span :class="row.original.code ? 'text-[13px]/[18px] text-toned' : 'text-highlighted'">{{ row.original.reference || (row.original.code ? 'Pesanan pengguna' : '—') }}</span>
                 <span
                   v-if="row.original.notes"
                   class="text-[13px]/[18px] text-toned"
                 >{{ row.original.notes }}</span>
+              </div>
+            </template>
+            <template #actions-cell="{ row }">
+              <div
+                v-if="row.original.status === 'pending'"
+                class="flex justify-end"
+              >
+                <UDropdownMenu
+                  :items="pendingMenu(row.original)"
+                  :content="{ align: 'end' }"
+                >
+                  <UButton
+                    icon="i-ctm-more-vertical"
+                    variant="ghost"
+                    size="sm"
+                    :aria-label="`Aksi pesanan ${row.original.code ?? ''}`"
+                  />
+                </UDropdownMenu>
               </div>
             </template>
           </UTable>
@@ -238,6 +312,47 @@ const columns: TableColumn<Tx>[] = [
         v-model:open="assignOpen"
         @saved="refresh"
       />
+
+      <UModal
+        :open="!!confirming"
+        title="Konfirmasi pembayaran"
+        :description="confirming ? `${confirming.userName} · ${confirming.packageName} · ${formatRupiah(confirming.amount)} · ${confirming.code ?? ''}` : ''"
+        @update:open="v => { if (!v) confirming = null }"
+      >
+        <template #body>
+          <div class="flex flex-col gap-4">
+            <p class="text-sm text-toned">
+              Pastikan dana sudah masuk ke rekening. Paket langsung aktif: berakhir pada tanggal berakhir paket pengguna saat ini (atau hari ini) ditambah {{ confirming?.durationDays }} hari.
+            </p>
+            <UFormField
+              label="Referensi pembayaran"
+              hint="Opsional"
+            >
+              <UInput
+                v-model="confirmRef"
+                placeholder="Contoh: TRF BCA 0711"
+              />
+            </UFormField>
+          </div>
+        </template>
+        <template #footer>
+          <div class="flex w-full justify-end gap-2">
+            <UButton
+              variant="ghost"
+              @click="confirming = null"
+            >
+              Batal
+            </UButton>
+            <UButton
+              icon="i-ctm-checkmark-circle"
+              :loading="actionBusy"
+              @click="confirmPaid"
+            >
+              Konfirmasi lunas
+            </UButton>
+          </div>
+        </template>
+      </UModal>
     </template>
   </UDashboardPanel>
 </template>

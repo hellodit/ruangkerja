@@ -3,9 +3,9 @@ import { assignPackageSchema } from '#shared/schemas/admin'
 
 /**
  * Admin assigns a package by hand (e.g. after a bank transfer). Records a
- * paid manual transaction whose period continues after the user's current
- * paid coverage ("extend") or starts now. The user row is locked so two
- * assignments at once cannot produce overlapping periods.
+ * paid manual transaction; the package ends at the user's current end date
+ * (or today when nothing is active) plus the package's duration. The user
+ * row is locked so two assignments at once cannot overlap.
  */
 export default defineEventHandler(async (event) => {
   const admin = await requireAdmin(event)
@@ -13,8 +13,7 @@ export default defineEventHandler(async (event) => {
   const db = useDb()
 
   const result = await db.transaction(async (tx) => {
-    const [user] = await tx.select({ id: schema.users.id, name: schema.users.name, email: schema.users.email })
-      .from(schema.users).where(eq(schema.users.id, input.userId)).for('update')
+    const user = await lockUser(tx, input.userId)
     if (!user) notFound('Pengguna')
 
     const [pkg] = await tx.select().from(schema.packages)
@@ -25,7 +24,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const now = new Date()
-    const period = computePackagePeriod({ now, currentEnd: await paidUntil(tx, user.id, now), durationDays: pkg.durationDays, start: input.start })
+    const period = computePackagePeriod({ now, currentEnd: await paidUntil(tx, user.id, now), durationDays: pkg.durationDays })
     const [row] = await tx.insert(schema.transactions).values({
       userId: user.id,
       userName: user.name,

@@ -25,21 +25,36 @@ describe('computePackagePeriod', () => {
   const now = new Date('2026-11-07T03:00:00Z')
 
   it('starts now when the user has no active period', () => {
-    const p = computePackagePeriod({ now, currentEnd: null, durationDays: 30, start: 'extend' })
+    const p = computePackagePeriod({ now, currentEnd: null, durationDays: 30 })
     expect(p.start).toEqual(now)
     expect(p.end.getTime() - now.getTime()).toBe(30 * DAY)
   })
 
-  it('extends after the current period so no paid days are lost', () => {
+  it('adds the duration after the current end so no paid days are lost', () => {
     const currentEnd = new Date('2026-11-20T00:00:00Z')
-    const p = computePackagePeriod({ now, currentEnd, durationDays: 30, start: 'extend' })
+    const p = computePackagePeriod({ now, currentEnd, durationDays: 30 })
     expect(p.start).toEqual(currentEnd)
     expect(p.end).toEqual(new Date(currentEnd.getTime() + 30 * DAY))
   })
 
-  it('ignores an expired period and can be forced to start now', () => {
-    expect(computePackagePeriod({ now, currentEnd: new Date('2026-10-01T00:00:00Z'), durationDays: 7, start: 'extend' }).start).toEqual(now)
-    expect(computePackagePeriod({ now, currentEnd: new Date('2026-11-20T00:00:00Z'), durationDays: 7, start: 'now' }).start).toEqual(now)
+  it('ignores an expired period', () => {
+    expect(computePackagePeriod({ now, currentEnd: new Date('2026-10-01T00:00:00Z'), durationDays: 7 }).start).toEqual(now)
+  })
+})
+
+describe('daysLeft and orderCode', () => {
+  it('rounds the days left up and stops at 0', async () => {
+    const { daysLeft } = await import('../../shared/utils/billing')
+    const now = new Date('2026-11-07T03:00:00Z')
+    expect(daysLeft(new Date('2026-11-14T03:00:00Z'), now)).toBe(7)
+    expect(daysLeft(new Date('2026-11-09T06:00:00Z'), now)).toBe(3)
+    expect(daysLeft(new Date('2026-11-01T00:00:00Z'), now)).toBe(0)
+  })
+
+  it('builds a readable order code from the WIB day and random bytes', async () => {
+    const { orderCode } = await import('../../shared/utils/billing')
+    expect(orderCode('2026-11-07', new Uint8Array([0, 1, 31, 32, 2, 3]))).toBe('RK-261107-AB9ACD')
+    expect(orderCode('2026-11-07', new Uint8Array([200, 7, 99, 250, 18, 77]))).toMatch(/^RK-261107-[A-HJ-NP-Z2-9]{6}$/)
   })
 })
 
@@ -54,7 +69,7 @@ describe('package and assign schemas', () => {
 
   it('validates manual assignments', () => {
     const ok = assignPackageSchema.parse({ userId: '6a475d92-b0a5-40b8-92c0-c681d28a97a2', packageId: '7b475d92-b0a5-40b8-92c0-c681d28a97a2', amount: 0, reference: '  ', notes: 'Promo' })
-    expect(ok).toMatchObject({ amount: 0, start: 'extend', reference: null, notes: 'Promo' })
+    expect(ok).toMatchObject({ amount: 0, reference: null, notes: 'Promo' })
     expect(assignPackageSchema.safeParse({ userId: 'x', packageId: '7b475d92-b0a5-40b8-92c0-c681d28a97a2', amount: 0 }).success).toBe(false)
   })
 })
