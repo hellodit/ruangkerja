@@ -36,6 +36,11 @@ const rhkFilter = computed({
 })
 
 const weekEnd = computed(() => addDays(weekStart.value, 4))
+const isCurrentWeek = computed(() => weekStart.value >= weekRange(today.value).start)
+const rhkChips = computed(() => [
+  { id: undefined as string | undefined, label: 'Semua RHK', number: 0 },
+  ...(rhkList.value?.rhks ?? []).map(r => ({ id: r.id as string | undefined, label: `RHK ${r.number}`, number: r.number }))
+])
 const { data, refresh, status } = await useFetch('/api/progress', {
   query: computed(() => ({ from: weekStart.value, to: weekEnd.value, rhkId: rhkId.value })),
   key: 'progress-list'
@@ -46,7 +51,8 @@ watch([weekStart, rhkId, noEvidence], () => {
 
 const entries = computed(() => data.value?.entries ?? [])
 const missingCount = computed(() => entries.value.filter(e => !e.hasEvidence).length)
-const shown = computed(() => (noEvidence.value ? entries.value.filter(e => !e.hasEvidence) : entries.value))
+// The calendar (canvas "Tampilan kalender") has no evidence filter: it always shows the whole week.
+const shown = computed(() => (noEvidence.value && view.value === 'list' ? entries.value.filter(e => !e.hasEvidence) : entries.value))
 const totalMinutes = computed(() => shown.value.reduce((n, e) => n + minutesBetween(e.startTime, e.endTime), 0))
 
 function toggleRow(id: string, selected: boolean) {
@@ -134,49 +140,94 @@ function addEvidence(id: string) {
           />
           <div class="flex items-center gap-1">
             <UButton
+              v-if="view === 'calendar' || !isCurrentWeek"
+              color="neutral"
+              variant="outline"
+              size="sm"
+              class="mr-1"
+              @click="weekStart = weekRange(today).start"
+            >
+              Minggu ini
+            </UButton>
+            <UButton
               icon="i-ctm-chevron-left"
               variant="ghost"
               aria-label="Minggu sebelumnya"
               @click="shiftWeek(-1)"
             />
-            <span class="min-w-40 text-center text-base/6 font-semibold text-highlighted">{{ formatRange(weekStart, weekEnd) }}</span>
             <UButton
+              v-if="view === 'calendar'"
               icon="i-ctm-chevron-right"
               variant="ghost"
               aria-label="Minggu berikutnya"
+              :disabled="isCurrentWeek"
               @click="shiftWeek(1)"
             />
+            <span
+              class="text-base/6 font-semibold text-highlighted"
+              :class="view === 'calendar' ? 'px-1' : 'min-w-40 text-center'"
+            >{{ formatRange(weekStart, weekEnd) }}</span>
             <UButton
-              v-if="weekStart !== weekRange(today).start"
+              v-if="view === 'list'"
+              icon="i-ctm-chevron-right"
+              variant="ghost"
+              aria-label="Minggu berikutnya"
+              :disabled="isCurrentWeek"
+              @click="shiftWeek(1)"
+            />
+          </div>
+          <div
+            v-if="view === 'calendar'"
+            role="group"
+            aria-label="Saring menurut RHK"
+            class="flex flex-wrap gap-2"
+          >
+            <UButton
+              v-for="c in rhkChips"
+              :key="c.label"
               color="neutral"
               variant="outline"
-              size="sm"
-              @click="weekStart = weekRange(today).start"
+              class="h-[30px] rounded-full px-3 text-sm/5 font-normal ring-default"
+              :class="rhkId === c.id && 'bg-brand-100 text-brand-ink ring-brand-700 hover:bg-brand-100 dark:bg-brand-950/50'"
+              :aria-pressed="rhkId === c.id"
+              @click="rhkId = c.id"
             >
-              Minggu ini
+              <span
+                v-if="c.number"
+                class="size-2.5 rounded-[3px] border"
+                :class="rhkColor(c.number).swatch"
+                aria-hidden="true"
+              />
+              {{ c.label }}
             </UButton>
           </div>
-          <USelect
-            v-model="rhkFilter"
-            :items="rhkItems"
-            class="w-50"
-            aria-label="Saring menurut RHK"
-          />
-          <UButton
-            color="neutral"
-            variant="outline"
-            icon="i-ctm-warning"
-            :aria-pressed="noEvidence"
-            class="h-[30px] rounded-full px-3 text-sm/5 font-normal ring-default"
-            :class="noEvidence && 'bg-brand-100 text-brand-ink ring-brand-700 hover:bg-brand-100 dark:bg-brand-950/50'"
-            :ui="{ leadingIcon: 'size-4 text-warning' }"
-            @click="noEvidence = !noEvidence"
-          >
-            Belum ada bukti · {{ missingCount }}
-          </UButton>
-          <span class="ml-auto hidden text-sm text-toned md:inline">{{ shown.length }} catatan · {{ formatDuration(totalMinutes) }}</span>
+          <template v-else>
+            <USelect
+              v-model="rhkFilter"
+              :items="rhkItems"
+              class="w-50"
+              aria-label="Saring menurut RHK"
+            />
+            <UButton
+              color="neutral"
+              variant="outline"
+              icon="i-ctm-warning"
+              :aria-pressed="noEvidence"
+              class="h-[30px] rounded-full px-3 text-sm/5 font-normal ring-default"
+              :class="noEvidence && 'bg-brand-100 text-brand-ink ring-brand-700 hover:bg-brand-100 dark:bg-brand-950/50'"
+              :ui="{ leadingIcon: 'size-4 text-warning' }"
+              @click="noEvidence = !noEvidence"
+            >
+              Belum ada bukti · {{ missingCount }}
+            </UButton>
+          </template>
+          <span
+            v-if="view === 'list'"
+            class="ml-auto hidden text-sm text-toned md:inline"
+          >{{ shown.length }} catatan · {{ formatDuration(totalMinutes) }}</span>
           <UButton
             to="/progres/tambah"
+            :class="view === 'calendar' && 'ml-auto'"
             icon="i-ctm-plus"
           >
             Tambah progres
@@ -380,13 +431,6 @@ function addEvidence(id: string) {
             :timezone="me?.user.timezone"
             @select="openDetail"
           />
-          <div class="flex flex-wrap items-center justify-between gap-2 text-sm text-muted">
-            <span class="flex items-center gap-1.5"><UIcon
-              name="i-ctm-information"
-              class="size-4"
-            />Klik catatan untuk melihat detailnya. Klik slot kosong untuk menambah progres pada jam itu.</span>
-            <span>{{ shown.length }} catatan · {{ formatDuration(totalMinutes) }}<template v-if="missingCount"> · <span class="text-warning">{{ missingCount }} belum ada bukti</span></template></span>
-          </div>
         </template>
       </div>
       <ProgressDetailModal

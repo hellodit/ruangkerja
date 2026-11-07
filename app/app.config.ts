@@ -221,6 +221,22 @@ export default defineAppConfig({
         { color: 'error', variant: 'subtle', class: { root: 'bg-red-100 ring-0 text-highlighted dark:bg-red-950/60', icon: 'text-red-600 dark:text-red-400', description: 'text-toned' } }
       ]
     },
+    // CTM "Modal" (ds-modal): 520px, radius 16, shadow-2xl on a 36% overlay;
+    // header/body padding 20 with dividers, title 20/26, footer 12/20.
+    modal: {
+      slots: {
+        header: 'items-start gap-4 p-5 sm:px-5 min-h-0',
+        body: 'p-5 sm:p-5',
+        footer: 'gap-2 px-5 py-3 sm:px-5',
+        title: 'text-xl/[26px] font-semibold',
+        description: 'mt-0.5 text-[13px]/[18px] text-toned',
+        close: 'top-5 end-5 size-7'
+      },
+      variants: {
+        fullscreen: { false: { content: 'max-w-[520px] rounded-lg shadow-2xl ring-0' } },
+        overlay: { true: { overlay: 'bg-[#1a1a1a]/36' } }
+      }
+    },
     // CTM "Card" (ds-card): white, 1px border-primary, radius 12, padding 24,
     // no dividers between header and body (lists draw their own lines).
     card: {
