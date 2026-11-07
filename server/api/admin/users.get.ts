@@ -17,8 +17,8 @@ export default defineEventHandler(async (event) => {
     const pattern = likePattern(query.q)
     where.push(or(ilike(u.name, pattern), ilike(u.email, pattern))!)
   }
-  if (query.filter === 'belum_verifikasi') where.push(eq(u.emailVerified, false))
-  if (query.filter === 'belum_onboarding') where.push(isNull(u.onboardingCompletedAt))
+  if (query.filter === 'unverified') where.push(eq(u.emailVerified, false))
+  if (query.filter === 'not_onboarded') where.push(isNull(u.onboardingCompletedAt))
   if (query.filter === 'admin') where.push(eq(u.role, 'admin'))
   const filtered = where.length ? and(...where) : undefined
 

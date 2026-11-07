@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import type { InternalApi } from 'nitropack'
-import type { AdminUserFilter } from '#shared/schemas/admin'
+import { ADMIN_USER_FILTERS, type AdminUserFilter } from '#shared/schemas/admin'
 
 useSeoMeta({ title: 'Pengguna · Admin' })
 type AdminUser = InternalApi['/api/admin/users']['get']['users'][number]
@@ -13,7 +13,7 @@ const today = computed(() => me.value?.today ?? todayInTimeZone('Asia/Jakarta'))
 
 const q = ref(typeof route.query.q === 'string' ? route.query.q : '')
 const qDebounced = refDebounced(q, 300)
-const filter = ref<AdminUserFilter>((['semua', 'belum_verifikasi', 'belum_onboarding', 'admin'] as const).find(f => f === route.query.filter) ?? 'semua')
+const filter = ref<AdminUserFilter>(ADMIN_USER_FILTERS.find(f => f === route.query.filter) ?? 'all')
 const page = ref(Math.max(1, Number(route.query.page) || 1))
 const pageSize = 25
 
@@ -21,7 +21,7 @@ watch([qDebounced, filter], () => {
   page.value = 1
 })
 watch([qDebounced, filter, page], () => {
-  router.replace({ query: { ...(qDebounced.value ? { q: qDebounced.value } : {}), ...(filter.value !== 'semua' ? { filter: filter.value } : {}), ...(page.value > 1 ? { page: page.value } : {}) } })
+  router.replace({ query: { ...(qDebounced.value ? { q: qDebounced.value } : {}), ...(filter.value !== 'all' ? { filter: filter.value } : {}), ...(page.value > 1 ? { page: page.value } : {}) } })
 })
 
 const { data, status, error } = await useFetch('/api/admin/users', {
@@ -40,9 +40,9 @@ const rangeText = computed(() => {
 const pct = (n: number) => (stats.value?.total ? `${Math.round((n / stats.value.total) * 100)}%` : '0%')
 
 const filters: { id: AdminUserFilter, label: string }[] = [
-  { id: 'semua', label: 'Semua' },
-  { id: 'belum_verifikasi', label: 'Belum verifikasi' },
-  { id: 'belum_onboarding', label: 'Belum onboarding' },
+  { id: 'all', label: 'Semua' },
+  { id: 'unverified', label: 'Belum verifikasi' },
+  { id: 'not_onboarded', label: 'Belum onboarding' },
   { id: 'admin', label: 'Admin' }
 ]
 
@@ -61,7 +61,7 @@ const columns: TableColumn<AdminUser>[] = [
 </script>
 
 <template>
-  <UDashboardPanel id="admin-pengguna">
+  <UDashboardPanel id="admin-users">
     <template #header>
       <UDashboardNavbar>
         <template #title>

@@ -14,7 +14,7 @@ Asisten kerja digital personal untuk ASN: susun **rencana aksi per RHK**, catat 
 | Bukti dukung | Semua tautan bukti, pencarian, filter RHK, daftar progres yang belum punya bukti. Bukti = nama + tautan, **tanpa unggah file**. |
 | Realisasi periode | Draf per RHK yang disusun **hanya** dari progres harian (rencana aksi tanpa progres ditandai, tidak diisi otomatis), bisa diubah, salin per RHK atau semua, unduh **.docx** asli. |
 | Profil | Data pribadi/kepegawaian/atasan, foto profil (R2), pengingat, ubah kata sandi, ekspor semua data (JSON), hapus akun permanen. |
-| Admin | `/admin/pengguna` (khusus admin): statistik akun, daftar pengguna dengan pencarian, saringan, dan paginasi. Hanya data akun dasar; NIP, tanggal lahir, alamat, nomor HP, dan isi pekerjaan tidak ditampilkan. |
+| Admin | `/admin/users` (khusus admin): statistik akun, daftar pengguna dengan pencarian, saringan, dan paginasi. Hanya data akun dasar; NIP, tanggal lahir, alamat, nomor HP, dan isi pekerjaan tidak ditampilkan. |
 
 Di luar Rilis 1.0 (sesuai PRD): fitur AI (rapikan kalimat, draf AI — Rilis 1.1), Alat bantu (Panduan kerja, Asisten AI, Draf SOP), pembayaran. Webhook SingaPay sudah tersedia untuk fase pembayaran.
 
@@ -136,7 +136,7 @@ server/utils/        auth, workspace (kepemilikan & nilai turunan), progress, re
 server/api/          me, profile, settings, onboarding, skp, rhks, action-plans, progress, evidence,
                      dashboard, realizations (+ export .docx), account/export, uploads, webhooks/singapay,
                      admin/users
-app/pages/           auth, onboarding/*, beranda, rhk/*, progres/*, bukti, realisasi, profil, admin/pengguna
+app/pages/           auth, onboarding/*, beranda, rhk/*, progres/*, bukti, realisasi, profil, admin/users
 app/components/      AppSidebar, ProgressForm, ProgressCalendar, RhkForm, ActionPlanModal, …
 scripts/seed-demo.ts Akun demo
 scripts/set-role.ts  Angkat/cabut admin

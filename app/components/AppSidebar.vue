@@ -34,7 +34,7 @@ const links = computed<NavigationMenuItem[][]>(() => [[
   ...(me.value?.isAdmin
     ? [
         { label: 'Admin', type: 'label' as const },
-        { label: 'Pengguna', icon: 'i-ctm-user-group', to: '/admin/pengguna' }
+        { label: 'Pengguna', icon: 'i-ctm-user-group', to: '/admin/users' }
       ]
     : [])
 ]])

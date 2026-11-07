@@ -88,9 +88,9 @@ describe('workspace schemas', () => {
 describe('adminUsersQuery', () => {
   it('applies defaults and rejects unknown filters and page sizes', async () => {
     const { adminUsersQuery } = await import('../../shared/schemas/admin')
-    expect(adminUsersQuery.parse({})).toEqual({ q: undefined, filter: 'semua', page: 1, pageSize: 25 })
+    expect(adminUsersQuery.parse({})).toEqual({ q: undefined, filter: 'all', page: 1, pageSize: 25 })
     expect(adminUsersQuery.parse({ q: '  rina ', page: '2', pageSize: '50', filter: 'admin' })).toEqual({ q: 'rina', filter: 'admin', page: 2, pageSize: 50 })
-    expect(adminUsersQuery.safeParse({ filter: 'semuanya' }).success).toBe(false)
+    expect(adminUsersQuery.safeParse({ filter: 'semua' }).success).toBe(false)
     expect(adminUsersQuery.safeParse({ pageSize: '1000' }).success).toBe(false)
     expect(adminUsersQuery.safeParse({ page: '0' }).success).toBe(false)
   })
