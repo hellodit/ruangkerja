@@ -6,9 +6,7 @@ export default defineEventHandler(async (event) => {
   const existing = await requireOwnedProgress(user.id, id)
   const input = await readValidatedBody(event, progressSchema.parse)
   await requireOwnedActionPlan(user.id, input.actionPlanId)
-  await saveProgress(user.id, id, input)
-  if (existing.actionPlanId !== input.actionPlanId) {
-    await syncPlanStatus(existing.actionPlanId)
-  }
+  // Moving the entry to another plan re-checks the old plan's status too.
+  await saveProgress(user.id, id, input, existing.actionPlanId)
   return { id }
 })

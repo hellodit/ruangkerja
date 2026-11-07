@@ -1,7 +1,16 @@
 import type { H3Event } from 'h3'
 
-export async function getAuthSession(event: H3Event) {
-  return useAuth().api.getSession({ headers: event.headers })
+type AuthSession = Awaited<ReturnType<ReturnType<typeof useAuth>['api']['getSession']>>
+
+/**
+ * The request's Better Auth session, looked up once per request: the
+ * subscription middleware and the handler both need it, and every lookup is
+ * a database round trip.
+ */
+export function getAuthSession(event: H3Event): Promise<AuthSession> {
+  const ctx = event.context as { authSession?: Promise<AuthSession> }
+  ctx.authSession ??= useAuth().api.getSession({ headers: event.headers })
+  return ctx.authSession
 }
 
 /** Returns the signed-in user or throws 401. */

@@ -81,6 +81,14 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2026-06-30',
 
+  // server/services holds the longer database queries (one module per domain);
+  // auto-imported like server/utils.
+  nitro: {
+    imports: {
+      dirs: ['./server/services']
+    }
+  },
+
   eslint: {
     config: {
       stylistic: {

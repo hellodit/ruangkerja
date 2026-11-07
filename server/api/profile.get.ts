@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireWorkspaceUser(event)
-  const [p] = await useDb().select().from(schema.profiles).where(eq(schema.profiles.userId, user.id))
+  const p = await useDb().query.profiles.findFirst({ where: eq(schema.profiles.userId, user.id) })
   return {
     name: user.name,
     email: user.email,

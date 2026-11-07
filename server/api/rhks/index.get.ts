@@ -5,23 +5,19 @@ export default defineEventHandler(async (event) => {
   if (!ws) {
     return { skp: null, current: null, rhks: [] }
   }
-  const rhks = await listRhks(ws.skp.id)
-  const plans = ws.current ? await listPlans(rhks.map(r => r.id), ws.current.id, today) : []
+  const { rhks } = await listRhksWithPlans(ws.skp.id, ws.current?.id ?? null, today)
   return {
     skp: ws.skp,
     current: ws.current,
-    rhks: rhks.map((r) => {
-      const mine = plans.filter(p => p.rhkId === r.id)
-      return {
-        ...r,
-        summary: {
-          plans: mine.length,
-          done: mine.filter(p => p.status === 'selesai').length,
-          overdue: mine.filter(p => p.overdue).length,
-          notStarted: mine.filter(p => p.status === 'belum_dimulai').length,
-          progress: mine.reduce((n, p) => n + p.progressCount, 0)
-        }
+    rhks: rhks.map(({ plans, ...r }) => ({
+      ...r,
+      summary: {
+        plans: plans.length,
+        done: plans.filter(p => p.status === 'selesai').length,
+        overdue: plans.filter(p => p.overdue).length,
+        notStarted: plans.filter(p => p.status === 'belum_dimulai').length,
+        progress: plans.reduce((n, p) => n + p.progressCount, 0)
       }
-    })
+    }))
   }
 })
