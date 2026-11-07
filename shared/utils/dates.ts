@@ -105,3 +105,13 @@ export function formatRange(start: string, end: string): string {
   }
   return `${a.getUTCDate()} ${MONTHS_ID[a.getUTCMonth()]} – ${formatDate(end)}`
 }
+
+/** "Hari ini", "Kemarin", "3 hari lalu", then a short date (for "last active"). */
+export function formatDaysAgo(at: string | Date, today: string, timeZone = 'Asia/Jakarta'): string {
+  const day = todayInTimeZone(timeZone, typeof at === 'string' ? new Date(at) : at)
+  const diff = daysBetween(day, today)
+  if (diff <= 0) return 'Hari ini'
+  if (diff === 1) return 'Kemarin'
+  if (diff < 7) return `${diff} hari lalu`
+  return formatDateShort(day)
+}

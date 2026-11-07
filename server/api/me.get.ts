@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
     positionTitle: profile?.positionTitle ?? null,
     today,
     onboardingCompleted: !!user.onboardingCompletedAt,
+    isAdmin: (user as { role?: string }).role === 'admin',
     hasSkp: !!ws,
     rhkCount,
     evidenceCount,

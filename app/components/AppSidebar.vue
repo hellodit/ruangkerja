@@ -30,7 +30,13 @@ const links = computed<NavigationMenuItem[][]>(() => [[
   { label: 'Alat bantu', type: 'label' },
   { label: 'Panduan kerja', icon: 'i-ctm-list-bullet', onSelect: () => comingSoon('Panduan kerja') },
   { label: 'Asisten AI', icon: 'i-ctm-sparkles', badge: chip('Segera'), onSelect: () => comingSoon('Asisten AI') },
-  { label: 'Draf SOP', icon: 'i-ctm-files-01', badge: chip('Beta'), onSelect: () => comingSoon('Draf SOP') }
+  { label: 'Draf SOP', icon: 'i-ctm-files-01', badge: chip('Beta'), onSelect: () => comingSoon('Draf SOP') },
+  ...(me.value?.isAdmin
+    ? [
+        { label: 'Admin', type: 'label' as const },
+        { label: 'Pengguna', icon: 'i-ctm-user-group', to: '/admin/pengguna' }
+      ]
+    : [])
 ]])
 
 const initials = computed(() => (me.value?.user.name ?? '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]!.toUpperCase()).join(''))

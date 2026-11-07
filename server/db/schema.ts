@@ -62,8 +62,11 @@ export const users = pgTable('users', {
   image: text('image'),
   timezone: text('timezone').notNull().default('Asia/Jakarta'),
   onboardingCompletedAt: timestamp('onboarding_completed_at', { withTimezone: true }),
+  // 'admin' opens the admin panel. Never settable through the API: granted
+  // with scripts/set-role.ts only.
+  role: text('role', { enum: ['user', 'admin'] }).notNull().default('user'),
   ...timestamps
-})
+}, t => [check('users_role_check', sql`${t.role} in ('user', 'admin')`)])
 
 export const sessions = pgTable('sessions', {
   id: uuid('id').primaryKey().defaultRandom(),

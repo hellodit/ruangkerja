@@ -3,6 +3,7 @@ export interface MeData {
   positionTitle: string | null
   today: string
   onboardingCompleted: boolean
+  isAdmin: boolean
   hasSkp: boolean
   rhkCount: number
   evidenceCount: number

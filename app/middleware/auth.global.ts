@@ -5,6 +5,7 @@ const PUBLIC = [...GUEST_ONLY, '/reset-password', '/verify-email', '/privasi']
  * - Public auth pages are open; signed-in users skip login/register.
  * - Everything else needs a session.
  * - Until onboarding is finished, the workspace redirects to it (ONB).
+ * - /admin is for admins only.
  */
 export default defineNuxtRouteMiddleware(async (to) => {
   const { ensure } = useAuthSession()
@@ -22,6 +23,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   const me = await useMe().ensure()
+  // Admin panel: admins only (the API checks again); not gated by onboarding.
+  if (to.path.startsWith('/admin')) {
+    return me?.isAdmin ? undefined : navigateTo('/beranda')
+  }
   const inOnboarding = to.path.startsWith('/onboarding')
   if (me && !me.onboardingCompleted && !inOnboarding && to.path !== '/profil') {
     return navigateTo('/onboarding/profil')
