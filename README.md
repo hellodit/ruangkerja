@@ -35,8 +35,19 @@ Isi `NUXT_DATABASE_URL`. Lalu:
 ```bash
 bun run db:migrate      # terapkan migrasi di server/db/migrations
 bun run db:generate     # buat migrasi baru setelah mengubah server/db/schema.ts
+bun run db:seed         # data dasar: 3 paket, 1 pengguna, 1 admin
 bun run db:seed-demo    # opsional: akun demo berisi contoh data dari desain UI
 ```
+
+Data dasar dari `db:seed`:
+
+| Isi | Detail |
+|---|---|
+| Paket | Bulanan (30 hari, Rp25.000), Triwulan (90 hari, Rp65.000), Tahunan (365 hari, Rp225.000). Harga contoh: ubah di `scripts/seed.ts` atau Admin → Paket |
+| Pengguna | `user@ruangkerja.io` / `user-ruangkerja-2026`, belum punya paket, jadi diarahkan ke `/subscription` |
+| Admin | `admin@ruangkerja.io` / `admin-ruangkerja-2026`, buka `/admin` |
+
+Aman dijalankan ulang: paket hanya ditambah kalau belum ada, dan peran serta sandi kedua akun dikembalikan ke nilai di atas. Sandi bisa diganti dengan `SEED_USER_PASSWORD` dan `SEED_ADMIN_PASSWORD`. Script menolak berjalan saat `NODE_ENV=production` kecuali `SEED_FORCE=1`, dan di production kedua sandi itu wajib diisi.
 
 Akun demo: `demo@ruangkerja.io` / `demo-ruangkerja-2026` (bisa diganti: `bun scripts/seed-demo.ts email sandi`). Script menolak berjalan saat `NODE_ENV=production` kecuali `SEED_DEMO_FORCE=1`.
 
@@ -152,6 +163,7 @@ server/api/          me, profile, settings, onboarding, skp, rhks, action-plans,
                      admin/dashboard, admin/users, admin/packages, admin/transactions
 app/pages/           auth, onboarding/*, beranda, rhk/*, progres/*, bukti, realisasi, profil, admin/{dashboard,users,packages,transactions}
 app/components/      AppSidebar, ProgressForm, ProgressCalendar, RhkForm, ActionPlanModal, …
+scripts/seed.ts      Data dasar: 3 paket, 1 pengguna, 1 admin
 scripts/seed-demo.ts Akun demo
 scripts/set-role.ts  Angkat/cabut admin
 tests/               unit test + fixture PHP untuk normalisasi SingaPay
