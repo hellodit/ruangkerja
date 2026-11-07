@@ -19,7 +19,7 @@ Asisten kerja digital personal untuk ASN: susun **rencana aksi per RHK**, catat 
 
 Di luar Rilis 1.0 (sesuai PRD): fitur AI (rapikan kalimat, draf AI — Rilis 1.1), Alat bantu (Panduan kerja, Asisten AI, Draf SOP), pembayaran. Webhook SingaPay sudah tersedia untuk fase pembayaran.
 
-**Data sensitif.** NIP, tanggal lahir, dan alamat dienkripsi (AES-256-GCM) sebelum disimpan. Semua query dibatasi ke pemilik akun.
+**Data sensitif.** NIP, tanggal lahir, dan alamat disimpan apa adanya (tanpa enkripsi tingkat aplikasi), tidak ditampilkan di Admin, dan tidak pernah dikirim ke AI. Semua query dibatasi ke pemilik akun.
 
 ## Persiapan
 
@@ -28,9 +28,9 @@ bun install
 cp .env.example .env   # lalu isi semua nilainya
 ```
 
-### 1. Database (PostgreSQL) dan enkripsi
+### 1. Database (PostgreSQL)
 
-Isi `NUXT_DATABASE_URL` dan `NUXT_DATA_ENCRYPTION_KEY` (`openssl rand -base64 32`; **jangan pernah diganti** setelah ada data — data terenkripsi tidak bisa dibaca lagi). Lalu:
+Isi `NUXT_DATABASE_URL`. Lalu:
 
 ```bash
 bun run db:migrate      # terapkan migrasi di server/db/migrations

@@ -44,7 +44,6 @@ const sections = [
     title: 'Keamanan data',
     list: [
       'Seluruh koneksi memakai HTTPS. Kata sandi disimpan dalam bentuk hash.',
-      'NIP, tanggal lahir, dan alamat dienkripsi sebelum disimpan.',
       'Setiap data hanya bisa dibuka oleh pemilik akunnya.',
       'Sesi masuk memiliki masa berlaku, dan percobaan masuk dibatasi.'
     ]

@@ -3,7 +3,7 @@
  * Ghery untuk menyiapkan iklan"). Creates (or recreates) one account with the
  * sample data from the UI design, dated relative to the current week.
  *
- *   NUXT_DATABASE_URL=… NUXT_DATA_ENCRYPTION_KEY=… bun scripts/seed-demo.ts [email] [password]
+ *   NUXT_DATABASE_URL=… bun scripts/seed-demo.ts [email] [password]
  *
  * Refuses to run when NODE_ENV=production unless SEED_DEMO_FORCE=1.
  */
@@ -12,7 +12,6 @@ import { eq } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 import * as schema from '../server/db/schema'
-import { encryptWith, parseKey } from '../server/utils/field-crypto'
 import { addDays, todayInTimeZone, weekRange } from '../shared/utils/dates'
 import { findCurrentPeriod, generatePeriods } from '../shared/utils/periods'
 
@@ -24,12 +23,10 @@ if (process.env.NODE_ENV === 'production' && process.env.SEED_DEMO_FORCE !== '1'
 const email = (process.argv[2] ?? 'demo@ruangkerja.io').toLowerCase()
 const password = process.argv[3] ?? 'demo-ruangkerja-2026'
 const url = process.env.NUXT_DATABASE_URL
-const keyB64 = process.env.NUXT_DATA_ENCRYPTION_KEY
-if (!url || !keyB64) {
-  console.error('NUXT_DATABASE_URL and NUXT_DATA_ENCRYPTION_KEY are required.')
+if (!url) {
+  console.error('NUXT_DATABASE_URL is required.')
   process.exit(1)
 }
-const key = parseKey(keyB64)
 const client = postgres(url, { max: 1 })
 const db = drizzle(client, { schema })
 
@@ -56,9 +53,9 @@ await db.transaction(async (tx) => {
   await tx.insert(schema.profiles).values({
     userId,
     phoneWhatsapp: '0812 0000 1234',
-    birthDate: encryptWith(key, '1990-05-14'),
+    birthDate: '1990-05-14',
     gender: 'perempuan',
-    address: encryptWith(key, 'Jl. Melati No. 12, Kecamatan Sukamaju, Kabupaten Contoh'),
+    address: 'Jl. Melati No. 12, Kecamatan Sukamaju, Kabupaten Contoh',
     employmentStatus: 'pns',
     rankGrade: 'Penata Muda Tingkat I, III/b',
     positionTitle: 'Analis Kebijakan Ahli Pertama',

@@ -17,7 +17,7 @@ design system "CTM Project". App name: **RuangKerja**. Built on top of
 | Auth tables | Plural (`users`, `sessions`, `accounts`, `verifications`), UUID ids, additionalFields `timezone`, `onboardingCompletedAt`. Magic link added (AKN-03). Google kept. |
 | i18n | Indonesian only; `@nuxtjs/i18n` removed (product targets ASN, e-Kinerja terms kept verbatim). |
 | Realisasi draft | Deterministic, composed only from progress entries (no AI); plans without progress are flagged and excluded (RLS-02). |
-| Sensitive data | `nip`, `birth_date`, `address` encrypted at rest (AES-256-GCM, `NUXT_DATA_ENCRYPTION_KEY`). |
+| Sensitive data | `nip`, `birth_date`, `address` stored as plaintext (app-level encryption dropped 2026-11-07); owner-scoped queries, hidden from Admin, never sent to AI. |
 | Delete RHK / rencana aksi | Soft delete; children hidden through joins (open question in PRD; reversible). |
 | Ekspor | Real `.docx` via `docx` library, with independence statement. |
 | Reminders | Settings stored; delivery channel is an open PRD question → not sent yet. |

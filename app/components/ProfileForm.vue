@@ -2,7 +2,7 @@
 import type { FormSubmitEvent } from '@nuxt/ui'
 import { profileSchema, type ProfileInput } from '#shared/schemas/workspace'
 
-/** Isi profil (ONB-02) and the Profil page. Personal fields are encrypted server-side. */
+/** Isi profil (ONB-02) and the Profil page. */
 const emit = defineEmits<{ saved: [] }>()
 
 const notify = useNotify()
@@ -133,7 +133,6 @@ async function onSubmit(event: FormSubmitEvent<ReturnType<typeof profileSchema.p
           label="NIP"
           name="nip"
           hint="Opsional"
-          help="Disimpan terenkripsi."
         >
           <UInput
             v-model="state.nip"

@@ -29,8 +29,6 @@ export default defineNuxtConfig({
   // (e.g. NUXT_R2_SECRET_ACCESS_KEY). Only `public` reaches the browser.
   runtimeConfig: {
     databaseUrl: '',
-    // base64 of 32 random bytes: openssl rand -base64 32
-    dataEncryptionKey: '',
     // true only when behind exactly one trusted proxy that sets X-Forwarded-For (e.g. Vercel)
     trustProxy: false,
     betterAuthSecret: '',
