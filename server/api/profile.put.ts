@@ -8,10 +8,10 @@ export default defineEventHandler(async (event) => {
 
   const values = {
     phoneWhatsapp: input.phoneWhatsapp ?? null,
-    birthDate: encryptField(input.birthDate),
+    birthDate: input.birthDate || null,
     gender: input.gender ?? null,
-    address: encryptField(input.address),
-    nip: encryptField(input.nip),
+    address: input.address || null,
+    nip: input.nip || null,
     employmentStatus: input.employmentStatus ?? null,
     rankGrade: input.rankGrade ?? null,
     positionTitle: input.positionTitle,

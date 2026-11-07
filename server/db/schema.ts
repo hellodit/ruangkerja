@@ -117,12 +117,12 @@ export const rateLimits = pgTable('rate_limits', {
 export const profiles = pgTable('profiles', {
   userId: uuid('user_id').primaryKey().references(() => users.id, { onDelete: 'cascade' }),
   phoneWhatsapp: text('phone_whatsapp'),
-  /** Encrypted (AES-256-GCM) — personal data, never sent to AI. */
+  /** Personal data (stored as plaintext), never sent to AI. YYYY-MM-DD. */
   birthDate: text('birth_date'),
   gender: genderEnum('gender'),
-  /** Encrypted. */
+  /** Personal data, never sent to AI. */
   address: text('address'),
-  /** Encrypted. Optional. */
+  /** Personal data, never sent to AI. Optional. */
   nip: text('nip'),
   employmentStatus: employmentStatusEnum('employment_status'),
   rankGrade: text('rank_grade'),

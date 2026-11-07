@@ -25,9 +25,7 @@ export default defineEventHandler(async (event) => {
   return {
     exportedAt: new Date().toISOString(),
     user: { id: user.id, name: user.name, email: user.email, timezone: user.timezone },
-    profile: profile
-      ? { ...profile, nip: decryptField(profile.nip), birthDate: decryptField(profile.birthDate), address: decryptField(profile.address) }
-      : null,
+    profile: profile ?? null,
     settings: settings ?? null,
     skps,
     periods,

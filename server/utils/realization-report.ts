@@ -17,7 +17,7 @@ export async function loadRealizationReport(event: H3Event): Promise<Realization
     privacyUrl: `${useRuntimeConfig().public.siteUrl.replace(/\/+$/, '')}/privasi`,
     person: {
       name: user.name,
-      nip: decryptField(profile?.nip),
+      nip: profile?.nip,
       rankGrade: profile?.rankGrade,
       positionTitle: profile?.positionTitle,
       workUnit: profile?.workUnit,
