@@ -101,3 +101,27 @@ describe('reportFileName', () => {
     expect(reportFileName({ ...base, person: { name: 'Siti Nurhaliza, S.E.' } })).toBe('Realisasi-Bulanan-11-2026-Siti-Nurhaliza-SE.docx')
   })
 })
+
+describe('buildRealizationPdf', () => {
+  it('renders an A4 PDF with the evidence and privacy links as real link annotations', async () => {
+    const { buildRealizationPdf } = await import('../../server/utils/realization-pdf')
+    const pdf = await buildRealizationPdf(base)
+    const raw = pdf.toString('latin1')
+    expect(raw.startsWith('%PDF-')).toBe(true)
+    expect(raw).toContain('/MediaBox [0 0 595.28 841.89]')
+    expect(raw).toContain('/URI (https://drive.google.com/file/d/contoh-rekap)')
+    expect(raw).toContain('/URI (https://app.ruangkerja.io/privasi)')
+  })
+
+  it('builds a definition with the same sections as the Word export', async () => {
+    const { buildRealizationPdfDefinition } = await import('../../server/utils/realization-pdf')
+    const json = JSON.stringify(buildRealizationPdfDefinition(base).content)
+    for (const text of ['Draf Realisasi Kinerja', '199005142015032001', 'RHK 1 · Utama', 'REALISASI', 'RENCANA AKSI', 'BUKTI DUKUNG', 'SUMBER: 1 PROGRES HARIAN', 'Lewat tenggat', 'tidak dimasukkan ke realisasi']) {
+      expect(json).toContain(text)
+    }
+  })
+
+  it('names the PDF file', () => {
+    expect(reportFileName(base, 'pdf')).toBe('Realisasi-Bulanan-11-2026-Rina-Puspitasari.pdf')
+  })
+})

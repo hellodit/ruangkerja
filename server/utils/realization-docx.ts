@@ -105,9 +105,9 @@ function sectionLabel(text: string) {
   return para([new TextRun({ text, allCaps: true, bold: true, size: PT(8.5), color: C.muted, characterSpacing: 20 })], { before: 200, after: 80, keepNext: true })
 }
 
-export function reportFileName(r: Pick<RealizationReport, 'period' | 'person'>) {
+export function reportFileName(r: Pick<RealizationReport, 'period' | 'person'>, format: 'docx' | 'pdf' = 'docx') {
   const slug = (s: string) => s.normalize('NFKD').replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-')
-  return `Realisasi-${slug(r.period.label)}-${r.period.startDate.slice(0, 4)}-${slug(r.person.name) || 'RuangKerja'}.docx`
+  return `Realisasi-${slug(r.period.label)}-${r.period.startDate.slice(0, 4)}-${slug(r.person.name) || 'RuangKerja'}.${format}`
 }
 
 export function buildRealizationDocument(r: RealizationReport): Document {
