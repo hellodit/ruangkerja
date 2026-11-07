@@ -38,7 +38,6 @@ function submit(mode: 'continue' | 'later') {
     <template #footer>
       <span class="flex-1 text-sm text-muted">Langkah 1 dari 3</span>
       <UButton
-        color="neutral"
         variant="ghost"
         size="lg"
         @click="submit('later')"

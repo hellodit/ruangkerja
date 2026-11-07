@@ -55,15 +55,15 @@ async function onSaved() {
           <UButton
             to="/progres"
             icon="i-ctm-chevron-left"
-            color="neutral"
             variant="ghost"
+            class="w-11 justify-center px-0"
             aria-label="Kembali ke daftar progres harian"
           />
         </template>
         <template #title>
           <div class="flex flex-col">
-            <span class="text-xs text-muted">Progres harian</span>
-            <h1 class="text-xl font-semibold text-highlighted">
+            <span class="text-xs/4 text-toned">Progres harian</span>
+            <h1 class="text-xl/7 font-semibold tracking-[-0.2px] text-highlighted">
               Ubah progres harian
             </h1>
           </div>
@@ -82,7 +82,7 @@ async function onSaved() {
       </UDashboardNavbar>
     </template>
     <template #body>
-      <div class="mx-auto w-full max-w-6xl">
+      <div class="w-full max-w-[1200px]">
         <ProgressForm
           v-if="initial"
           :progress-id="id"
@@ -112,7 +112,6 @@ async function onSaved() {
         <template #footer>
           <div class="flex w-full justify-end gap-2">
             <UButton
-              color="neutral"
               variant="ghost"
               @click="deleteOpen = false"
             >

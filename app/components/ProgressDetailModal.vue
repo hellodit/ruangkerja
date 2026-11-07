@@ -101,7 +101,6 @@ async function copyEntry() {
     <template #footer>
       <div class="flex w-full flex-wrap justify-end gap-2">
         <UButton
-          color="neutral"
           variant="ghost"
           @click="open = false"
         >

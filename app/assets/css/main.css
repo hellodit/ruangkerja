@@ -49,7 +49,7 @@
 }
 
 :root {
-  /* button 8 · input 12 · card 16 (CTM radius scale) */
+  /* CTM radius scale: rounded-sm 8 (button md, chip) · rounded-md 12 (field, card, button lg) */
   --ui-radius: 0.5rem;
   /* Gold is a light color: the brand fill is brand-400 in both themes. */
   --ui-primary: var(--ui-color-primary-400);
@@ -60,6 +60,11 @@
   --ui-text-toned: var(--ui-color-neutral-600);
   --ui-text-muted: var(--ui-color-neutral-500);
   --ui-border: var(--ui-color-neutral-200);
+  /* CTM text-*-primary: semantic text/icons use the 600/700 steps, not 500. */
+  --ui-success: var(--ui-color-success-600);
+  --ui-info: var(--ui-color-info-600);
+  --ui-warning: var(--ui-color-warning-700);
+  --ui-error: var(--ui-color-error-600);
 }
 
 .dark {
@@ -74,6 +79,10 @@
   --ui-text-highlighted: #f3f4f6;
   --ui-border: #303236;
   --ui-border-accented: #3e4045;
+  --ui-success: var(--ui-color-success-400);
+  --ui-info: var(--ui-color-info-400);
+  --ui-warning: var(--ui-color-warning-400);
+  --ui-error: var(--ui-color-error-400);
 }
 
 /* Brand-colored text on light surfaces must use brand-800 (5.4:1), never the fill. */

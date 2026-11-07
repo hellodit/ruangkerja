@@ -49,8 +49,8 @@ async function remove() {
           <UButton
             :to="`/rhk/${id}`"
             icon="i-ctm-chevron-left"
-            color="neutral"
             variant="ghost"
+            class="w-11 justify-center px-0"
             aria-label="Kembali ke detail RHK"
           />
         </template>
@@ -67,7 +67,7 @@ async function remove() {
       </UDashboardNavbar>
     </template>
     <template #body>
-      <div class="mx-auto flex w-full max-w-4xl flex-col gap-4">
+      <div class="flex w-full max-w-4xl flex-col gap-4">
         <UAlert
           color="neutral"
           variant="subtle"
@@ -94,7 +94,6 @@ async function remove() {
         <template #footer>
           <div class="flex w-full justify-end gap-2">
             <UButton
-              color="neutral"
               variant="ghost"
               @click="deleteOpen = false"
             >

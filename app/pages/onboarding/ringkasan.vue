@@ -223,7 +223,6 @@ const steps = [
       </UButton>
       <span class="flex-1 text-sm text-muted">Langkah 3 dari 3</span>
       <UButton
-        color="neutral"
         variant="ghost"
         size="lg"
         :loading="finishing"

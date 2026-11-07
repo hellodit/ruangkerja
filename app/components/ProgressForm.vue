@@ -169,7 +169,7 @@ function submit(mode: 'done' | 'again') {
               </UFormField>
             </div>
           </fieldset>
-
+          <USeparator />
           <fieldset class="flex flex-col gap-3">
             <legend class="mb-4 text-base font-semibold text-highlighted">
               Uraian
@@ -214,7 +214,7 @@ function submit(mode: 'done' | 'again') {
               >{{ speech.error.value }}</span>
             </div>
           </fieldset>
-
+          <USeparator />
           <fieldset class="flex flex-col gap-4">
             <legend class="mb-4 text-base font-semibold text-highlighted">
               Hasil dan bukti
@@ -230,6 +230,8 @@ function submit(mode: 'done' | 'again') {
                   v-model="state.realization"
                   :min="0"
                   :step="1"
+                  :increment="false"
+                  :decrement="false"
                   :format-options="{ maximumFractionDigits: 2 }"
                 />
               </UFormField>
@@ -246,7 +248,7 @@ function submit(mode: 'done' | 'again') {
 
             <ProgressResults v-model="state.results" />
           </fieldset>
-
+          <USeparator />
           <fieldset class="flex flex-col gap-4">
             <legend class="mb-4 text-base font-semibold text-highlighted">
               Status
@@ -266,37 +268,37 @@ function submit(mode: 'done' | 'again') {
               label="Tandai rencana aksi ini selesai"
             />
           </fieldset>
+          <USeparator />
+          <div class="flex flex-wrap items-center gap-3">
+            <UButton
+              to="/progres"
+              variant="ghost"
+              class="mr-auto"
+            >
+              Batal
+            </UButton>
+            <slot name="actions" />
+            <UButton
+              v-if="!progressId"
+              color="neutral"
+              variant="outline"
+              :loading="saving && next === 'again'"
+              @click="submit('again')"
+            >
+              Simpan dan tambah lagi
+            </UButton>
+            <UButton
+              :loading="saving && next === 'done'"
+              @click="submit('done')"
+            >
+              {{ progressId ? 'Simpan perubahan' : 'Simpan progres' }}
+            </UButton>
+          </div>
         </div>
       </UCard>
-
-      <div class="flex flex-wrap justify-end gap-2">
-        <slot name="actions" />
-        <UButton
-          to="/progres"
-          color="neutral"
-          variant="ghost"
-        >
-          Batal
-        </UButton>
-        <UButton
-          v-if="!progressId"
-          color="neutral"
-          variant="outline"
-          :loading="saving && next === 'again'"
-          @click="submit('again')"
-        >
-          Simpan dan tambah lagi
-        </UButton>
-        <UButton
-          :loading="saving && next === 'done'"
-          @click="submit('done')"
-        >
-          {{ progressId ? 'Simpan perubahan' : 'Simpan progres' }}
-        </UButton>
-      </div>
     </UForm>
 
-    <aside class="flex flex-col gap-6 lg:sticky lg:top-4">
+    <aside class="flex flex-col gap-6 lg:sticky lg:top-0">
       <UCard v-if="plan">
         <div class="flex flex-col gap-4">
           <div class="flex flex-wrap items-center gap-2">

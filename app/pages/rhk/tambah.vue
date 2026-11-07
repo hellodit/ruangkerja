@@ -16,15 +16,15 @@ async function onSaved(id: string) {
           <UButton
             to="/rhk"
             icon="i-ctm-chevron-left"
-            color="neutral"
             variant="ghost"
+            class="w-11 justify-center px-0"
             aria-label="Kembali ke RHK saya"
           />
         </template>
       </UDashboardNavbar>
     </template>
     <template #body>
-      <UCard class="mx-auto w-full max-w-4xl">
+      <UCard class="w-full max-w-4xl">
         <RhkForm
           cancelable
           @saved="onSaved"

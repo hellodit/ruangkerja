@@ -36,10 +36,9 @@ function remove(index: number) {
       class="flex flex-col gap-3 rounded-md border border-default p-4"
     >
       <div class="flex items-center justify-between">
-        <span class="text-sm font-semibold text-highlighted">Hasil {{ index + 1 }}</span>
+        <span class="text-[13px]/5 font-semibold text-toned">Hasil {{ index + 1 }}</span>
         <UButton
           icon="i-ctm-delete"
-          color="neutral"
           variant="ghost"
           size="sm"
           :aria-label="`Hapus hasil ${index + 1}`"
@@ -72,7 +71,6 @@ function remove(index: number) {
     </div>
     <UButton
       icon="i-ctm-plus"
-      color="neutral"
       variant="ghost"
       class="self-start"
       :disabled="results.length >= 10"

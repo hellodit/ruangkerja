@@ -99,7 +99,6 @@ async function onSubmit(event: FormSubmitEvent<z.output<typeof formSchema>>) {
     <template #footer>
       <div class="flex w-full justify-end gap-2">
         <UButton
-          color="neutral"
           variant="ghost"
           @click="open = false"
         >

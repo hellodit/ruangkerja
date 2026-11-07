@@ -113,7 +113,6 @@ function onPeriodSaved() {
           </h2>
           <UButton
             v-if="skp?.skp"
-            color="neutral"
             variant="ghost"
             icon="i-ctm-copy"
             @click="bulkOpen = true"
@@ -235,7 +234,6 @@ function onPeriodSaved() {
       <template #footer>
         <div class="flex w-full justify-end gap-2">
           <UButton
-            color="neutral"
             variant="ghost"
             @click="bulkOpen = false"
           >
@@ -267,7 +265,6 @@ function onPeriodSaved() {
         <template v-else>{{ rhks.length }} RHK tersimpan. RHK lain bisa ditambah kapan saja dari menu RHK saya.</template>
       </span>
       <UButton
-        color="neutral"
         variant="ghost"
         size="lg"
         @click="notify.success('Tersimpan', 'Lanjutkan kapan saja.')"

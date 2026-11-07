@@ -115,33 +115,33 @@ function addEvidence(id: string) {
 <template>
   <UDashboardPanel id="progres">
     <template #header>
-      <UDashboardNavbar title="Progres harian">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
-      </UDashboardNavbar>
-      <UDashboardToolbar>
-        <template #left>
+      <UDashboardNavbar title="Progres harian" />
+    </template>
+
+    <template #body>
+      <StartFromRhk v-if="me && !me.rhkCount" />
+      <div
+        v-else
+        class="flex w-full max-w-[1200px] flex-col gap-4"
+      >
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-3">
           <UTabs
             v-model="view"
             :items="viewTabs"
             :content="false"
-            size="sm"
             class="w-auto"
             aria-label="Tampilan progres harian"
           />
           <div class="flex items-center gap-1">
             <UButton
               icon="i-ctm-chevron-left"
-              color="neutral"
               variant="ghost"
               aria-label="Minggu sebelumnya"
               @click="shiftWeek(-1)"
             />
-            <span class="min-w-36 text-center text-sm font-medium text-highlighted">{{ formatRange(weekStart, weekEnd) }}</span>
+            <span class="min-w-40 text-center text-base/6 font-semibold text-highlighted">{{ formatRange(weekStart, weekEnd) }}</span>
             <UButton
               icon="i-ctm-chevron-right"
-              color="neutral"
               variant="ghost"
               aria-label="Minggu berikutnya"
               @click="shiftWeek(1)"
@@ -159,47 +159,37 @@ function addEvidence(id: string) {
           <USelect
             v-model="rhkFilter"
             :items="rhkItems"
-            size="sm"
-            class="w-36"
+            class="w-50"
             aria-label="Saring menurut RHK"
           />
           <UButton
-            :color="noEvidence ? 'warning' : 'neutral'"
-            :variant="noEvidence ? 'soft' : 'outline'"
-            size="sm"
+            color="neutral"
+            variant="outline"
             icon="i-ctm-warning"
             :aria-pressed="noEvidence"
+            class="h-[30px] rounded-full px-3 text-sm/5 font-normal ring-default"
+            :class="noEvidence && 'bg-brand-100 text-brand-ink ring-brand-700 hover:bg-brand-100 dark:bg-brand-950/50'"
+            :ui="{ leadingIcon: 'size-4 text-warning' }"
             @click="noEvidence = !noEvidence"
           >
             Belum ada bukti · {{ missingCount }}
           </UButton>
-        </template>
-        <template #right>
-          <span class="hidden text-sm text-muted md:inline">{{ shown.length }} catatan · {{ formatDuration(totalMinutes) }}</span>
+          <span class="ml-auto hidden text-sm text-toned md:inline">{{ shown.length }} catatan · {{ formatDuration(totalMinutes) }}</span>
           <UButton
             to="/progres/tambah"
             icon="i-ctm-plus"
           >
             Tambah progres
           </UButton>
-        </template>
-      </UDashboardToolbar>
-    </template>
+        </div>
 
-    <template #body>
-      <StartFromRhk v-if="me && !me.rhkCount" />
-      <div
-        v-else
-        class="flex flex-col gap-4"
-      >
         <div
           v-if="view === 'list' && selectedIds.length"
           role="status"
-          class="flex flex-wrap items-center gap-3 rounded-lg border border-brand-300 bg-brand-50 px-4 py-2.5 dark:border-brand-800 dark:bg-brand-950/40"
+          class="flex flex-wrap items-center gap-3 rounded-md border border-brand-200 bg-brand-50 px-4 py-2.5 dark:border-brand-800 dark:bg-brand-950/40"
         >
-          <span class="flex-1 text-sm font-medium text-highlighted">{{ selectedIds.length }} catatan dipilih</span>
+          <span class="flex-1 text-sm font-semibold text-highlighted">{{ selectedIds.length }} catatan dipilih</span>
           <UButton
-            color="neutral"
             variant="ghost"
             size="sm"
             @click="rowSelection = {}"
@@ -275,7 +265,6 @@ function addEvidence(id: string) {
                 <div class="flex flex-col gap-1">
                   <UButton
                     icon="i-ctm-copy"
-                    color="neutral"
                     variant="ghost"
                     size="sm"
                     :aria-label="`Salin catatan ${formatDateShort(e.workDate)} ${formatTime(e.startTime)}`"
@@ -284,7 +273,6 @@ function addEvidence(id: string) {
                   <UButton
                     :to="`/progres/${e.id}`"
                     icon="i-ctm-edit"
-                    color="neutral"
                     variant="ghost"
                     size="sm"
                     :aria-label="`Ubah catatan ${formatDateShort(e.workDate)} ${formatTime(e.startTime)}`"
@@ -306,7 +294,6 @@ function addEvidence(id: string) {
             :columns="columns"
             :get-row-id="(row: Entry) => row.id"
             :loading="status === 'pending'"
-            :ui="{ td: 'align-top' }"
           >
             <template #empty>
               <UEmpty
@@ -318,19 +305,19 @@ function addEvidence(id: string) {
               />
             </template>
             <template #workDate-cell="{ row }">
-              <span class="whitespace-nowrap">{{ formatDateShort(row.original.workDate) }}</span>
+              <span class="font-semibold whitespace-nowrap">{{ formatDateShort(row.original.workDate) }}</span>
             </template>
             <template #time-cell="{ row }">
-              <span class="font-mono text-xs whitespace-nowrap">{{ formatTime(row.original.startTime) }}–{{ formatTime(row.original.endTime) }}</span>
+              <span class="font-mono text-[13px] whitespace-nowrap">{{ formatTime(row.original.startTime) }}–{{ formatTime(row.original.endTime) }}</span>
             </template>
             <template #plan-cell="{ row }">
               <div class="flex max-w-56 flex-col items-start gap-1">
                 <RhkTag :number="row.original.rhk.number" />
-                <span class="text-sm whitespace-normal text-highlighted">{{ row.original.plan.name }}</span>
+                <span class="text-sm text-highlighted">{{ row.original.plan.name }}</span>
               </div>
             </template>
             <template #description-cell="{ row }">
-              <p class="max-w-80 text-sm whitespace-normal">
+              <p class="max-w-80 text-[13px]/[18px] text-toned">
                 {{ row.original.description }}
               </p>
             </template>
@@ -341,19 +328,20 @@ function addEvidence(id: string) {
               <ULink
                 v-if="row.original.hasEvidence"
                 :to="`/bukti?rhkId=${row.original.rhk.id}`"
-                class="flex items-center gap-1 text-sm whitespace-nowrap text-info"
+                class="flex items-center gap-1 text-[13px] whitespace-nowrap text-blue-600 hover:text-blue-700 dark:text-blue-400"
               >
                 <UIcon
                   name="i-ctm-link"
                   class="size-4"
-                />{{ row.original.results.filter(r => r.evidenceUrl).length }} bukti
+                /><span class="underline underline-offset-2">{{ row.original.results.filter(r => r.evidenceUrl).length }} bukti</span>
               </ULink>
               <UButton
                 v-else
                 color="warning"
-                variant="ghost"
-                size="xs"
+                variant="link"
                 icon="i-ctm-warning"
+                class="gap-1 text-[13px]/5 whitespace-nowrap no-underline"
+                :ui="{ leadingIcon: 'size-4' }"
                 @click="addEvidence(row.original.id)"
               >
                 Belum ada
@@ -364,7 +352,6 @@ function addEvidence(id: string) {
                 <UTooltip text="Salin untuk e-Kinerja">
                   <UButton
                     icon="i-ctm-copy"
-                    color="neutral"
                     variant="ghost"
                     size="sm"
                     :aria-label="`Salin catatan ${formatDateShort(row.original.workDate)} ${formatTime(row.original.startTime)}`"
@@ -375,7 +362,6 @@ function addEvidence(id: string) {
                   <UButton
                     :to="`/progres/${row.original.id}`"
                     icon="i-ctm-edit"
-                    color="neutral"
                     variant="ghost"
                     size="sm"
                     :aria-label="`Ubah catatan ${formatDateShort(row.original.workDate)} ${formatTime(row.original.startTime)}`"

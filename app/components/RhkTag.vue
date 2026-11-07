@@ -5,9 +5,9 @@ defineProps<{ number: number }>()
 <template>
   <UBadge
     color="neutral"
-    variant="outline"
+    variant="soft"
     size="sm"
-    class="whitespace-nowrap font-semibold"
+    class="whitespace-nowrap"
   >
     RHK {{ number }}
   </UBadge>

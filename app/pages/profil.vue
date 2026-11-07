@@ -104,15 +104,11 @@ async function deleteAccount() {
 <template>
   <UDashboardPanel id="profil">
     <template #header>
-      <UDashboardNavbar title="Profil dan pengaturan">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
-      </UDashboardNavbar>
+      <UDashboardNavbar title="Profil dan pengaturan" />
     </template>
 
     <template #body>
-      <div class="mx-auto flex w-full max-w-4xl flex-col gap-6">
+      <div class="flex w-full max-w-4xl flex-col gap-6">
         <UAlert
           v-if="me && !me.onboardingCompleted"
           color="info"
@@ -148,7 +144,6 @@ async function deleteAccount() {
                   Email belum diverifikasi
                 </UBadge>
                 <UButton
-                  color="neutral"
                   variant="ghost"
                   size="sm"
                   :loading="sending"
@@ -381,7 +376,6 @@ async function deleteAccount() {
         <template #footer>
           <div class="flex w-full justify-end gap-2">
             <UButton
-              color="neutral"
               variant="ghost"
               @click="deleteOpen = false"
             >

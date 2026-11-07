@@ -7,6 +7,7 @@ type Rhk = InternalApi['/api/realizations']['get']['rhks'][number]
 type PlanRow = Rhk['plans'][number]
 
 const route = useRoute()
+const openSources = ref<Record<string, boolean>>({})
 const notify = useNotify()
 const copy = useCopyText()
 const { me } = useMe()
@@ -68,22 +69,24 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
 <template>
   <UDashboardPanel id="realisasi">
     <template #header>
-      <UDashboardNavbar title="Realisasi periode">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
-      </UDashboardNavbar>
-      <UDashboardToolbar v-if="data">
-        <template #left>
+      <UDashboardNavbar title="Realisasi periode" />
+    </template>
+
+    <template #body>
+      <StartFromRhk v-if="me && !me.rhkCount" />
+      <div
+        v-else-if="data"
+        class="flex w-full max-w-[1200px] flex-col gap-6"
+      >
+        <div class="flex flex-wrap items-center gap-3">
           <USelect
             v-model="selectedPeriod"
             :items="periodItems"
             icon="i-ctm-date"
-            class="w-56"
+            class="w-auto min-w-56"
+            :ui="{ base: 'h-9 rounded-sm px-4 gap-2 text-sm/5 font-semibold text-highlighted' }"
             aria-label="Pilih periode"
           />
-        </template>
-        <template #right>
           <UButton
             :to="exportUrl"
             external
@@ -91,6 +94,7 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
             color="neutral"
             variant="outline"
             icon="i-ctm-upload"
+            class="ml-auto"
           >
             Unduh Word
           </UButton>
@@ -100,42 +104,34 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
           >
             Salin semua realisasi
           </UButton>
-        </template>
-      </UDashboardToolbar>
-    </template>
-
-    <template #body>
-      <StartFromRhk v-if="me && !me.rhkCount" />
-      <div
-        v-else-if="data"
-        class="mx-auto flex w-full max-w-5xl flex-col gap-6"
-      >
+        </div>
         <UAlert
           :color="data.daysToDeadline <= 3 ? 'error' : 'warning'"
           variant="subtle"
           icon="i-ctm-clock"
+          :ui="{ description: 'text-xs/4' }"
           :title="`Batas pengisian ${data.period.label}: ${formatDateLong(data.period.submissionDeadline)} · ${data.daysToDeadline >= 0 ? `${data.daysToDeadline} hari lagi` : `lewat ${-data.daysToDeadline} hari`}`"
           description="Isi realisasi dan tautan bukti dukung di e-Kinerja sebelum tanggal ini. Setelah itu atasan melakukan evaluasi periode."
         />
         <div class="flex flex-wrap gap-2">
           <UBadge
             color="neutral"
-            variant="outline"
-            size="lg"
+            variant="soft"
+            size="sm"
           >
             {{ data.totals.plans }} rencana aksi · {{ data.totals.done }} selesai
           </UBadge>
           <UBadge
             color="neutral"
-            variant="outline"
-            size="lg"
+            variant="soft"
+            size="sm"
           >
             {{ data.totals.progress }} progres harian
           </UBadge>
           <UBadge
             color="neutral"
-            variant="outline"
-            size="lg"
+            variant="soft"
+            size="sm"
           >
             {{ data.totals.evidence }} bukti dukung
           </UBadge>
@@ -147,25 +143,29 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
         >
           <div class="flex flex-col gap-5">
             <div class="flex flex-wrap items-start justify-between gap-3">
-              <div class="flex min-w-0 flex-1 flex-col gap-1.5">
-                <RhkTag
-                  :number="r.rhk.number"
-                  class="self-start"
-                />
-                <h2 class="text-lg font-semibold text-highlighted">
-                  {{ r.rhk.statement }}
-                </h2>
-                <p
-                  v-if="r.indicator"
-                  class="text-sm text-muted"
+              <div class="flex min-w-0 flex-1 items-start gap-3">
+                <UBadge
+                  color="neutral"
+                  variant="subtle"
+                  class="shrink-0"
                 >
-                  IKI: {{ r.indicator.indicator }} · Target tahunan {{ formatNumber(r.indicator.target) }} {{ r.indicator.unit }}
-                </p>
+                  RHK {{ r.rhk.number }}
+                </UBadge>
+                <div class="flex min-w-0 flex-col gap-0.5">
+                  <h2 class="text-[17px]/7 font-semibold text-highlighted">
+                    {{ r.rhk.statement }}
+                  </h2>
+                  <p
+                    v-if="r.indicator"
+                    class="text-xs/[18px] text-muted"
+                  >
+                    IKI: {{ r.indicator.indicator }} · Target tahunan {{ formatNumber(r.indicator.target) }} {{ r.indicator.unit }}
+                  </p>
+                </div>
               </div>
               <div class="flex gap-2">
                 <UButton
                   v-if="r.draftText || r.finalText"
-                  color="neutral"
                   variant="ghost"
                   size="sm"
                   icon="i-ctm-edit"
@@ -188,21 +188,19 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
 
             <div class="rounded-md bg-muted p-4">
               <div class="mb-2 flex flex-wrap items-center gap-2">
-                <span class="text-xs font-semibold tracking-wide text-muted uppercase">
+                <span class="text-[11px]/4 font-semibold tracking-[1.1px] text-toned uppercase">
                   {{ r.finalText ? 'Narasi realisasi · diubah pengguna' : 'Draf realisasi · disusun dari progres harian' }}
                 </span>
-                <UBadge
+                <StatusChip
                   v-if="r.status === 'disalin'"
                   color="success"
-                  variant="subtle"
-                  size="sm"
                 >
                   Sudah disalin
-                </UBadge>
+                </StatusChip>
               </div>
               <p
                 v-if="r.finalText || r.draftText"
-                class="text-sm whitespace-pre-line text-highlighted"
+                class="text-sm/[22px] whitespace-pre-line text-highlighted"
               >
                 {{ r.finalText ?? r.draftText }}
               </p>
@@ -212,22 +210,29 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
               >
                 Belum ada progres harian untuk RHK ini di {{ data.period.label }}. Realisasi tidak diisi otomatis.
               </p>
-              <UCollapsible
+              <div
                 v-if="r.sources.length"
                 class="mt-3"
-                :ui="{ content: 'pt-3' }"
               >
-                <UButton
-                  color="neutral"
-                  variant="link"
-                  size="xs"
-                  trailing-icon="i-ctm-chevron-down"
-                  class="-ml-2.5 group"
-                  :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform' }"
+                <div class="flex flex-wrap items-center gap-1 text-xs/4 text-muted">
+                  <span>Sumber: {{ r.sourceCount }} progres harian · {{ r.evidenceCount }} bukti dukung ·</span>
+                  <UButton
+                    variant="link"
+                    class="gap-1 text-xs/4"
+                    trailing-icon="i-ctm-chevron-down"
+                    :aria-expanded="!!openSources[r.id]"
+                    :aria-controls="`sumber-${r.id}`"
+                    :ui="{ trailingIcon: openSources[r.id] ? 'size-3.5 rotate-180 transition-transform' : 'size-3.5 transition-transform' }"
+                    @click="openSources[r.id] = !openSources[r.id]"
+                  >
+                    {{ openSources[r.id] ? 'Sembunyikan sumber' : 'Lihat sumber' }}
+                  </UButton>
+                </div>
+                <div
+                  v-show="openSources[r.id]"
+                  :id="`sumber-${r.id}`"
+                  class="pt-3"
                 >
-                  Sumber: {{ r.sourceCount }} progres harian · {{ r.evidenceCount }} bukti dukung
-                </UButton>
-                <template #content>
                   <ul class="divide-y divide-default rounded-md border border-default bg-default">
                     <li
                       v-for="src in r.sources"
@@ -250,8 +255,8 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
                       </span>
                     </li>
                   </ul>
-                </template>
-              </UCollapsible>
+                </div>
+              </div>
               <p
                 v-else
                 class="mt-3 text-xs text-muted"
@@ -273,11 +278,7 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
               v-if="r.plans.length"
               :data="r.plans"
               :columns="columns"
-              class="rounded-md border border-default"
             >
-              <template #name-cell="{ row }">
-                <span class="whitespace-normal">{{ row.original.name }}</span>
-              </template>
               <template #target-cell="{ row }">
                 <span class="whitespace-nowrap tabular-nums">{{ formatNumber(row.original.target) }} {{ row.original.unit }}</span>
               </template>
@@ -318,7 +319,6 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
           <div class="flex w-full flex-wrap justify-between gap-2">
             <UButton
               v-if="editing?.finalText"
-              color="neutral"
               variant="ghost"
               icon="i-ctm-undo"
               @click="saveEdit(true)"
@@ -327,7 +327,6 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
             </UButton>
             <div class="ml-auto flex gap-2">
               <UButton
-                color="neutral"
                 variant="ghost"
                 @click="editing = null"
               >
