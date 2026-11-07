@@ -50,7 +50,8 @@ export async function buildRealizations(userId: string, ws: { skp: { id: string 
     const kuantitas = rhk.indicators.find(i => i.aspect === 'kuantitas') ?? rhk.indicators[0] ?? null
     out.push({
       id: row!.id,
-      rhk: { id: rhk.id, number: rhk.number, statement: rhk.statement },
+      rhk: { id: rhk.id, number: rhk.number, statement: rhk.statement, type: rhk.type },
+      indicators: rhk.indicators.map(i => ({ aspect: i.aspect, indicator: i.indicator, target: i.target, unit: i.unit })),
       indicator: kuantitas ? { indicator: kuantitas.indicator, target: kuantitas.target, unit: kuantitas.unit } : null,
       draftText: text,
       finalText: row!.finalText,
@@ -67,7 +68,8 @@ export async function buildRealizations(userId: string, ws: { skp: { id: string 
         description: src.description,
         realization: src.realization,
         unit: src.plan.unit,
-        evidenceCount: src.results.filter(r => r.evidenceUrl).length
+        evidenceCount: src.results.filter(r => r.evidenceUrl).length,
+        evidence: src.results.filter(r => r.evidenceUrl).map(r => ({ name: r.name, url: r.evidenceUrl! }))
       })),
       evidenceCount: sources.reduce((n, s) => n + s.results.filter(r => r.evidenceUrl).length, 0),
       excluded,
