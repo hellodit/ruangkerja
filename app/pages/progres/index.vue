@@ -51,8 +51,7 @@ watch([weekStart, rhkId, noEvidence], () => {
 
 const entries = computed(() => data.value?.entries ?? [])
 const missingCount = computed(() => entries.value.filter(e => !e.hasEvidence).length)
-// The calendar (canvas "Tampilan kalender") has no evidence filter: it always shows the whole week.
-const shown = computed(() => (noEvidence.value && view.value === 'list' ? entries.value.filter(e => !e.hasEvidence) : entries.value))
+const shown = computed(() => (noEvidence.value ? entries.value.filter(e => !e.hasEvidence) : entries.value))
 const totalMinutes = computed(() => shown.value.reduce((n, e) => n + minutesBetween(e.startTime, e.endTime), 0))
 
 function toggleRow(id: string, selected: boolean) {
@@ -160,7 +159,6 @@ function addEvidence(id: string) {
               icon="i-ctm-chevron-right"
               variant="ghost"
               aria-label="Minggu berikutnya"
-              :disabled="isCurrentWeek"
               @click="shiftWeek(1)"
             />
             <span
@@ -172,7 +170,6 @@ function addEvidence(id: string) {
               icon="i-ctm-chevron-right"
               variant="ghost"
               aria-label="Minggu berikutnya"
-              :disabled="isCurrentWeek"
               @click="shiftWeek(1)"
             />
           </div>
@@ -199,6 +196,18 @@ function addEvidence(id: string) {
                 aria-hidden="true"
               />
               {{ c.label }}
+            </UButton>
+            <UButton
+              color="neutral"
+              variant="outline"
+              icon="i-ctm-warning"
+              :aria-pressed="noEvidence"
+              class="h-[30px] rounded-full px-3 text-sm/5 font-normal ring-default"
+              :class="noEvidence && 'bg-brand-100 text-brand-ink ring-brand-700 hover:bg-brand-100 dark:bg-brand-950/50'"
+              :ui="{ leadingIcon: 'size-4 text-warning' }"
+              @click="noEvidence = !noEvidence"
+            >
+              Belum ada bukti · {{ missingCount }}
             </UButton>
           </div>
           <template v-else>
