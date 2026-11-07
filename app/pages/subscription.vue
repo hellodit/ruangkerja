@@ -140,7 +140,7 @@ async function signOut() {
       <UCard
         v-if="order"
         id="pembayaran"
-        class="scroll-mt-6 ring-2 ring-brand-400"
+        class="scroll-mt-6 ring-2 ring-primary"
         :ui="{ body: 'flex flex-col gap-5' }"
       >
         <div class="flex flex-wrap items-start justify-between gap-3">
@@ -267,7 +267,7 @@ async function signOut() {
           <UCard
             v-for="p in packages"
             :key="p.id"
-            :class="order?.packageId === p.id && 'ring-2 ring-brand-400'"
+            :class="order?.packageId === p.id && 'ring-2 ring-primary'"
             :ui="{ body: 'flex h-full flex-col gap-4' }"
           >
             <div class="flex flex-col gap-1">

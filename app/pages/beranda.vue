@@ -145,7 +145,7 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
                     >{{ p.count }}</span>
                     <div
                       class="w-full max-w-14 rounded-t-md"
-                      :class="p.date === d.today ? 'bg-primary' : 'bg-brand-200 dark:bg-brand-800'"
+                      :class="p.date === d.today ? 'bg-primary dark:bg-brand-200' : 'bg-brand-300 dark:bg-brand-400'"
                       :style="{ height: `${Math.max(4, (p.count / maxDay) * 86)}%` }"
                     />
                   </div>

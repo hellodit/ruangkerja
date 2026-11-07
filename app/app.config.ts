@@ -1,5 +1,5 @@
 // CTM Project design system mapped onto Nuxt UI.
-// Gold (brand-400) is light: anything drawn ON it uses ink (#111216), never white.
+// Brand = logo navy (brand-700 light, brand-500 dark): anything drawn ON it is white.
 
 // --- CTM Field (ds-field) shared classes -------------------------------------
 const FIELD_PLACEHOLDER = 'text-slate-500 dark:text-[#8a8d93]'
@@ -66,8 +66,8 @@ export default defineAppConfig({
       info: 'blue'
     },
     // CTM "Button" (ds-btn): sm 28 / md 36 / lg 44, 600 weight, gap 8,
-    // radius 6 / 8 / 12. Primary = gold fill; Secondary = neutral outline;
-    // Ghost = brand-800 text, no fill; icon-only buttons are square.
+    // radius 6 / 8 / 12. Primary = navy fill, white text; Secondary = neutral outline;
+    // Ghost = navy text, no fill; icon-only buttons are square.
     button: {
       slots: { base: 'font-semibold disabled:opacity-100 aria-disabled:opacity-100' },
       variants: {
@@ -80,11 +80,11 @@ export default defineAppConfig({
         }
       },
       compoundVariants: [
-        { color: 'primary', variant: 'solid', class: `text-ink bg-brand-400 hover:bg-brand-500 active:bg-brand-600 ${BTN_DISABLED_FILL} ${BTN_FOCUS}` },
-        { color: 'primary', variant: 'outline', class: `text-brand-ink ring-brand-600 hover:bg-brand-50 dark:hover:bg-brand-950/40 ${BTN_FOCUS}` },
+        { color: 'primary', variant: 'solid', class: `text-white bg-brand-700 hover:bg-brand-800 active:bg-brand-900 dark:bg-brand-500 dark:hover:bg-brand-600 dark:active:bg-brand-700 ${BTN_DISABLED_FILL} ${BTN_FOCUS}` },
+        { color: 'primary', variant: 'outline', class: `text-brand-ink ring-brand-700 hover:bg-brand-50 dark:ring-brand-400 dark:hover:bg-brand-950/40 ${BTN_FOCUS}` },
         { color: 'primary', variant: 'soft', class: `text-brand-ink bg-brand-100 hover:bg-brand-200 dark:bg-brand-950/50 ${BTN_FOCUS}` },
         { color: 'primary', variant: 'subtle', class: `text-brand-ink bg-brand-50 ring-brand-200 ${BTN_FOCUS}` },
-        { color: 'primary', variant: 'ghost', class: `text-brand-ink hover:bg-transparent hover:text-brand-900 active:bg-transparent active:text-brand-900 dark:hover:text-brand-300 disabled:text-dimmed aria-disabled:text-dimmed ${BTN_FOCUS}` },
+        { color: 'primary', variant: 'ghost', class: `text-brand-ink hover:bg-transparent hover:text-brand-900 active:bg-transparent active:text-brand-900 dark:hover:text-brand-200 disabled:text-dimmed aria-disabled:text-dimmed ${BTN_FOCUS}` },
         { color: 'primary', variant: 'link', class: `h-auto px-0 font-normal text-blue-600 underline underline-offset-2 hover:text-blue-700 active:text-blue-800 dark:text-blue-400 ${BTN_FOCUS}` },
         { color: 'neutral', variant: 'outline', class: `ring-accented text-highlighted bg-default hover:bg-muted hover:ring-slate-400 dark:hover:ring-[#6b6d72] active:bg-elevated ${BTN_DISABLED_FILL} disabled:ring-accented aria-disabled:ring-accented ${BTN_FOCUS}` },
         { color: 'neutral', variant: 'ghost', class: `text-toned hover:text-highlighted hover:bg-muted active:bg-elevated disabled:text-dimmed aria-disabled:text-dimmed ${BTN_FOCUS}` },
@@ -110,10 +110,10 @@ export default defineAppConfig({
         }
       },
       compoundVariants: [
-        { color: 'primary', variant: 'solid', class: 'text-ink' },
+        { color: 'primary', variant: 'solid', class: 'text-white' },
         { color: 'primary', variant: 'soft', class: 'text-brand-ink bg-brand-100 dark:bg-brand-950/50' },
         { color: 'primary', variant: 'subtle', class: 'text-brand-ink bg-brand-50 ring-0' },
-        { color: 'primary', variant: 'outline', class: 'text-brand-ink ring-brand-600' },
+        { color: 'primary', variant: 'outline', class: 'text-brand-ink ring-brand-700 dark:ring-brand-400' },
         { color: 'success', variant: 'subtle', class: 'ring-0 bg-green-100 text-green-600 dark:bg-green-950/60 dark:text-green-400' },
         { color: 'info', variant: 'subtle', class: 'ring-0 bg-blue-100 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400' },
         { color: 'warning', variant: 'subtle', class: 'ring-0 bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400' },
@@ -123,20 +123,20 @@ export default defineAppConfig({
         { color: 'neutral', variant: 'outline', class: 'ring-default text-toned rounded-full' }
       ]
     },
-    // CTM checkbox: 20px box, radius 2, border-secondary; checked = gold fill.
+    // CTM checkbox: 20px box, radius 2, border-secondary; checked = navy fill.
     checkbox: {
       slots: { base: 'rounded-[2px] ring-slate-300 dark:ring-[#3e4045]' },
       variants: { size: { md: { base: 'size-5', icon: 'size-3.5' } } },
-      compoundVariants: [{ color: 'primary', class: { indicator: 'text-ink bg-brand-400' } }]
+      compoundVariants: [{ color: 'primary', class: { indicator: 'text-white bg-primary' } }]
     },
     radioGroup: {
-      compoundVariants: [{ color: 'primary', class: { indicator: 'after:bg-ink' } }]
+      compoundVariants: [{ color: 'primary', class: { indicator: 'after:bg-white' } }]
     },
     switch: {
       slots: { thumb: 'bg-white' }
     },
     stepper: {
-      compoundVariants: [{ color: 'primary', class: { trigger: 'group-data-[state=completed]:text-ink group-data-[state=active]:text-ink' } }]
+      compoundVariants: [{ color: 'primary', class: { trigger: 'group-data-[state=completed]:text-white group-data-[state=active]:text-white' } }]
     },
     // CTM "Menu Tree" (ds-navtree): 40px items, radius-sm, 14/20 medium,
     // text-secondary + icon-secondary; hover bg-secondary; current page
@@ -175,15 +175,15 @@ export default defineAppConfig({
           variant: 'pill',
           active: true,
           class: {
-            link: 'font-semibold text-brand-800 before:bg-brand-50 dark:text-brand-300 dark:before:bg-[#2e2a18]',
-            linkLeadingIcon: 'text-brand-800 dark:text-brand-300',
-            linkTrailingBadge: 'bg-brand-100 text-brand-800 dark:bg-[#3a2f12] dark:text-brand-300'
+            link: 'font-semibold text-brand-700 before:bg-brand-50 dark:text-brand-200 dark:before:bg-brand-900',
+            linkLeadingIcon: 'text-brand-700 dark:text-brand-200',
+            linkTrailingBadge: 'bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-200'
           }
         }
       ]
     },
-    // CTM tabs: pill = gold active pill on a slate-100 track (36px items);
-    // link = underline tabs, active brand-800 text + 2px gold underline.
+    // CTM tabs: pill = navy active pill (white text) on a slate-100 track (36px items);
+    // link = underline tabs, active navy text + 2px navy underline.
     tabs: {
       compoundVariants: [
         {
@@ -192,7 +192,7 @@ export default defineAppConfig({
           class: {
             list: 'rounded-full bg-elevated p-1 gap-1',
             indicator: 'rounded-full bg-primary shadow-none inset-y-1',
-            trigger: 'grow-0 h-9 rounded-full px-4 py-2 text-sm/5 font-medium data-[state=active]:text-ink data-[state=inactive]:text-toned hover:data-[state=inactive]:not-disabled:text-highlighted'
+            trigger: 'grow-0 h-9 rounded-full px-4 py-2 text-sm/5 font-medium data-[state=active]:text-white data-[state=inactive]:text-toned hover:data-[state=inactive]:not-disabled:text-highlighted'
           }
         },
         {
@@ -201,7 +201,7 @@ export default defineAppConfig({
           class: {
             indicator: 'bg-primary h-0.5',
             trigger: 'px-3 py-2.5 text-sm/5 font-medium data-[state=active]:text-brand-ink data-[state=inactive]:text-toned hover:data-[state=inactive]:not-disabled:text-highlighted',
-            trailingBadge: 'h-[18px] min-w-5 justify-center rounded-full ring-0 bg-muted px-1.5 text-[11px]/none font-semibold tabular-nums text-toned group-data-[state=active]:bg-brand-100 group-data-[state=active]:text-brand-800'
+            trailingBadge: 'h-[18px] min-w-5 justify-center rounded-full ring-0 bg-muted px-1.5 text-[11px]/none font-semibold tabular-nums text-toned group-data-[state=active]:bg-brand-100 group-data-[state=active]:text-brand-700'
           }
         }
       ]
@@ -288,7 +288,7 @@ export default defineAppConfig({
     },
     // CTM "Field" (ds-field): 44px, radius-md, 1px border-secondary,
     // 14/20 text, placeholder text-placeholder, icons 20px icon-secondary.
-    // Hover border-tertiary; mouse focus = 1px gold border (no glow);
+    // Hover border-tertiary; mouse focus = 1px navy border (no glow);
     // keyboard focus = 2px blue (border-focus-ring); error = red-700.
     input: {
       slots: {

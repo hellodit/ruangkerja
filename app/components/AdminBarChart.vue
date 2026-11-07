@@ -72,7 +72,7 @@ const showLabel = (i: number) => i === props.points.length - 1 || (i % every.val
               :aria-label="`${formatDateShort(p.day)}: ${format(p.value)}`"
             >
               <div
-                class="w-full rounded-t-[4px] bg-brand-400 transition-colors group-hover:bg-brand-600 group-focus-visible:bg-brand-600"
+                class="w-full rounded-t-[4px] bg-brand-500 transition-colors group-hover:bg-brand-700 group-focus-visible:bg-brand-700 dark:group-hover:bg-brand-400 dark:group-focus-visible:bg-brand-400"
                 :style="{ height: p.value ? `max(2px, ${(p.value / max) * 100}%)` : '0' }"
               />
             </div>
