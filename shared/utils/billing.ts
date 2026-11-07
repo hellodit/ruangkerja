@@ -25,3 +25,17 @@ export function computePackagePeriod(opts: { now: Date, currentEnd: Date | null,
   const start = opts.start === 'extend' && opts.currentEnd && opts.currentEnd > opts.now ? opts.currentEnd : opts.now
   return { start, end: new Date(start.getTime() + opts.durationDays * 24 * 60 * 60 * 1000) }
 }
+
+const COMPACT = new Intl.NumberFormat('id-ID', { notation: 'compact', maximumFractionDigits: 1 })
+
+/** Axis labels: 1250000 → "Rp 1,3 jt", 49000 → "Rp 49 rb". */
+export function formatRupiahCompact(amount: number): string {
+  return `Rp ${COMPACT.format(amount).replace(/\s/g, ' ')}`
+}
+
+/** A round axis maximum ≥ n: 1, 2, 5 × 10^k (never below 1). */
+export function niceMax(n: number): number {
+  if (n <= 1) return 1
+  const p = 10 ** Math.floor(Math.log10(n))
+  return [1, 2, 5, 10].map(m => m * p).find(v => v >= n)!
+}

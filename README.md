@@ -14,7 +14,7 @@ Asisten kerja digital personal untuk ASN: susun **rencana aksi per RHK**, catat 
 | Bukti dukung | Semua tautan bukti, pencarian, filter RHK, daftar progres yang belum punya bukti. Bukti = nama + tautan, **tanpa unggah file**. |
 | Realisasi periode | Draf per RHK yang disusun **hanya** dari progres harian (rencana aksi tanpa progres ditandai, tidak diisi otomatis), bisa diubah, salin per RHK atau semua, unduh **.docx** asli. |
 | Profil | Data pribadi/kepegawaian/atasan, foto profil (R2), pengingat, ubah kata sandi, ekspor semua data (JSON), hapus akun permanen. |
-| Admin | Layout tersendiri (sidebar gelap), khusus admin. **Pengguna** (`/admin/users`): statistik, pencarian, saringan, paket aktif tiap pengguna, assign paket. **Paket** (`/admin/packages`): tambah, ubah, nonaktifkan, arsipkan. **Transaksi** (`/admin/transactions`): riwayat dan pendapatan; assign paket manual mencatat transaksi lunas dan memperpanjang masa aktif. Hanya data akun dasar; NIP, tanggal lahir, alamat, nomor HP, dan isi pekerjaan tidak ditampilkan. |
+| Admin | Layout tersendiri (sidebar gelap), khusus admin. **Dashboard** (`/admin/dashboard`): angka utama, grafik pendaftaran dan pendapatan per hari (7/30/90 hari, WIB), paket aktif, transaksi terbaru, paket yang segera berakhir, pendaftar terbaru. **Pengguna** (`/admin/users`): statistik, pencarian, saringan, paket aktif tiap pengguna, assign paket. **Paket** (`/admin/packages`): tambah, ubah, nonaktifkan, arsipkan. **Transaksi** (`/admin/transactions`): riwayat dan pendapatan; assign paket manual mencatat transaksi lunas dan memperpanjang masa aktif. Hanya data akun dasar; NIP, tanggal lahir, alamat, nomor HP, dan isi pekerjaan tidak ditampilkan. |
 
 Di luar Rilis 1.0 (sesuai PRD): fitur AI (rapikan kalimat, draf AI — Rilis 1.1), Alat bantu (Panduan kerja, Asisten AI, Draf SOP), pembayaran. Webhook SingaPay sudah tersedia untuk fase pembayaran.
 
@@ -135,8 +135,8 @@ server/db/           Skema Drizzle (sesuai PRD) + migrasi
 server/utils/        auth, workspace (kepemilikan & nilai turunan), progress, realization, crypto, r2, singapay
 server/api/          me, profile, settings, onboarding, skp, rhks, action-plans, progress, evidence,
                      dashboard, realizations (+ export .docx), account/export, uploads, webhooks/singapay,
-                     admin/users, admin/packages, admin/transactions
-app/pages/           auth, onboarding/*, beranda, rhk/*, progres/*, bukti, realisasi, profil, admin/{users,packages,transactions}
+                     admin/dashboard, admin/users, admin/packages, admin/transactions
+app/pages/           auth, onboarding/*, beranda, rhk/*, progres/*, bukti, realisasi, profil, admin/{dashboard,users,packages,transactions}
 app/components/      AppSidebar, ProgressForm, ProgressCalendar, RhkForm, ActionPlanModal, …
 scripts/seed-demo.ts Akun demo
 scripts/set-role.ts  Angkat/cabut admin

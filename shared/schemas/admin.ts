@@ -49,3 +49,9 @@ export const adminTransactionsQuery = z.object({
   page: z.coerce.number().int().min(1).max(10_000).default(1),
   pageSize: z.coerce.number().int().refine(n => [10, 25, 50].includes(n), 'Ukuran halaman tidak valid').default(25)
 })
+
+export const DASHBOARD_RANGES = [7, 30, 90] as const
+/** GET /api/admin/dashboard query. */
+export const adminDashboardQuery = z.object({
+  days: z.coerce.number().int().refine(n => (DASHBOARD_RANGES as readonly number[]).includes(n), 'Rentang tidak valid').default(30)
+})

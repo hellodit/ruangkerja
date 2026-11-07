@@ -13,6 +13,7 @@ const colorMode = useColorMode()
 const links = computed<NavigationMenuItem[][]>(() => [
   [
     { label: 'Kelola', type: 'label' },
+    { label: 'Dashboard', icon: 'i-ctm-dashboard', to: '/admin/dashboard' },
     { label: 'Pengguna', icon: 'i-ctm-user-group', to: '/admin/users' },
     { label: 'Paket', icon: 'i-ctm-product', to: '/admin/packages' },
     { label: 'Transaksi', icon: 'i-ctm-credit-cards', to: '/admin/transactions' }
@@ -72,7 +73,7 @@ const navUi = {
   >
     <template #header>
       <NuxtLink
-        to="/admin/users"
+        to="/admin/dashboard"
         class="flex items-center gap-2.5 rounded-md focus-visible:outline-2 focus-visible:outline-blue-400"
         aria-label="Panel admin RuangKerja"
       >

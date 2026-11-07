@@ -62,6 +62,11 @@ export default defineNuxtConfig({
     }
   },
 
+  // The admin panel opens on its dashboard.
+  routeRules: {
+    '/admin': { redirect: '/admin/dashboard' }
+  },
+
   compatibilityDate: '2026-06-30',
 
   eslint: {

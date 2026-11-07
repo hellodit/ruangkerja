@@ -58,3 +58,21 @@ describe('package and assign schemas', () => {
     expect(assignPackageSchema.safeParse({ userId: 'x', packageId: '7b475d92-b0a5-40b8-92c0-c681d28a97a2', amount: 0 }).success).toBe(false)
   })
 })
+
+describe('chart helpers', () => {
+  it('formats compact rupiah for axis labels', async () => {
+    const { formatRupiahCompact } = await import('../../shared/utils/billing')
+    expect(formatRupiahCompact(1250000)).toBe('Rp 1,3 jt')
+    expect(formatRupiahCompact(49000)).toBe('Rp 49 rb')
+    expect(formatRupiahCompact(0)).toBe('Rp 0')
+  })
+
+  it('rounds the axis maximum up to 1, 2 or 5 × 10^k', async () => {
+    const { niceMax } = await import('../../shared/utils/billing')
+    expect(niceMax(0)).toBe(1)
+    expect(niceMax(3)).toBe(5)
+    expect(niceMax(7)).toBe(10)
+    expect(niceMax(130000)).toBe(200000)
+    expect(niceMax(500000)).toBe(500000)
+  })
+})
