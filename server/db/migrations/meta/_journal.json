@@ -29,6 +29,13 @@
       "when": 1794020030214,
       "tag": "0003_checkout_orders",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794068607352,
+      "tag": "0004_fk_indexes",
+      "breakpoints": true
     }
   ]
 }
