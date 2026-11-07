@@ -8,7 +8,6 @@ import type { DropdownMenuItem, NavigationMenuItem } from '@nuxt/ui'
  */
 const { me } = useMe()
 const auth = useAuthSession()
-const colorMode = useColorMode()
 
 const links = computed<NavigationMenuItem[][]>(() => [
   [
@@ -28,14 +27,7 @@ const initials = computed(() => (me.value?.user.name ?? '').split(/\s+/).filter(
 const userItems = computed<DropdownMenuItem[][]>(() => [
   [{ label: me.value?.user.name ?? '', description: me.value?.user.email ?? '', type: 'label' }],
   [
-    { label: 'Ruang kerja saya', icon: 'i-ctm-home', to: '/beranda' },
-    {
-      label: colorMode.value === 'dark' ? 'Tampilan terang' : 'Tampilan gelap',
-      icon: colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon',
-      onSelect: () => {
-        colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
-      }
-    }
+    { label: 'Ruang kerja saya', icon: 'i-ctm-home', to: '/beranda' }
   ],
   [{
     label: 'Keluar',
@@ -68,7 +60,7 @@ const navUi = {
       toggle: 'text-slate-300 hover:bg-white/5 hover:text-white active:bg-white/10',
       header: 'h-auto px-5 pt-5 pb-0',
       body: 'gap-5 px-3 pt-5 pb-6',
-      footer: 'border-t border-white/10 p-3'
+      footer: 'flex-col items-stretch gap-1 border-t border-white/10 p-3'
     }"
   >
     <template #header>
@@ -99,6 +91,9 @@ const navUi = {
     </template>
 
     <template #footer>
+      <div class="flex px-2 py-1.5">
+        <ThemeSwitch inverted />
+      </div>
       <UDropdownMenu
         :items="userItems"
         :content="{ align: 'start', side: 'top', sideOffset: 8 }"

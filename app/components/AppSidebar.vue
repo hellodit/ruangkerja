@@ -10,7 +10,6 @@ import type { DropdownMenuItem, NavigationMenuItem } from '@nuxt/ui'
 const collapsed = ref(false)
 const { me } = useMe()
 const auth = useAuthSession()
-const colorMode = useColorMode()
 const toast = useToast()
 
 function comingSoon(label: string) {
@@ -51,14 +50,7 @@ const userItems = computed<DropdownMenuItem[][]>(() => [
       icon: 'i-ctm-product',
       to: '/subscription'
     },
-    { label: 'Kebijakan privasi', icon: 'i-ctm-square-lock-01', to: '/privasi' },
-    {
-      label: colorMode.value === 'dark' ? 'Tampilan terang' : 'Tampilan gelap',
-      icon: colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon',
-      onSelect: () => {
-        colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
-      }
-    }
+    { label: 'Kebijakan privasi', icon: 'i-ctm-square-lock-01', to: '/privasi' }
   ],
   [{
     label: 'Keluar',
@@ -85,7 +77,7 @@ const userItems = computed<DropdownMenuItem[][]>(() => [
       root: 'bg-default border-e border-default',
       header: collapsed ? 'h-auto px-2 pt-5 pb-0' : 'h-auto px-5 pt-5 pb-0',
       body: collapsed ? 'gap-5 px-2 pt-5 pb-6' : 'gap-5 px-3 pt-5 pb-6',
-      footer: collapsed ? 'border-t border-default p-2' : 'border-t border-default p-3'
+      footer: collapsed ? 'flex-col gap-1 border-t border-default p-2' : 'flex-col items-stretch gap-1 border-t border-default p-3'
     }"
   >
     <template #header>
@@ -119,6 +111,12 @@ const userItems = computed<DropdownMenuItem[][]>(() => [
     </template>
 
     <template #footer>
+      <div
+        class="flex"
+        :class="collapsed ? 'justify-center' : 'px-2 py-1.5'"
+      >
+        <ThemeSwitch :compact="collapsed" />
+      </div>
       <UDropdownMenu
         :items="userItems"
         :content="{ align: 'start', side: 'top', sideOffset: 8 }"

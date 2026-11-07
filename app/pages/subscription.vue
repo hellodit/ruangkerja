@@ -99,6 +99,7 @@ async function signOut() {
           Kembali ke ruang kerja
         </UButton>
         <span class="hidden text-sm text-toned sm:inline">{{ me?.user.email }}</span>
+        <ThemeSwitch />
         <UButton
           color="neutral"
           variant="ghost"

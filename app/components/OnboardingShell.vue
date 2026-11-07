@@ -28,6 +28,7 @@ const current = computed(() => props.step - 1)
           class="w-full max-w-md"
         />
       </nav>
+      <ThemeSwitch />
     </header>
 
     <div class="mx-auto w-full max-w-5xl flex-1 px-4 pt-10 pb-12 sm:px-8">
