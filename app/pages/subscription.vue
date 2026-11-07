@@ -88,7 +88,7 @@ async function signOut() {
 <template>
   <div class="flex min-h-screen flex-col">
     <header class="flex items-center gap-3 border-b border-default bg-default px-4 py-3 sm:px-8">
-      <AppLogo :subtitle="false" />
+      <AppLogo />
       <div class="ml-auto flex items-center gap-2">
         <UButton
           v-if="current"
@@ -113,7 +113,7 @@ async function signOut() {
     <div class="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 pt-10 pb-16 sm:px-8">
       <div class="flex flex-col gap-2">
         <h1 class="text-2xl font-bold tracking-[-0.15px] text-highlighted sm:text-[28px]/9">
-          {{ current ? 'Perpanjang paket' : 'Pilih paket RuangKerja' }}
+          {{ current ? 'Perpanjang paket' : 'Pilih paket Ruang Kerja' }}
         </h1>
         <p class="max-w-2xl text-base text-toned">
           Catat progres harian, kumpulkan tautan bukti, dan susun draf realisasi per periode. Pilih paket, lalu selesaikan pembayaran untuk membuka ruang kerja.
@@ -203,7 +203,7 @@ async function signOut() {
           variant="subtle"
           icon="i-ctm-information"
           title="Instruksi pembayaran belum diatur"
-          :description="supportEmail ? `Hubungi ${supportEmail} dengan kode pesanan di atas untuk menyelesaikan pembayaran.` : 'Hubungi admin RuangKerja dengan kode pesanan di atas untuk menyelesaikan pembayaran.'"
+          :description="supportEmail ? `Hubungi ${supportEmail} dengan kode pesanan di atas untuk menyelesaikan pembayaran.` : 'Hubungi admin Ruang Kerja dengan kode pesanan di atas untuk menyelesaikan pembayaran.'"
         />
 
         <ol class="flex list-decimal flex-col gap-1.5 ps-5 text-sm text-highlighted">
@@ -258,7 +258,7 @@ async function signOut() {
           v-if="!packages.length"
           icon="i-ctm-product"
           title="Belum ada paket yang dijual"
-          :description="supportEmail ? `Hubungi ${supportEmail}.` : 'Hubungi admin RuangKerja.'"
+          :description="supportEmail ? `Hubungi ${supportEmail}.` : 'Hubungi admin Ruang Kerja.'"
         />
         <div
           v-else

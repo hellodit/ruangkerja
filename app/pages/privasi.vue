@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'public' })
-useSeoMeta({ title: 'Kebijakan privasi', description: 'Cara RuangKerja mengumpulkan, memakai, dan melindungi data pribadi pengguna.' })
+useSeoMeta({ title: 'Kebijakan privasi', description: 'Cara Ruang Kerja mengumpulkan, memakai, dan melindungi data pribadi pengguna.' })
 
 const support = useRuntimeConfig().public.supportEmail
 const updated = '7 November 2026'
@@ -15,9 +15,9 @@ function goBack() {
 
 const sections = [
   {
-    title: 'Tentang RuangKerja',
+    title: 'Tentang Ruang Kerja',
     body: [
-      'RuangKerja adalah alat bantu kerja personal untuk ASN. RuangKerja tidak terhubung ke e-Kinerja BKN maupun sistem pemerintah lain, dan tidak mengirim data Anda ke sistem tersebut.',
+      'Ruang Kerja adalah alat bantu kerja personal untuk ASN. Ruang Kerja tidak terhubung ke e-Kinerja BKN maupun sistem pemerintah lain, dan tidak mengirim data Anda ke sistem tersebut.',
       'Kebijakan ini disusun dengan mengacu pada Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP).'
     ]
   },
@@ -34,7 +34,7 @@ const sections = [
   {
     title: 'Untuk apa data dipakai',
     list: [
-      'Menyediakan fitur RuangKerja: mencatat progres, mengumpulkan tautan bukti, dan menyusun draf realisasi dari catatan Anda sendiri.',
+      'Menyediakan fitur Ruang Kerja: mencatat progres, mengumpulkan tautan bukti, dan menyusun draf realisasi dari catatan Anda sendiri.',
       'Mengirim email yang berkaitan dengan akun: verifikasi email, tautan masuk, dan atur ulang kata sandi.',
       'Menjaga keamanan layanan, termasuk mencegah penyalahgunaan dan percobaan masuk berulang.'
     ],
@@ -52,7 +52,7 @@ const sections = [
     title: 'Pihak yang membantu kami memproses data',
     body: ['Untuk menjalankan layanan, sebagian data diproses oleh penyedia layanan berikut sesuai fungsinya:'],
     list: [
-      'Penyedia hosting aplikasi dan basis data, untuk menyimpan dan menjalankan RuangKerja.',
+      'Penyedia hosting aplikasi dan basis data, untuk menyimpan dan menjalankan Ruang Kerja.',
       'Resend, untuk mengirim email akun.',
       'Cloudflare, untuk verifikasi keamanan (Turnstile) dan penyimpanan foto profil (R2).',
       'Google, hanya bila Anda memilih masuk dengan akun Google.'
@@ -77,8 +77,8 @@ const sections = [
   {
     title: 'Tanggung jawab pengguna',
     body: [
-      'Jangan memasukkan informasi rahasia negara, dokumen berklasifikasi, atau data pribadi warga ke RuangKerja. Pastikan tautan bukti dukung hanya bisa dibuka oleh pihak yang berhak.',
-      'Draf realisasi bersifat personal dan perlu Anda periksa sebelum dipakai. RuangKerja tidak menggantikan persetujuan atasan, penilaian kinerja resmi, atau penyimpanan arsip instansi.'
+      'Jangan memasukkan informasi rahasia negara, dokumen berklasifikasi, atau data pribadi warga ke Ruang Kerja. Pastikan tautan bukti dukung hanya bisa dibuka oleh pihak yang berhak.',
+      'Draf realisasi bersifat personal dan perlu Anda periksa sebelum dipakai. Ruang Kerja tidak menggantikan persetujuan atasan, penilaian kinerja resmi, atau penyimpanan arsip instansi.'
     ]
   },
   {

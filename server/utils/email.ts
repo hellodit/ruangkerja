@@ -42,9 +42,9 @@ function renderActionEmail(e: ActionEmail) {
 <p style="margin:32px 0"><a href="${url}" style="background:#ecbd56;color:#111216;padding:12px 20px;border-radius:6px;text-decoration:none;display:inline-block">${escapeHtml(e.actionLabel)}</a></p>
 <p style="font-size:13px;color:#475569">Jika tombol tidak berfungsi, salin tautan ini ke browser Anda:<br><span style="word-break:break-all">${url}</span></p>
 <p style="font-size:13px;color:#475569">${escapeHtml(e.outro)}</p>
-<p>— RuangKerja</p>
+<p>— Ruang Kerja</p>
 </body></html>`
-  const text = `Halo ${e.greetingName},\n\n${e.intro}\n\n${e.actionLabel}: ${e.actionUrl}\n\n${e.outro}\n\n— RuangKerja`
+  const text = `Halo ${e.greetingName},\n\n${e.intro}\n\n${e.actionLabel}: ${e.actionUrl}\n\n${e.outro}\n\n— Ruang Kerja`
   return { html, text }
 }
 
@@ -67,7 +67,7 @@ async function sendActionEmail(e: ActionEmail) {
 export function sendVerificationEmail(to: string, name: string, url: string) {
   return sendActionEmail({
     to,
-    subject: 'Verifikasi email Anda — RuangKerja',
+    subject: 'Verifikasi email Anda — Ruang Kerja',
     greetingName: name,
     intro: 'Terima kasih telah mendaftar. Klik tombol di bawah untuk memverifikasi alamat email Anda.',
     actionLabel: 'Verifikasi email',
@@ -79,7 +79,7 @@ export function sendVerificationEmail(to: string, name: string, url: string) {
 export function sendResetPasswordEmail(to: string, name: string, url: string) {
   return sendActionEmail({
     to,
-    subject: 'Atur ulang kata sandi — RuangKerja',
+    subject: 'Atur ulang kata sandi — Ruang Kerja',
     greetingName: name,
     intro: 'Kami menerima permintaan untuk mengatur ulang kata sandi akun Anda. Tautan ini berlaku selama 1 jam.',
     actionLabel: 'Atur ulang kata sandi',
@@ -91,10 +91,10 @@ export function sendResetPasswordEmail(to: string, name: string, url: string) {
 export function sendMagicLinkEmail(to: string, url: string) {
   return sendActionEmail({
     to,
-    subject: 'Tautan masuk RuangKerja',
+    subject: 'Tautan masuk Ruang Kerja',
     greetingName: to,
-    intro: 'Klik tombol di bawah untuk masuk ke RuangKerja. Tautan ini berlaku 15 menit dan hanya bisa dipakai sekali.',
-    actionLabel: 'Masuk ke RuangKerja',
+    intro: 'Klik tombol di bawah untuk masuk ke Ruang Kerja. Tautan ini berlaku 15 menit dan hanya bisa dipakai sekali.',
+    actionLabel: 'Masuk ke Ruang Kerja',
     actionUrl: url,
     outro: 'Jika Anda tidak meminta tautan ini, abaikan email ini.'
   })

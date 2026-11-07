@@ -15,8 +15,8 @@ useHead({
 })
 
 useSeoMeta({
-  titleTemplate: title => (title ? `${title} · RuangKerja` : 'RuangKerja'),
-  description: 'RuangKerja — asisten kerja digital personal untuk ASN: rencana aksi per RHK, progres harian, bukti dukung, dan draf realisasi.'
+  titleTemplate: title => (title ? `${title} · Ruang Kerja` : 'Ruang Kerja'),
+  description: 'Ruang Kerja — asisten kerja digital personal untuk ASN: rencana aksi per RHK, progres harian, bukti dukung, dan draf realisasi.'
 })
 </script>
 

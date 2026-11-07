@@ -3,7 +3,7 @@
     <header class="border-b border-default bg-default px-4 py-4 sm:px-8">
       <NuxtLink
         to="/"
-        aria-label="RuangKerja"
+        aria-label="Ruang Kerja"
       >
         <AppLogo />
       </NuxtLink>

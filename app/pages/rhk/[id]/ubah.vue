@@ -72,7 +72,7 @@ async function remove() {
           color="neutral"
           variant="subtle"
           icon="i-ctm-information"
-          title="Perubahan di RuangKerja tidak mengubah SKP resmi di e-Kinerja."
+          title="Perubahan di Ruang Kerja tidak mengubah SKP resmi di e-Kinerja."
         />
         <UCard>
           <RhkForm

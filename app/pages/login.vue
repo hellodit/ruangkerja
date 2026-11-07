@@ -77,7 +77,7 @@ async function signInWithGoogle() {
 <template>
   <div class="flex flex-col gap-6">
     <AuthHeader
-      title="Masuk ke RuangKerja"
+      title="Masuk ke Ruang Kerja"
       description="Pakai email yang kamu daftarkan."
     />
 

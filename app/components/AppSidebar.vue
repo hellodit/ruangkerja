@@ -95,10 +95,10 @@ const userItems = computed<DropdownMenuItem[][]>(() => [
       >
         <NuxtLink
           to="/beranda"
-          class="rounded-md focus-visible:outline-2 focus-visible:outline-blue-700"
-          aria-label="RuangKerja, ke Beranda"
+          class="min-w-0 rounded-md focus-visible:outline-2 focus-visible:outline-blue-700"
+          aria-label="Ruang Kerja, ke Beranda"
         >
-          <AppLogo :collapsed="collapsed" />
+          <AppLogo :variant="collapsed ? 'mark' : 'horizontal'" />
         </NuxtLink>
         <UDashboardSidebarCollapse
           size="sm"

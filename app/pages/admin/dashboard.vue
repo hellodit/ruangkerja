@@ -41,7 +41,7 @@ const initials = (name: string) => name.split(/\s+/).filter(Boolean).slice(0, 2)
       <div class="flex w-full max-w-[1200px] flex-col gap-6">
         <div class="flex flex-wrap items-center gap-x-4 gap-y-3">
           <p class="flex-1 basis-60 text-sm text-toned">
-            Ringkasan pengguna dan pendapatan RuangKerja. Hari dihitung dalam WIB.
+            Ringkasan pengguna dan pendapatan Ruang Kerja. Hari dihitung dalam WIB.
           </p>
           <UTabs
             v-model="days"

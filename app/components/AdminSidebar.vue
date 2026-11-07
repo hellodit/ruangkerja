@@ -74,20 +74,11 @@ const navUi = {
     <template #header>
       <NuxtLink
         to="/admin/dashboard"
-        class="flex items-center gap-2.5 rounded-md focus-visible:outline-2 focus-visible:outline-blue-400"
-        aria-label="Panel admin RuangKerja"
+        class="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-md focus-visible:outline-2 focus-visible:outline-blue-400"
+        aria-label="Panel admin Ruang Kerja"
       >
-        <span
-          class="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-primary text-sm font-extrabold tracking-tight text-ink"
-          aria-hidden="true"
-        >rk</span>
-        <span class="flex flex-col">
-          <span class="flex items-center gap-2 text-[15px] leading-5 font-bold text-white">
-            RuangKerja
-            <span class="rounded-full bg-brand-400/20 px-2 text-[11px]/4 font-semibold text-brand-300">Admin</span>
-          </span>
-          <span class="text-xs text-slate-400">Panel admin</span>
-        </span>
+        <AppLogo surface="dark" />
+        <span class="rounded-full bg-brand-400/20 px-2 text-[11px]/4 font-semibold text-brand-300">Admin</span>
       </NuxtLink>
     </template>
 

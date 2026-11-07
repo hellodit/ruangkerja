@@ -1,9 +1,9 @@
-# RuangKerja Rilis 1.0 — Design & Plan
+# Ruang Kerja Rilis 1.0 — Design & Plan
 
 Date: 2026-11-06 · Status: Approved (user: "kerjakan sampai selesai")
 
 Sources: PRD "PRD Ruang Kerja ASN" (Claude Docs), canvas "UI Ruang Kerja ASN",
-design system "CTM Project". App name: **RuangKerja**. Built on top of
+design system "CTM Project". App name: **Ruang Kerja**. Built on top of
 `feat/auth-profile-uploads` (PR #1).
 
 ## Decisions

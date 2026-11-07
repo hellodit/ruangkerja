@@ -180,7 +180,7 @@ async function onPeriodSaved() {
           </div>
         </UCard>
         <p class="text-xs text-muted">
-          Perubahan RHK di RuangKerja tidak mengubah SKP resmi di e-Kinerja.
+          Perubahan RHK di Ruang Kerja tidak mengubah SKP resmi di e-Kinerja.
         </p>
       </div>
       <UModal

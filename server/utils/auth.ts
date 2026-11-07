@@ -15,7 +15,7 @@ function createAuth() {
   }
 
   return betterAuth({
-    appName: 'RuangKerja',
+    appName: 'Ruang Kerja',
     baseURL: siteUrl,
     basePath: '/api/auth',
     secret: config.betterAuthSecret,

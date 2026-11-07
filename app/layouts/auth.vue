@@ -6,9 +6,9 @@
         <NuxtLink
           to="/login"
           class="self-start min-[1040px]:hidden"
-          aria-label="RuangKerja, ke halaman masuk"
+          aria-label="Ruang Kerja, ke halaman masuk"
         >
-          <AppLogo :subtitle="false" />
+          <AppLogo />
         </NuxtLink>
         <slot />
       </div>

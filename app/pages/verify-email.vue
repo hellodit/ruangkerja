@@ -25,7 +25,7 @@ await auth.refresh()
       block
       :class="AUTH_BUTTON"
     >
-      {{ auth.loggedIn.value ? (failed ? 'Buka Profil' : 'Lanjut ke RuangKerja') : 'Ke halaman masuk' }}
+      {{ auth.loggedIn.value ? (failed ? 'Buka Profil' : 'Lanjut ke Ruang Kerja') : 'Ke halaman masuk' }}
     </UButton>
   </div>
 </template>

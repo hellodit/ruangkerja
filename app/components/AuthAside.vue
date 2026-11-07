@@ -9,15 +9,15 @@ const points = [
 
 <template>
   <aside
-    aria-label="Tentang RuangKerja"
+    aria-label="Tentang Ruang Kerja"
     class="flex flex-[1_1_480px] flex-col justify-between gap-10 border-r border-brand-100 bg-brand-50 px-6 py-10 sm:px-12 dark:border-[#3a2f12] dark:bg-[#2e2a18]"
   >
     <NuxtLink
       to="/login"
       class="self-start max-[1039px]:hidden"
-      aria-label="RuangKerja, ke halaman masuk"
+      aria-label="Ruang Kerja, ke halaman masuk"
     >
-      <AppLogo />
+      <AppLogo variant="stacked" />
     </NuxtLink>
 
     <div class="flex max-w-[440px] flex-col gap-7">

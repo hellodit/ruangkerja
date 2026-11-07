@@ -170,7 +170,7 @@ export function buildRealizationPdfDefinition(r: RealizationReport): TDocumentDe
   return {
     pageSize: 'A4',
     pageMargins: MARGIN,
-    info: { title: `Draf Realisasi ${r.period.label} ${r.skpYear}`, author: p.name, creator: 'RuangKerja', subject: 'Draf realisasi kinerja' },
+    info: { title: `Draf Realisasi ${r.period.label} ${r.skpYear}`, author: p.name, creator: 'Ruang Kerja', subject: 'Draf realisasi kinerja' },
     defaultStyle: { font: 'Roboto', fontSize: 10.5, lineHeight: 1.25, color: C.text },
     // A section label or RHK title in the bottom fifth of a page moves to the
     // next page, so it is never left alone above content that did not fit.
@@ -178,7 +178,7 @@ export function buildRealizationPdfDefinition(r: RealizationReport): TDocumentDe
     header: () => ({ text: `Draf Realisasi ${r.period.label} ${r.skpYear} · ${p.name}`, alignment: 'right', fontSize: 8, color: C.muted, margin: [MARGIN[0], 12 * MM, MARGIN[2], 0] }),
     footer: (page: number, pages: number) => ({
       columns: [
-        { text: `Dibuat dengan RuangKerja, ${formatDateLong(r.generatedOn)}` },
+        { text: `Dibuat dengan Ruang Kerja, ${formatDateLong(r.generatedOn)}` },
         { text: `Halaman ${page} dari ${pages}`, alignment: 'right' }
       ],
       fontSize: 8,

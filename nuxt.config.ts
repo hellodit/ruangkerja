@@ -14,7 +14,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'id' },
-      title: 'RuangKerja'
+      title: 'Ruang Kerja'
     }
   },
 

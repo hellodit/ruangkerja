@@ -107,7 +107,7 @@ function sectionLabel(text: string) {
 
 export function reportFileName(r: Pick<RealizationReport, 'period' | 'person'>, format: 'docx' | 'pdf' = 'docx') {
   const slug = (s: string) => s.normalize('NFKD').replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-')
-  return `Realisasi-${slug(r.period.label)}-${r.period.startDate.slice(0, 4)}-${slug(r.person.name) || 'RuangKerja'}.${format}`
+  return `Realisasi-${slug(r.period.label)}-${r.period.startDate.slice(0, 4)}-${slug(r.person.name) || 'Ruang-Kerja'}.${format}`
 }
 
 export function buildRealizationDocument(r: RealizationReport): Document {
@@ -215,7 +215,7 @@ export function buildRealizationDocument(r: RealizationReport): Document {
   ], { before: 360 }))
 
   return new Document({
-    creator: 'RuangKerja',
+    creator: 'Ruang Kerja',
     title: `Draf Realisasi ${r.period.label} ${r.skpYear}`,
     description: `Draf realisasi kinerja ${p.name}`,
     styles: {
@@ -237,7 +237,7 @@ export function buildRealizationDocument(r: RealizationReport): Document {
           children: [new Paragraph({
             tabStops: [{ type: TabStopType.RIGHT, position: CONTENT }],
             children: [
-              run(`Dibuat dengan RuangKerja, ${formatDateLong(r.generatedOn)}`, { size: PT(8.5), color: C.muted }),
+              run(`Dibuat dengan Ruang Kerja, ${formatDateLong(r.generatedOn)}`, { size: PT(8.5), color: C.muted }),
               new TextRun({ children: ['\tHalaman ', PageNumber.CURRENT, ' dari ', PageNumber.TOTAL_PAGES], size: PT(8.5), color: C.muted })
             ]
           })]
