@@ -123,3 +123,15 @@ describe('composeRealizationDraft', () => {
     expect(composeRealizationDraft([plans[2]!]).text).toBe('')
   })
 })
+
+describe('formatDaysAgo', () => {
+  it('describes recent days relative to today (WIB) and older ones as a date', async () => {
+    const { formatDaysAgo } = await import('../../shared/utils/dates')
+    expect(formatDaysAgo('2026-11-07T02:00:00Z', '2026-11-07')).toBe('Hari ini')
+    // 23:30 UTC on the 6th is already the 7th in WIB.
+    expect(formatDaysAgo('2026-11-06T23:30:00Z', '2026-11-07')).toBe('Hari ini')
+    expect(formatDaysAgo('2026-11-06T10:00:00Z', '2026-11-07')).toBe('Kemarin')
+    expect(formatDaysAgo('2026-11-03T10:00:00Z', '2026-11-07')).toBe('4 hari lalu')
+    expect(formatDaysAgo('2026-10-20T10:00:00Z', '2026-11-07')).toBe(formatDateShort('2026-10-20'))
+  })
+})

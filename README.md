@@ -14,6 +14,8 @@ Asisten kerja digital personal untuk ASN: susun **rencana aksi per RHK**, catat 
 | Bukti dukung | Semua tautan bukti, pencarian, filter RHK, daftar progres yang belum punya bukti. Bukti = nama + tautan, **tanpa unggah file**. |
 | Realisasi periode | Draf per RHK yang disusun **hanya** dari progres harian (rencana aksi tanpa progres ditandai, tidak diisi otomatis), bisa diubah, salin per RHK atau semua, unduh **.docx** asli. |
 | Profil | Data pribadi/kepegawaian/atasan, foto profil (R2), pengingat, ubah kata sandi, ekspor semua data (JSON), hapus akun permanen. |
+| Admin | Layout tersendiri (sidebar gelap), khusus admin. **Dashboard** (`/admin/dashboard`): angka utama, grafik pendaftaran dan pendapatan per hari (7/30/90 hari, WIB), paket aktif, transaksi terbaru, paket yang segera berakhir, pendaftar terbaru. **Pengguna** (`/admin/users`): statistik, pencarian, saringan, paket aktif tiap pengguna, assign paket. **Paket** (`/admin/packages`): tambah, ubah, nonaktifkan, arsipkan. **Transaksi** (`/admin/transactions`): riwayat dan pendapatan; assign paket manual mencatat transaksi lunas dan memperpanjang masa aktif. Hanya data akun dasar; NIP, tanggal lahir, alamat, nomor HP, dan isi pekerjaan tidak ditampilkan. |
+| Paket dan pembayaran | Ruang kerja butuh paket aktif (admin dikecualikan). Tanpa paket, semua halaman kecuali Profil diarahkan ke `/subscription`: pilih paket → pesanan berkode (RK-YYMMDD-XXXXXX) dengan instruksi transfer bank → admin mengonfirmasi lunas di Admin → Transaksi → paket aktif. API ruang kerja menjawab 402 tanpa paket aktif. Beranda menampilkan pengingat mulai 7 hari sebelum paket berakhir. Perpanjangan, konfirmasi, dan assign manual menambah durasi paket ke tanggal berakhir yang berjalan (atau hari ini). |
 
 Di luar Rilis 1.0 (sesuai PRD): fitur AI (rapikan kalimat, draf AI — Rilis 1.1), Alat bantu (Panduan kerja, Asisten AI, Draf SOP), pembayaran. Webhook SingaPay sudah tersedia untuk fase pembayaran.
 
@@ -37,6 +39,15 @@ bun run db:seed-demo    # opsional: akun demo berisi contoh data dari desain UI
 ```
 
 Akun demo: `demo@ruangkerja.io` / `demo-ruangkerja-2026` (bisa diganti: `bun scripts/seed-demo.ts email sandi`). Script menolak berjalan saat `NODE_ENV=production` kecuali `SEED_DEMO_FORCE=1`.
+
+**Admin.** Peran admin tidak bisa diatur dari aplikasi atau API. Angkat (atau cabut) admin dengan:
+
+```bash
+bun run admin:set-role email@contoh.go.id          # jadikan admin
+bun run admin:set-role email@contoh.go.id user     # cabut admin
+```
+
+Menu **Admin → Pengguna** muncul di sidebar untuk akun admin. Pengguna lain mendapat 404 dari `/api/admin/*`.
 
 ### 2. Better Auth
 
@@ -85,7 +96,20 @@ Atur **CORS** di bucket tersebut (Settings → CORS policy), ganti origin dengan
 ]
 ```
 
-### 7. SingaPay
+### 7. Pembayaran paket (transfer bank)
+
+Sampai checkout SingaPay aktif, pengguna membayar lewat transfer bank dan admin mengonfirmasi di **Admin → Transaksi** (saringan *Menunggu* → *Konfirmasi lunas*). Isi rekening tujuan:
+
+```env
+NUXT_PUBLIC_PAYMENT_BANK_NAME=BCA
+NUXT_PUBLIC_PAYMENT_ACCOUNT_NUMBER=1234567890
+NUXT_PUBLIC_PAYMENT_ACCOUNT_NAME=PT Contoh
+NUXT_PUBLIC_PAYMENT_WHATSAPP=6281234567890   # opsional: tombol konfirmasi lewat WhatsApp
+```
+
+Akun demo dari `db:seed-demo` otomatis mendapat paket *Demo* selama setahun.
+
+### 8. SingaPay
 
 Di dashboard SingaPay, atur URL notifikasi (transaksi dan/atau disbursement) ke:
 
@@ -124,10 +148,12 @@ shared/utils/        Logika domain murni: periode, tanggal, status, teks e-Kiner
 server/db/           Skema Drizzle (sesuai PRD) + migrasi
 server/utils/        auth, workspace (kepemilikan & nilai turunan), progress, realization, crypto, r2, singapay
 server/api/          me, profile, settings, onboarding, skp, rhks, action-plans, progress, evidence,
-                     dashboard, realizations (+ export .docx), account/export, uploads, webhooks/singapay
-app/pages/           auth, onboarding/*, beranda, rhk/*, progres/*, bukti, realisasi, profil
+                     dashboard, realizations (+ export .docx), account/export, uploads, webhooks/singapay,
+                     admin/dashboard, admin/users, admin/packages, admin/transactions
+app/pages/           auth, onboarding/*, beranda, rhk/*, progres/*, bukti, realisasi, profil, admin/{dashboard,users,packages,transactions}
 app/components/      AppSidebar, ProgressForm, ProgressCalendar, RhkForm, ActionPlanModal, …
 scripts/seed-demo.ts Akun demo
+scripts/set-role.ts  Angkat/cabut admin
 tests/               unit test + fixture PHP untuk normalisasi SingaPay
 ```
 

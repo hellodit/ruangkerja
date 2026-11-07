@@ -6,6 +6,16 @@ const { data } = await useFetch('/api/dashboard', { key: 'dashboard' })
 const d = computed(() => (data.value && data.value.ready ? data.value : null))
 
 const firstName = computed(() => (data.value?.name ?? '').split(' ')[0])
+
+// H-7 renewal reminder: the package (incl. any renewal already paid) ends soon.
+const { me } = useMe()
+const renewal = computed(() => {
+  const sub = me.value?.subscription
+  if (!sub || sub.daysLeft > RENEWAL_NOTICE_DAYS) return null
+  const end = formatDateLong(todayInTimeZone('Asia/Jakarta', new Date(sub.endsAt)))
+  const when = sub.daysLeft <= 1 ? 'besok' : `dalam ${sub.daysLeft} hari`
+  return { daysLeft: sub.daysLeft, title: `Paket ${sub.name} berakhir ${when} (${end})` }
+})
 const attention = computed(() => {
   if (!d.value) {
     return ''
@@ -48,6 +58,15 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
         v-else
         class="flex w-full max-w-[1200px] flex-col gap-6"
       >
+        <UAlert
+          v-if="renewal"
+          :color="renewal.daysLeft <= 3 ? 'error' : 'warning'"
+          variant="subtle"
+          icon="i-ctm-clock"
+          :title="renewal.title"
+          description="Perpanjang sekarang supaya ruang kerja tidak terkunci. Masa aktif baru ditambahkan setelah tanggal berakhir, jadi tidak ada hari yang hilang."
+          :actions="[{ label: 'Perpanjang paket', to: '/subscription', color: 'neutral', variant: 'outline', icon: 'i-ctm-refresh' }]"
+        />
         <div class="flex flex-col gap-1">
           <span class="text-xs font-semibold tracking-[1.1px] text-muted uppercase">{{ formatDateLong(d.today) }}</span>
           <h2 class="text-2xl font-bold tracking-[-0.15px] text-highlighted sm:text-[28px]/9">

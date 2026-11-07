@@ -30,7 +30,13 @@ const links = computed<NavigationMenuItem[][]>(() => [[
   { label: 'Alat bantu', type: 'label' },
   { label: 'Panduan kerja', icon: 'i-ctm-list-bullet', onSelect: () => comingSoon('Panduan kerja') },
   { label: 'Asisten AI', icon: 'i-ctm-sparkles', badge: chip('Segera'), onSelect: () => comingSoon('Asisten AI') },
-  { label: 'Draf SOP', icon: 'i-ctm-files-01', badge: chip('Beta'), onSelect: () => comingSoon('Draf SOP') }
+  { label: 'Draf SOP', icon: 'i-ctm-files-01', badge: chip('Beta'), onSelect: () => comingSoon('Draf SOP') },
+  ...(me.value?.isAdmin
+    ? [
+        { label: 'Admin', type: 'label' as const },
+        { label: 'Panel admin', icon: 'i-ctm-dashboard', to: '/admin/dashboard' }
+      ]
+    : [])
 ]])
 
 const initials = computed(() => (me.value?.user.name ?? '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]!.toUpperCase()).join(''))
@@ -39,6 +45,12 @@ const userItems = computed<DropdownMenuItem[][]>(() => [
   [{ label: me.value?.user.name ?? '', description: me.value?.user.email ?? '', type: 'label', slot: 'account' as const }],
   [
     { label: 'Profil dan pengaturan', icon: 'i-ctm-user', to: '/profil' },
+    {
+      label: me.value?.subscription ? `Paket ${me.value.subscription.name}` : 'Pilih paket',
+      description: me.value?.subscription ? `Aktif sampai ${formatDateShort(todayInTimeZone('Asia/Jakarta', new Date(me.value.subscription.endsAt)))}` : undefined,
+      icon: 'i-ctm-product',
+      to: '/subscription'
+    },
     { label: 'Kebijakan privasi', icon: 'i-ctm-square-lock-01', to: '/privasi' },
     {
       label: colorMode.value === 'dark' ? 'Tampilan terang' : 'Tampilan gelap',

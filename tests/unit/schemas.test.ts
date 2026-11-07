@@ -84,3 +84,20 @@ describe('workspace schemas', () => {
     expect(evidenceSchema.safeParse({ progressId: uuid, name: 'Notula', evidenceUrl: 'drive.google.com/x' }).success).toBe(false)
   })
 })
+
+describe('adminUsersQuery', () => {
+  it('applies defaults and rejects unknown filters and page sizes', async () => {
+    const { adminUsersQuery } = await import('../../shared/schemas/admin')
+    expect(adminUsersQuery.parse({})).toEqual({ q: undefined, filter: 'all', page: 1, pageSize: 25 })
+    expect(adminUsersQuery.parse({ q: '  rina ', page: '2', pageSize: '50', filter: 'admin' })).toEqual({ q: 'rina', filter: 'admin', page: 2, pageSize: 50 })
+    expect(adminUsersQuery.safeParse({ filter: 'semua' }).success).toBe(false)
+    expect(adminUsersQuery.safeParse({ pageSize: '1000' }).success).toBe(false)
+    expect(adminUsersQuery.safeParse({ page: '0' }).success).toBe(false)
+  })
+
+  it('escapes LIKE wildcards in the search pattern', async () => {
+    const { likePattern } = await import('../../shared/schemas/admin')
+    expect(likePattern('rina')).toBe('%rina%')
+    expect(likePattern('50%_a\\b')).toBe('%50\\%\\_a\\\\b%')
+  })
+})

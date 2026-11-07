@@ -6,6 +6,8 @@ export default defineEventHandler(async (event) => {
   const db = useDb()
   const [profile] = await db.select({ positionTitle: schema.profiles.positionTitle }).from(schema.profiles).where(eq(schema.profiles.userId, user.id))
   const ws = await getWorkspace(user.id, today)
+  const now = new Date()
+  const pkg = (await activePackages([user.id], now)).get(user.id)
 
   let rhkCount = 0
   let evidenceCount = 0
@@ -23,6 +25,9 @@ export default defineEventHandler(async (event) => {
     positionTitle: profile?.positionTitle ?? null,
     today,
     onboardingCompleted: !!user.onboardingCompletedAt,
+    isAdmin: (user as { role?: string }).role === 'admin',
+    // Active package (ends = paid coverage incl. queued renewals). Null: show /subscription.
+    subscription: pkg ? { name: pkg.name, endsAt: pkg.paidUntil.toISOString(), daysLeft: daysLeft(pkg.paidUntil, now) } : null,
     hasSkp: !!ws,
     rhkCount,
     evidenceCount,

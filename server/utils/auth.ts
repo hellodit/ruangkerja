@@ -75,7 +75,9 @@ function createAuth() {
       modelName: 'users',
       additionalFields: {
         timezone: { type: 'string', required: false, defaultValue: 'Asia/Jakarta', input: false },
-        onboardingCompletedAt: { type: 'date', required: false, input: false }
+        onboardingCompletedAt: { type: 'date', required: false, input: false },
+        // input: false — sign-up and update-user can never set it.
+        role: { type: 'string', required: false, defaultValue: 'user', input: false }
       },
       // Email change is out of scope (needs its own verification flow).
       changeEmail: { enabled: false },

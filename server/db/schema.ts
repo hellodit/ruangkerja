@@ -48,6 +48,8 @@ export const progressCategoryEnum = pgEnum('progress_category', ['biasa', 'perlu
 export const aiTargetTypeEnum = pgEnum('ai_target_type', ['progress_description', 'realization'])
 export const realizationStatusEnum = pgEnum('realization_status', ['draf', 'disalin'])
 export const uploadKindEnum = pgEnum('upload_kind', ['avatar'])
+export const transactionMethodEnum = pgEnum('transaction_method', ['manual', 'singapay'])
+export const transactionStatusEnum = pgEnum('transaction_status', ['pending', 'paid', 'failed', 'refunded', 'cancelled'])
 
 // ---------------------------------------------------------------------------
 // Better Auth core tables (plural names via modelName). Property names are what
@@ -62,8 +64,11 @@ export const users = pgTable('users', {
   image: text('image'),
   timezone: text('timezone').notNull().default('Asia/Jakarta'),
   onboardingCompletedAt: timestamp('onboarding_completed_at', { withTimezone: true }),
+  // 'admin' opens the admin panel. Never settable through the API: granted
+  // with scripts/set-role.ts only.
+  role: text('role', { enum: ['user', 'admin'] }).notNull().default('user'),
   ...timestamps
-})
+}, t => [check('users_role_check', sql`${t.role} in ('user', 'admin')`)])
 
 export const sessions = pgTable('sessions', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -298,6 +303,62 @@ export const singapayWebhookEvents = pgTable('singapay_webhook_events', {
   processedAt: timestamp('processed_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 })
+
+// ---------------------------------------------------------------------------
+// Packages and transactions (admin panel)
+// ---------------------------------------------------------------------------
+
+/** A subscription package sold to users. Archived (soft-deleted), never removed: transactions refer to it. */
+export const packages = pgTable('packages', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  description: text('description'),
+  /** Whole rupiah. */
+  price: bigint('price', { mode: 'number' }).notNull(),
+  durationDays: integer('duration_days').notNull(),
+  isActive: boolean('is_active').notNull().default(true),
+  ...timestamps,
+  ...softDelete
+}, t => [
+  check('packages_price_ck', sql`${t.price} >= 0`),
+  check('packages_duration_ck', sql`${t.durationDays} between 1 and 3660`)
+])
+
+/**
+ * One payment for a package. A paid transaction grants the package from
+ * period_start to period_end; the user's active package is the paid
+ * transaction whose period covers now. Package and user details are copied
+ * so the record stays correct after a package is edited or a user deleted.
+ */
+export const transactions = pgTable('transactions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  /** Order code the user writes in the transfer note (self-checkout), e.g. RK-261107-7KQ2. */
+  code: text('code').unique(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  userName: text('user_name').notNull(),
+  userEmail: text('user_email').notNull(),
+  packageId: uuid('package_id').references(() => packages.id, { onDelete: 'set null' }),
+  packageName: text('package_name').notNull(),
+  durationDays: integer('duration_days').notNull(),
+  /** Whole rupiah actually charged (may differ from the package price, e.g. a discount). */
+  amount: bigint('amount', { mode: 'number' }).notNull(),
+  currency: text('currency').notNull().default('IDR'),
+  method: transactionMethodEnum('method').notNull(),
+  status: transactionStatusEnum('status').notNull(),
+  periodStart: timestamp('period_start', { withTimezone: true }),
+  periodEnd: timestamp('period_end', { withTimezone: true }),
+  reference: text('reference'),
+  notes: text('notes'),
+  /** Admin who recorded a manual transaction. */
+  createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
+  paidAt: timestamp('paid_at', { withTimezone: true }),
+  ...timestamps
+}, t => [
+  index('transactions_user_idx').on(t.userId, t.periodEnd),
+  index('transactions_created_idx').on(t.createdAt),
+  check('transactions_amount_ck', sql`${t.amount} >= 0`),
+  check('transactions_period_ck', sql`${t.periodEnd} is null or ${t.periodEnd} > ${t.periodStart}`)
+])
 
 // ---------------------------------------------------------------------------
 // Relations

@@ -8,6 +8,27 @@
       "when": 1793987542510,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794016370816,
+      "tag": "0001_admin_role",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794017486035,
+      "tag": "0002_packages_transactions",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794020030214,
+      "tag": "0003_checkout_orders",
+      "breakpoints": true
     }
   ]
 }
