@@ -203,13 +203,43 @@ export async function getAdminDashboard(days: number, now = new Date()) {
 // Transactions and packages
 // ---------------------------------------------------------------------------
 
+interface TransactionRow {
+  id: string
+  code: string | null
+  userId: string | null
+  userName: string
+  userEmail: string
+  packageName: string
+  durationDays: number
+  amount: number
+  method: 'manual' | 'singapay'
+  status: 'pending' | 'paid' | 'failed' | 'refunded' | 'cancelled'
+  periodStart: string | null
+  periodEnd: string | null
+  reference: string | null
+  notes: string | null
+  paidAt: string | null
+  createdAt: string
+  createdByName: string | null
+}
+
+interface TransactionsResult {
+  revenue: number
+  revenueThisMonth: number
+  count: number
+  activeUsers: number
+  pending: number
+  total: number
+  transactions: TransactionRow[]
+}
+
 /**
- * Transaction history with revenue numbers. Two queries: the numbers (one
- * scan of transactions, including the filtered total) and the page with the
- * recording admin's name through the createdByUser relation.
+ * Transaction history with revenue numbers in one statement: the page (with
+ * the recording admin's name) is a CTE aggregated with json_agg, and every
+ * number comes from one scan of transactions. One round trip, no parallel
+ * queries.
  */
 export async function listTransactions(query: TransactionsQuery, now = new Date()) {
-  const db = useDb()
   const t = schema.transactions
 
   const where: SQL[] = []
@@ -220,39 +250,52 @@ export async function listTransactions(query: TransactionsQuery, now = new Date(
   if (query.method !== 'all') where.push(eq(t.method, query.method))
   if (query.status !== 'all') where.push(eq(t.status, query.status))
   if (query.userId) where.push(eq(t.userId, query.userId))
-  const filtered = where.length ? and(...where) : undefined
+  // Rendered with the table name ("transactions"."user_name"), so the SQL
+  // below keeps the transactions table unaliased.
+  const filtered = where.length ? and(...where)! : sql`true`
 
   // Month boundaries in WIB, the business timezone.
   const monthStart = new Date(`${todayInTimeZone(TZ, now).slice(0, 7)}-01T00:00:00+07:00`).toISOString()
   const nowIso = now.toISOString()
 
-  const [stats] = await db.select({
-    revenue: sql<number>`coalesce(sum(${t.amount}) filter (where ${t.status} = 'paid'), 0)`.mapWith(Number),
-    revenueThisMonth: sql<number>`coalesce(sum(${t.amount}) filter (where ${t.status} = 'paid' and ${t.paidAt} >= ${monthStart}), 0)`.mapWith(Number),
-    count: sql<number>`count(*) filter (where ${t.status} = 'paid')`.mapWith(Number),
-    activeUsers: sql<number>`count(distinct ${t.userId}) filter (where ${t.status} = 'paid' and ${t.periodStart} <= ${nowIso} and ${t.periodEnd} > ${nowIso})`.mapWith(Number),
-    pending: sql<number>`count(*) filter (where ${t.status} = 'pending')`.mapWith(Number),
-    total: filtered ? sql<number>`count(*) filter (where ${filtered})`.mapWith(Number) : count()
-  }).from(t)
-
-  const rows = await db.query.transactions.findMany({
-    where: filtered,
-    orderBy: [desc(t.createdAt), desc(t.id)],
-    limit: query.pageSize,
-    offset: (query.page - 1) * query.pageSize,
-    columns: {
-      id: true, code: true, userId: true, userName: true, userEmail: true, packageName: true, durationDays: true, amount: true,
-      method: true, status: true, periodStart: true, periodEnd: true, reference: true, notes: true, paidAt: true, createdAt: true
-    },
-    with: { createdByUser: { columns: { name: true } } }
-  })
+  const [row] = await useDb().execute<TransactionsResult & Record<string, unknown>>(sql`
+    with page as (
+      select transactions.id, transactions.code, transactions.user_id as "userId", transactions.user_name as "userName",
+        transactions.user_email as "userEmail", transactions.package_name as "packageName", transactions.duration_days as "durationDays",
+        transactions.amount, transactions.method, transactions.status, transactions.period_start as "periodStart",
+        transactions.period_end as "periodEnd", transactions.reference, transactions.notes, transactions.paid_at as "paidAt",
+        transactions.created_at as "createdAt", admin.name as "createdByName"
+      from transactions
+      left join users admin on admin.id = transactions.created_by
+      where ${filtered}
+      order by transactions.created_at desc, transactions.id desc
+      limit ${query.pageSize} offset ${(query.page - 1) * query.pageSize}
+    )
+    select
+      coalesce(sum(amount) filter (where status = 'paid'), 0)::float8 as "revenue",
+      coalesce(sum(amount) filter (where status = 'paid' and paid_at >= ${monthStart}), 0)::float8 as "revenueThisMonth",
+      (count(*) filter (where status = 'paid'))::int as "count",
+      (count(distinct user_id) filter (where status = 'paid' and period_start <= ${nowIso} and period_end > ${nowIso}))::int as "activeUsers",
+      (count(*) filter (where status = 'pending'))::int as "pending",
+      (count(*) filter (where ${filtered}))::int as "total",
+      (select coalesce(json_agg(p order by p."createdAt" desc, p.id desc), '[]') from page p) as "transactions"
+    from transactions
+  `)
+  const d = row!
+  const date = (v: string | null) => (v ? new Date(v) : null)
 
   return {
-    stats: { revenue: stats?.revenue ?? 0, revenueThisMonth: stats?.revenueThisMonth ?? 0, count: stats?.count ?? 0, activeUsers: stats?.activeUsers ?? 0, pending: stats?.pending ?? 0 },
-    total: stats?.total ?? 0,
+    stats: { revenue: d.revenue, revenueThisMonth: d.revenueThisMonth, count: d.count, activeUsers: d.activeUsers, pending: d.pending },
+    total: d.total,
     page: query.page,
     pageSize: query.pageSize,
-    transactions: rows.map(({ createdByUser, ...r }) => ({ ...r, createdByName: createdByUser?.name ?? null }))
+    transactions: d.transactions.map(r => ({
+      ...r,
+      periodStart: date(r.periodStart),
+      periodEnd: date(r.periodEnd),
+      paidAt: date(r.paidAt),
+      createdAt: new Date(r.createdAt)
+    }))
   }
 }
 
