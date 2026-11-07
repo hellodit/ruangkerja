@@ -64,8 +64,7 @@ const columns: TableColumn<AdminUser>[] = [
   { id: 'status', header: 'Status' },
   { id: 'package', header: 'Paket' },
   { id: 'activity', header: 'Aktivitas' },
-  { id: 'lastSeen', header: 'Terakhir aktif' },
-  { id: 'actions', header: () => h('span', { class: 'sr-only' }, 'Aksi') }
+  { id: 'lastSeen', header: 'Terakhir aktif' }
 ]
 </script>
 
@@ -170,7 +169,7 @@ const columns: TableColumn<AdminUser>[] = [
               />
             </template>
             <template #user-cell="{ row }">
-              <div class="flex min-w-52 items-center gap-3">
+              <div class="flex min-w-44 items-center gap-3">
                 <UAvatar
                   :src="row.original.image ?? undefined"
                   :alt="row.original.name"
@@ -220,21 +219,32 @@ const columns: TableColumn<AdminUser>[] = [
               </div>
             </template>
             <template #package-cell="{ row }">
-              <div
-                v-if="row.original.activePackage"
-                class="flex flex-col whitespace-nowrap"
-              >
-                <span class="text-highlighted">{{ row.original.activePackage.name }}</span>
-                <span class="text-[13px]/[18px] text-toned">s.d. {{ formatDateShort(dateOf(row.original.activePackage.paidUntil)) }}</span>
+              <div class="flex items-center gap-1">
+                <div
+                  v-if="row.original.activePackage"
+                  class="flex flex-col whitespace-nowrap"
+                >
+                  <span class="text-highlighted">{{ row.original.activePackage.name }}</span>
+                  <span class="text-[13px]/[18px] text-toned">s.d. {{ formatDateShort(dateOf(row.original.activePackage.paidUntil)) }}</span>
+                </div>
+                <span
+                  v-else
+                  class="whitespace-nowrap text-muted"
+                >Tanpa paket</span>
+                <UTooltip text="Assign paket">
+                  <UButton
+                    variant="ghost"
+                    size="sm"
+                    icon="i-ctm-plus"
+                    :aria-label="`Assign paket ke ${row.original.name}`"
+                    @click="openAssign(row.original)"
+                  />
+                </UTooltip>
               </div>
-              <span
-                v-else
-                class="whitespace-nowrap text-muted"
-              >Tanpa paket</span>
             </template>
             <template #activity-cell="{ row }">
-              <div class="flex flex-col whitespace-nowrap">
-                <span class="text-highlighted tabular-nums">{{ formatNumber(row.original.rhkCount) }} RHK · {{ formatNumber(row.original.progressCount) }} progres</span>
+              <div class="flex max-w-44 flex-col">
+                <span class="whitespace-nowrap text-highlighted tabular-nums">{{ formatNumber(row.original.rhkCount) }} RHK · {{ formatNumber(row.original.progressCount) }} progres</span>
                 <span class="text-[13px]/[18px] text-toned">{{ row.original.lastProgressAt ? `Progres terakhir ${formatDaysAgo(row.original.lastProgressAt, today).toLowerCase()}` : 'Belum ada progres' }}</span>
               </div>
             </template>
@@ -242,18 +252,6 @@ const columns: TableColumn<AdminUser>[] = [
               <div class="flex flex-col whitespace-nowrap">
                 <span class="text-highlighted">{{ row.original.lastSeenAt ? formatDaysAgo(row.original.lastSeenAt, today) : 'Belum pernah' }}</span>
                 <span class="text-[13px]/[18px] text-toned">Daftar {{ formatDateShort(dateOf(row.original.createdAt)) }}</span>
-              </div>
-            </template>
-            <template #actions-cell="{ row }">
-              <div class="flex justify-end">
-                <UButton
-                  variant="ghost"
-                  size="sm"
-                  icon="i-ctm-product"
-                  @click="openAssign(row.original)"
-                >
-                  Assign paket
-                </UButton>
               </div>
             </template>
           </UTable>
