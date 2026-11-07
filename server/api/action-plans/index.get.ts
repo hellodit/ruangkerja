@@ -8,13 +8,11 @@ export default defineEventHandler(async (event) => {
   const q = getQuery(event)
   const date = typeof q.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(q.date) ? q.date : today
   const period = typeof q.periodId === 'string' ? pickPeriod(ws, q.periodId) : (findCurrentPeriod(ws.periods, date) ?? ws.current)
-  const rhks = await listRhks(ws.skp.id)
-  const plans = await listPlans(rhks.map(r => r.id), period.id, today)
+  const { rhks } = await listRhksWithPlans(ws.skp.id, period.id, today)
   return {
     period,
-    groups: rhks.map(r => ({
-      rhk: { id: r.id, number: r.number, statement: r.statement },
-      plans: plans.filter(p => p.rhkId === r.id)
-    })).filter(g => g.plans.length)
+    groups: rhks
+      .map(r => ({ rhk: { id: r.id, number: r.number, statement: r.statement }, plans: r.plans }))
+      .filter(g => g.plans.length)
   }
 })

@@ -34,7 +34,7 @@ Isi `NUXT_DATABASE_URL`. Lalu:
 
 ```bash
 bun run db:migrate      # terapkan migrasi di server/db/migrations
-bun run db:generate     # buat migrasi baru setelah mengubah server/db/schema.ts
+bun run db:generate     # buat migrasi baru setelah mengubah server/db/schema/*.ts
 bun run db:seed         # data dasar: 3 paket, 1 pengguna, 1 admin
 bun run db:seed-demo    # opsional: akun demo berisi contoh data dari desain UI
 ```

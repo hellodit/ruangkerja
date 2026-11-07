@@ -1,13 +1,15 @@
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { evidenceUpdateSchema } from '#shared/schemas/workspace'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireWorkspaceUser(event)
   const id = await getIdParam(event)
-  await requireOwnedResult(user.id, id)
   const input = await readValidatedBody(event, evidenceUpdateSchema.parse)
-  const [row] = await useDb().update(schema.progressResults)
+  const r = schema.progressResults
+  const [row] = await useDb().update(r)
     .set({ name: input.name, evidenceUrl: input.evidenceUrl ?? null })
-    .where(eq(schema.progressResults.id, id)).returning()
+    .where(and(eq(r.id, id), ownsProgress(user.id, r.progressId)))
+    .returning()
+  if (!row) notFound('Bukti')
   return row
 })

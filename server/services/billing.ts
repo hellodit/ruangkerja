@@ -1,6 +1,4 @@
-import { and, desc, eq, gt, inArray, lte } from 'drizzle-orm'
-
-type Db = Pick<ReturnType<typeof useDb>, 'select'>
+import { and, desc, eq, gt, lte } from 'drizzle-orm'
 
 export interface ActivePackage {
   packageId: string | null
@@ -11,34 +9,37 @@ export interface ActivePackage {
   paidUntil: Date
 }
 
-/**
- * Active package per user: the paid transaction whose period covers `now`
- * (the one ending last if periods overlap). Users whose only paid periods
- * start in the future have no active package yet.
- */
-export async function activePackages(userIds: string[], now = new Date()): Promise<Map<string, ActivePackage>> {
-  const out = new Map<string, ActivePackage>()
-  if (!userIds.length) return out
-  const t = schema.transactions
-  const rows = await useDb().select({ userId: t.userId, packageId: t.packageId, name: t.packageName, start: t.periodStart, end: t.periodEnd })
-    .from(t)
-    .where(and(inArray(t.userId, userIds), eq(t.status, 'paid'), gt(t.periodEnd, now)))
-    .orderBy(desc(t.periodEnd))
+type TransactionColumns = typeof schema.transactions._.columns
 
-  for (const userId of userIds) {
-    const mine = rows.filter(r => r.userId === userId && r.start && r.end)
-    // Sorted by end desc and every end is in the future: the first one that
-    // has started is the running period.
-    const current = mine.find(r => r.start! <= now)
-    if (current) {
-      out.set(userId, { packageId: current.packageId, name: current.name, startsAt: current.start!, endsAt: current.end!, paidUntil: mine[0]!.end! })
-    }
+/**
+ * `with` config for users.transactions: the user's paid periods that have not
+ * ended yet, newest end first. Feed the result to pickActivePackage().
+ */
+export const paidCoverage = (now: Date) => ({
+  columns: { packageId: true, packageName: true, periodStart: true, periodEnd: true } as const,
+  where: (t: TransactionColumns) => and(eq(t.status, 'paid'), gt(t.periodEnd, now)),
+  orderBy: (t: TransactionColumns) => [desc(t.periodEnd)]
+})
+
+/**
+ * The active package among paid periods that end after `now` (sorted by end,
+ * newest first): the first one that has started; `paidUntil` is the end of all
+ * coverage. Users whose paid periods all start in the future have none yet.
+ */
+export function pickActivePackage(
+  rows: { packageId: string | null, packageName: string, periodStart: Date | null, periodEnd: Date | null }[],
+  now = new Date()
+): ActivePackage | null {
+  const covered = rows.filter(r => r.periodStart && r.periodEnd)
+  const current = covered.find(r => r.periodStart! <= now)
+  if (!current) {
+    return null
   }
-  return out
+  return { packageId: current.packageId, name: current.packageName, startsAt: current.periodStart!, endsAt: current.periodEnd!, paidUntil: covered[0]!.periodEnd! }
 }
 
 /** End of the user's paid coverage that is still in the future, or null. Call inside the assigning transaction. */
-export async function paidUntil(db: Db, userId: string, now: Date): Promise<Date | null> {
+export async function paidUntil(db: Pick<Db, 'select'>, userId: string, now: Date): Promise<Date | null> {
   const t = schema.transactions
   const [row] = await db.select({ end: t.periodEnd }).from(t)
     .where(and(eq(t.userId, userId), eq(t.status, 'paid'), gt(t.periodEnd, now)))
@@ -47,7 +48,7 @@ export async function paidUntil(db: Db, userId: string, now: Date): Promise<Date
   return row?.end ?? null
 }
 
-/** True when the user has a paid package running right now. */
+/** True when the user has a paid package running right now (index transactions_user_idx). */
 export async function hasActivePackage(userId: string, now = new Date()): Promise<boolean> {
   const t = schema.transactions
   const [row] = await useDb().select({ id: t.id }).from(t)
@@ -55,8 +56,6 @@ export async function hasActivePackage(userId: string, now = new Date()): Promis
     .limit(1)
   return !!row
 }
-
-type Tx = Parameters<Parameters<ReturnType<typeof useDb>['transaction']>[0]>[0]
 
 /** Lock the user row so concurrent payments for one user are applied one after another. */
 export async function lockUser(tx: Tx, userId: string) {
