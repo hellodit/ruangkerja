@@ -20,6 +20,12 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  // Light by default instead of following the OS. A choice made with the
+  // sidebar toggle is kept in localStorage (nuxt-color-mode) and still wins.
+  colorMode: {
+    preference: 'light'
+  },
+
   // Fonts are self-hosted from the CTM design system (app/assets/css/main.css).
   ui: {
     fonts: false
