@@ -65,6 +65,8 @@ export default defineEventHandler(async (event) => {
       ])
     : [[], [], [], []]
 
+  const packagesByUser = await activePackages(ids)
+
   const [{ active } = { active: 0 }] = await db.select({ active: sql<number>`count(distinct ${schema.sessions.userId})`.mapWith(Number) })
     .from(schema.sessions).where(gte(schema.sessions.updatedAt, weekAgo))
 
@@ -79,7 +81,8 @@ export default defineEventHandler(async (event) => {
       lastSeenAt: lastSeen.find(s => s.userId === r.id)?.at ?? null,
       rhkCount: rhkCounts.find(x => x.userId === r.id)?.n ?? 0,
       progressCount: progress.find(x => x.userId === r.id)?.n ?? 0,
-      lastProgressAt: progress.find(x => x.userId === r.id)?.last ?? null
+      lastProgressAt: progress.find(x => x.userId === r.id)?.last ?? null,
+      activePackage: packagesByUser.get(r.id) ?? null
     }))
   }
 })

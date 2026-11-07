@@ -13,7 +13,9 @@ const colorMode = useColorMode()
 const links = computed<NavigationMenuItem[][]>(() => [
   [
     { label: 'Kelola', type: 'label' },
-    { label: 'Pengguna', icon: 'i-ctm-user-group', to: '/admin/users' }
+    { label: 'Pengguna', icon: 'i-ctm-user-group', to: '/admin/users' },
+    { label: 'Paket', icon: 'i-ctm-product', to: '/admin/packages' },
+    { label: 'Transaksi', icon: 'i-ctm-credit-cards', to: '/admin/transactions' }
   ],
   [
     { label: 'Kembali ke ruang kerja', icon: 'i-ctm-back-01', to: '/beranda' }

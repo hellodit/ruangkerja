@@ -25,7 +25,7 @@ watch([qDebounced, filter, page], () => {
   router.replace({ query: { ...(qDebounced.value ? { q: qDebounced.value } : {}), ...(filter.value !== 'all' ? { filter: filter.value } : {}), ...(page.value > 1 ? { page: page.value } : {}) } })
 })
 
-const { data, status, error } = await useFetch('/api/admin/users', {
+const { data, status, error, refresh } = await useFetch('/api/admin/users', {
   query: computed(() => ({ q: qDebounced.value || undefined, filter: filter.value, page: page.value, pageSize })),
   key: 'admin-users'
 })
@@ -51,13 +51,21 @@ const initials = (name: string) => name.split(/\s+/).filter(Boolean).slice(0, 2)
 const providerLabel = (p: string) => ({ credential: 'Email', google: 'Google' } as Record<string, string>)[p] ?? p
 const dateOf = (ts: string | Date) => todayInTimeZone('Asia/Jakarta', new Date(ts))
 
+const assignOpen = ref(false)
+const assignUser = ref<{ id: string, name: string, email: string, paidUntil: string | null } | null>(null)
+function openAssign(u: AdminUser) {
+  assignUser.value = { id: u.id, name: u.name, email: u.email, paidUntil: u.activePackage ? String(u.activePackage.paidUntil) : null }
+  assignOpen.value = true
+}
+
 const columns: TableColumn<AdminUser>[] = [
   { id: 'user', header: 'Pengguna' },
   { id: 'work', header: 'Instansi dan jabatan' },
   { id: 'status', header: 'Status' },
-  { id: 'providers', header: 'Masuk lewat' },
+  { id: 'package', header: 'Paket' },
   { id: 'activity', header: 'Aktivitas' },
-  { id: 'lastSeen', header: 'Terakhir aktif' }
+  { id: 'lastSeen', header: 'Terakhir aktif' },
+  { id: 'actions', header: () => h('span', { class: 'sr-only' }, 'Aksi') }
 ]
 </script>
 
@@ -181,6 +189,7 @@ const columns: TableColumn<AdminUser>[] = [
                     >Admin</UBadge>
                   </span>
                   <span class="truncate text-[13px]/[18px] text-toned">{{ row.original.email }}</span>
+                  <span class="text-xs/4 text-muted">Masuk lewat {{ row.original.providers.map(providerLabel).join(' dan ') || '—' }}</span>
                 </div>
               </div>
             </template>
@@ -210,18 +219,18 @@ const columns: TableColumn<AdminUser>[] = [
                 </StatusChip>
               </div>
             </template>
-            <template #providers-cell="{ row }">
-              <div class="flex flex-wrap gap-1">
-                <UBadge
-                  v-for="p in row.original.providers"
-                  :key="p"
-                  color="neutral"
-                  variant="soft"
-                  size="sm"
-                >
-                  {{ providerLabel(p) }}
-                </UBadge>
+            <template #package-cell="{ row }">
+              <div
+                v-if="row.original.activePackage"
+                class="flex flex-col whitespace-nowrap"
+              >
+                <span class="text-highlighted">{{ row.original.activePackage.name }}</span>
+                <span class="text-[13px]/[18px] text-toned">s.d. {{ formatDateShort(dateOf(row.original.activePackage.paidUntil)) }}</span>
               </div>
+              <span
+                v-else
+                class="whitespace-nowrap text-muted"
+              >Tanpa paket</span>
             </template>
             <template #activity-cell="{ row }">
               <div class="flex flex-col whitespace-nowrap">
@@ -233,6 +242,18 @@ const columns: TableColumn<AdminUser>[] = [
               <div class="flex flex-col whitespace-nowrap">
                 <span class="text-highlighted">{{ row.original.lastSeenAt ? formatDaysAgo(row.original.lastSeenAt, today) : 'Belum pernah' }}</span>
                 <span class="text-[13px]/[18px] text-toned">Daftar {{ formatDateShort(dateOf(row.original.createdAt)) }}</span>
+              </div>
+            </template>
+            <template #actions-cell="{ row }">
+              <div class="flex justify-end">
+                <UButton
+                  variant="ghost"
+                  size="sm"
+                  icon="i-ctm-product"
+                  @click="openAssign(row.original)"
+                >
+                  Assign paket
+                </UButton>
               </div>
             </template>
           </UTable>
@@ -253,6 +274,12 @@ const columns: TableColumn<AdminUser>[] = [
           Hanya data akun dasar yang ditampilkan. NIP, tanggal lahir, alamat, nomor HP, dan isi pekerjaan pengguna tidak dibuka di panel ini.
         </p>
       </div>
+
+      <AssignPackageModal
+        v-model:open="assignOpen"
+        :user="assignUser"
+        @saved="refresh"
+      />
     </template>
   </UDashboardPanel>
 </template>
