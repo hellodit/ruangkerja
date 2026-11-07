@@ -57,6 +57,18 @@ export async function buildRealizations(userId: string, ws: { skp: { id: string 
       status: row!.status,
       copiedAt: row!.copiedAt,
       sourceCount: sources.length,
+      // RLS-01: the progress entries the draft was built from.
+      sources: sources.map(src => ({
+        id: src.id,
+        workDate: src.workDate,
+        startTime: src.startTime,
+        endTime: src.endTime,
+        planName: src.plan.name,
+        description: src.description,
+        realization: src.realization,
+        unit: src.plan.unit,
+        evidenceCount: src.results.filter(r => r.evidenceUrl).length
+      })),
       evidenceCount: sources.reduce((n, s) => n + s.results.filter(r => r.evidenceUrl).length, 0),
       excluded,
       plans: mine.map(p => ({

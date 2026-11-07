@@ -39,6 +39,7 @@ const chartLabel = computed(() => d.value?.week.perDay.map(p => `${DAYS_ID[dayOf
             v-if="d"
             :deadline="d.period.submissionDeadline"
             :today="d.today"
+            class="hidden sm:inline-flex"
           />
         </template>
       </UDashboardNavbar>

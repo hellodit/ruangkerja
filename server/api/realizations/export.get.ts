@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
 
   children.push(new Paragraph({
     alignment: AlignmentType.LEFT,
-    children: [new TextRun({ text: 'Draf personal disusun dari progres harian yang dicatat pengguna. RuangKerja adalah aplikasi independen, bukan aplikasi resmi pemerintah, tidak terhubung ke e-Kinerja BKN, dan tidak menggantikan penilaian resmi.', size: 16, italics: true })]
+    children: [new TextRun({ text: `Draf personal disusun dari progres harian yang dicatat pengguna. RuangKerja adalah aplikasi independen, bukan aplikasi resmi pemerintah, tidak terhubung ke e-Kinerja BKN, dan tidak menggantikan penilaian resmi. Kebijakan privasi: ${useRuntimeConfig().public.siteUrl.replace(/\/+$/, '')}/privasi`, size: 16, italics: true })]
   }))
 
   const doc = new Document({

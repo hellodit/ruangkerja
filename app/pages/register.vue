@@ -91,7 +91,15 @@ async function signUpWithGoogle() {
     </template>
     <template #footer>
       <p class="text-xs text-muted">
-        Dengan mendaftar, Anda memahami bahwa RuangKerja adalah alat bantu personal yang independen, bukan aplikasi resmi pemerintah. Jangan memasukkan data rahasia atau data warga.
+        Dengan mendaftar, Anda menyetujui
+        <ULink
+          to="/privasi"
+          target="_blank"
+          class="font-medium text-brand-ink"
+        >
+          kebijakan privasi
+        </ULink>
+        dan memahami bahwa RuangKerja adalah alat bantu personal yang independen, bukan aplikasi resmi pemerintah. Jangan memasukkan data rahasia atau data warga.
       </p>
     </template>
   </UAuthForm>

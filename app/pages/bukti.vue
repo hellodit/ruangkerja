@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TableColumn } from '@nuxt/ui'
+import type { DropdownMenuItem, TableColumn } from '@nuxt/ui'
 import type { InternalApi } from 'nitropack'
 
 useSeoMeta({ title: 'Bukti dukung' })
@@ -71,6 +71,13 @@ async function removeLink(item: Item) {
     notify.error(err)
   }
 }
+function evidenceMenu(item: Item): DropdownMenuItem[][] {
+  return [
+    [{ label: 'Ubah', icon: 'i-lucide-pencil', onSelect: () => startEdit(item) }, { label: 'Buka progres', icon: 'i-lucide-notebook-pen', to: `/progres/${item.progressId}` }],
+    [{ label: 'Hapus tautan', icon: 'i-lucide-trash-2', color: 'error', onSelect: () => removeLink(item) }]
+  ]
+}
+
 function host(url: string) {
   try {
     return `${new URL(url).hostname}/…`
@@ -95,7 +102,7 @@ function host(url: string) {
             icon="i-lucide-search"
             placeholder="Cari nama dokumen atau rencana aksi"
             size="sm"
-            class="w-72"
+            class="w-full sm:w-72"
             aria-label="Cari bukti"
           />
           <div
@@ -191,7 +198,68 @@ function host(url: string) {
           </ul>
         </UCard>
 
-        <UCard :ui="{ body: 'p-0 sm:p-0' }">
+        <ul
+          class="flex flex-col gap-3 min-[740px]:hidden"
+          aria-label="Daftar bukti dukung"
+        >
+          <li v-if="!items.length">
+            <UEmpty
+              icon="i-lucide-link"
+              title="Belum ada bukti dukung"
+              description="Tambahkan tautan bukti dari form progres harian atau tombol Tambah bukti."
+            />
+          </li>
+          <li
+            v-for="item in items"
+            :key="item.id"
+          >
+            <UCard :ui="{ body: 'p-4 sm:p-4' }">
+              <div class="flex items-start gap-3">
+                <UIcon
+                  name="i-lucide-file-text"
+                  class="mt-0.5 size-5 shrink-0 text-muted"
+                />
+                <div class="flex min-w-0 flex-1 flex-col gap-1">
+                  <span class="text-sm font-semibold text-highlighted">{{ item.name }}</span>
+                  <span class="text-xs text-muted">{{ formatDayMonth(item.workDate) }} · RHK {{ item.rhk.number }} · {{ item.planName }}</span>
+                  <ULink
+                    :to="item.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="truncate text-sm text-info"
+                  >
+                    {{ host(item.url) }}
+                  </ULink>
+                </div>
+                <UButton
+                  icon="i-lucide-copy"
+                  color="neutral"
+                  variant="ghost"
+                  size="sm"
+                  aria-label="Salin tautan"
+                  @click="copy(item.url, 'Tautan disalin')"
+                />
+                <UDropdownMenu
+                  :items="evidenceMenu(item)"
+                  :content="{ align: 'end' }"
+                >
+                  <UButton
+                    icon="i-lucide-ellipsis-vertical"
+                    color="neutral"
+                    variant="ghost"
+                    size="sm"
+                    aria-label="Menu bukti"
+                  />
+                </UDropdownMenu>
+              </div>
+            </UCard>
+          </li>
+        </ul>
+
+        <UCard
+          class="max-[739px]:hidden"
+          :ui="{ body: 'p-0 sm:p-0' }"
+        >
           <UTable
             :data="items"
             :columns="columns"

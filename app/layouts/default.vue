@@ -5,5 +5,6 @@
   >
     <AppSidebar />
     <slot />
+    <AppBottomNav />
   </UDashboardGroup>
 </template>

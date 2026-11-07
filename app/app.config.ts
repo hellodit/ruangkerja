@@ -54,6 +54,18 @@ export default defineAppConfig({
     card: {
       slots: { root: 'rounded-lg' }
     },
+    // Toolbars wrap on narrow screens instead of hiding actions off-screen.
+    dashboardToolbar: {
+      slots: {
+        root: 'flex-wrap gap-y-2 py-2 overflow-x-visible',
+        left: 'flex-wrap gap-y-2',
+        right: 'flex-wrap gap-y-2 ml-auto'
+      }
+    },
+    // Room for the bottom navigation on phones (< 740 px).
+    dashboardPanel: {
+      slots: { body: 'max-[739px]:pb-24' }
+    },
     input: {
       slots: { root: 'w-full' }
     },

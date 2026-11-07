@@ -54,6 +54,8 @@ export default defineNuxtConfig({
     },
     public: {
       siteUrl: 'http://localhost:3000',
+      // Shown on the privacy page (support owner is still an open PRD question)
+      supportEmail: '',
       turnstile: {
         siteKey: ''
       }

@@ -212,14 +212,51 @@ const exportUrl = computed(() => (data.value ? `/api/realizations/export?periodI
               >
                 Belum ada progres harian untuk RHK ini di {{ data.period.label }}. Realisasi tidak diisi otomatis.
               </p>
-              <p class="mt-3 text-xs text-muted">
-                Sumber: {{ r.sourceCount }} progres harian · {{ r.evidenceCount }} bukti dukung ·
-                <ULink
-                  :to="`/progres?rhkId=${r.rhk.id}&minggu=${data.period.startDate}`"
-                  class="text-info"
+              <UCollapsible
+                v-if="r.sources.length"
+                class="mt-3"
+                :ui="{ content: 'pt-3' }"
+              >
+                <UButton
+                  color="neutral"
+                  variant="link"
+                  size="xs"
+                  trailing-icon="i-lucide-chevron-down"
+                  class="-ml-2.5 group"
+                  :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform' }"
                 >
-                  Lihat sumber
-                </ULink>
+                  Sumber: {{ r.sourceCount }} progres harian · {{ r.evidenceCount }} bukti dukung
+                </UButton>
+                <template #content>
+                  <ul class="divide-y divide-default rounded-md border border-default bg-default">
+                    <li
+                      v-for="src in r.sources"
+                      :key="src.id"
+                      class="grid gap-1 px-3 py-2.5 sm:grid-cols-[150px_minmax(0,1fr)_auto] sm:gap-3"
+                    >
+                      <span class="text-xs text-muted">{{ formatDateShort(src.workDate) }} · <span class="font-mono">{{ formatTime(src.startTime) }}–{{ formatTime(src.endTime) }}</span></span>
+                      <span class="min-w-0">
+                        <NuxtLink
+                          :to="`/progres/${src.id}`"
+                          class="text-sm text-highlighted hover:underline"
+                        >{{ src.description }}</NuxtLink>
+                        <span class="block text-xs text-muted">{{ src.planName }} · realisasi {{ formatNumber(src.realization) }} {{ src.realization ? src.unit : '' }}</span>
+                      </span>
+                      <span
+                        class="text-xs whitespace-nowrap"
+                        :class="src.evidenceCount ? 'text-muted' : 'text-warning'"
+                      >
+                        {{ src.evidenceCount ? `${src.evidenceCount} bukti` : 'Belum ada bukti' }}
+                      </span>
+                    </li>
+                  </ul>
+                </template>
+              </UCollapsible>
+              <p
+                v-else
+                class="mt-3 text-xs text-muted"
+              >
+                Sumber: belum ada progres harian di periode ini.
               </p>
             </div>
 

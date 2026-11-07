@@ -49,6 +49,10 @@ const missingCount = computed(() => entries.value.filter(e => !e.hasEvidence).le
 const shown = computed(() => (noEvidence.value ? entries.value.filter(e => !e.hasEvidence) : entries.value))
 const totalMinutes = computed(() => shown.value.reduce((n, e) => n + minutesBetween(e.startTime, e.endTime), 0))
 
+function toggleRow(id: string, selected: boolean) {
+  rowSelection.value = { ...rowSelection.value, [id]: selected }
+}
+
 function shiftWeek(delta: number) {
   weekStart.value = addDays(weekStart.value, delta * 7)
 }
@@ -134,7 +138,7 @@ function addEvidence(id: string) {
               aria-label="Minggu sebelumnya"
               @click="shiftWeek(-1)"
             />
-            <span class="min-w-40 text-center text-sm font-medium text-highlighted">{{ formatRange(weekStart, weekEnd) }}</span>
+            <span class="min-w-36 text-center text-sm font-medium text-highlighted">{{ formatRange(weekStart, weekEnd) }}</span>
             <UButton
               icon="i-lucide-chevron-right"
               color="neutral"
@@ -211,8 +215,89 @@ function addEvidence(id: string) {
           </UButton>
         </div>
 
+        <ul
+          v-if="view === 'list'"
+          class="flex flex-col gap-3 min-[740px]:hidden"
+          aria-label="Daftar progres harian"
+        >
+          <li v-if="!shown.length">
+            <UEmpty
+              icon="i-lucide-notebook-pen"
+              title="Belum ada catatan minggu ini"
+              description="Catat pekerjaan hari ini dalam beberapa kalimat."
+              :actions="[{ label: 'Tambah progres', to: '/progres/tambah', icon: 'i-lucide-plus' }]"
+            />
+          </li>
+          <li
+            v-for="e in shown"
+            :key="e.id"
+          >
+            <UCard :ui="{ body: 'p-4 sm:p-4' }">
+              <div class="flex items-start gap-3">
+                <UCheckbox
+                  :model-value="!!rowSelection[e.id]"
+                  :aria-label="`Pilih catatan ${formatDateShort(e.workDate)} ${formatTime(e.startTime)}`"
+                  class="mt-0.5"
+                  @update:model-value="(v: boolean | 'indeterminate') => toggleRow(e.id, !!v)"
+                />
+                <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+                  <div class="flex flex-wrap items-center gap-2 text-xs text-muted">
+                    <span>{{ formatDateShort(e.workDate) }}</span>
+                    <span class="font-mono">{{ formatTime(e.startTime) }}–{{ formatTime(e.endTime) }}</span>
+                    <RhkTag :number="e.rhk.number" />
+                  </div>
+                  <span class="text-sm font-semibold text-highlighted">{{ e.plan.name }}</span>
+                  <p class="text-sm">
+                    {{ e.description }}
+                  </p>
+                  <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+                    <span class="text-muted">Realisasi {{ formatNumber(e.realization) }} {{ e.realization ? e.plan.unit : '' }}</span>
+                    <span
+                      v-if="e.hasEvidence"
+                      class="flex items-center gap-1 text-info"
+                    ><UIcon
+                      name="i-lucide-link"
+                      class="size-3.5"
+                    />{{ e.results.filter(r => r.evidenceUrl).length }} bukti</span>
+                    <UButton
+                      v-else
+                      color="warning"
+                      variant="ghost"
+                      size="xs"
+                      icon="i-lucide-triangle-alert"
+                      class="-my-1"
+                      @click="addEvidence(e.id)"
+                    >
+                      Belum ada bukti
+                    </UButton>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <UButton
+                    icon="i-lucide-copy"
+                    color="neutral"
+                    variant="ghost"
+                    size="sm"
+                    :aria-label="`Salin catatan ${formatDateShort(e.workDate)} ${formatTime(e.startTime)}`"
+                    @click="copyEntries([e.id])"
+                  />
+                  <UButton
+                    :to="`/progres/${e.id}`"
+                    icon="i-lucide-pencil"
+                    color="neutral"
+                    variant="ghost"
+                    size="sm"
+                    :aria-label="`Ubah catatan ${formatDateShort(e.workDate)} ${formatTime(e.startTime)}`"
+                  />
+                </div>
+              </div>
+            </UCard>
+          </li>
+        </ul>
+
         <UCard
           v-if="view === 'list'"
+          class="max-[739px]:hidden"
           :ui="{ body: 'p-0 sm:p-0' }"
         >
           <UTable

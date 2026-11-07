@@ -105,6 +105,12 @@ const userItems = computed<DropdownMenuItem[][]>(() => [
         class="px-1 text-[11px] leading-4 text-muted"
       >
         Aplikasi independen. Bukan aplikasi resmi BKN atau e-Kinerja.
+        <ULink
+          to="/privasi"
+          class="underline underline-offset-2 hover:text-default"
+        >
+          Kebijakan privasi
+        </ULink>
       </p>
     </template>
   </UDashboardSidebar>
