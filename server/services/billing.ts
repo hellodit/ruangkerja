@@ -1,4 +1,4 @@
-import { and, desc, eq, gt, lte } from 'drizzle-orm'
+import { and, desc, eq, gt, isNotNull, lte } from 'drizzle-orm'
 
 export interface ActivePackage {
   packageId: string | null
@@ -98,4 +98,21 @@ export async function activatePendingTransaction(transactionId: string, opts: { 
     }).where(eq(t.id, order.id)).returning()
     return row!
   })
+}
+
+/**
+ * Free (Rp 0) packages are a one-time trial: a user who ever claimed one
+ * through self-checkout cannot claim another. Admin grants do not count.
+ */
+export function freeTrialClaimed(t: TransactionColumns | typeof schema.transactions) {
+  return and(eq(t.amount, 0), eq(t.status, 'paid'), isNotNull(t.code))
+}
+
+/** True when the user already used their free package. Call inside the locking transaction. */
+export async function hasClaimedFreePackage(db: Pick<Db, 'select'>, userId: string): Promise<boolean> {
+  const t = schema.transactions
+  const [row] = await db.select({ id: t.id }).from(t)
+    .where(and(eq(t.userId, userId), freeTrialClaimed(t)))
+    .limit(1)
+  return !!row
 }
