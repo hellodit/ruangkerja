@@ -16,7 +16,9 @@ const { me, refresh: refreshMe } = useMe()
 const payment = useRuntimeConfig().public.payment
 const supportEmail = useRuntimeConfig().public.supportEmail
 
-const { data, refresh } = await useFetch('/api/subscription', { key: 'subscription' })
+const { data, refresh: refreshStatus } = await useFetch('/api/subscription', { key: 'subscription' })
+const { data: history, refresh: refreshHistory } = await useFetch('/api/subscription/history', { key: 'subscription-history', default: () => [] })
+const refresh = () => Promise.all([refreshStatus(), refreshHistory()])
 const packages = computed(() => data.value?.packages ?? [])
 const current = computed(() => data.value?.current ?? null)
 const order = computed(() => data.value?.pendingOrder ?? null)
@@ -389,6 +391,8 @@ async function signOut() {
           </UCard>
         </div>
       </section>
+
+      <PaymentHistory :items="history" />
 
       <p class="text-xs text-muted">
         Butuh bantuan? Data akun dan ekspor data tetap bisa dibuka di
