@@ -64,12 +64,16 @@ export async function lockUser(tx: Tx, userId: string) {
   return user ?? null
 }
 
+type TransactionStatus = typeof schema.transactions.$inferSelect.status
+
 /**
  * Mark a pending order paid and grant its package: the period continues
  * after the user's current paid coverage (or starts now). Shared by the
- * admin "Konfirmasi lunas" action and, later, the SingaPay webhook.
+ * admin "Konfirmasi lunas" action and the SumoPay webhook. The webhook also
+ * passes `from: ['pending', 'cancelled', 'failed']`: money that SumoPay
+ * collected for an order the user replaced still buys its package.
  */
-export async function activatePendingTransaction(transactionId: string, opts: { reference?: string | null, confirmedBy?: string | null } = {}) {
+export async function activatePendingTransaction(transactionId: string, opts: { reference?: string | null, confirmedBy?: string | null, paidAt?: Date | null, from?: TransactionStatus[] } = {}) {
   return useDb().transaction(async (tx) => {
     const t = schema.transactions
     const [found] = await tx.select({ userId: t.userId }).from(t).where(eq(t.id, transactionId))
@@ -78,7 +82,7 @@ export async function activatePendingTransaction(transactionId: string, opts: { 
     // can never deadlock; then re-read the order under the lock.
     if (!found.userId || !(await lockUser(tx, found.userId))) notFound('Pengguna')
     const [order] = await tx.select().from(t).where(eq(t.id, transactionId)).for('update')
-    if (!order || order.status !== 'pending' || order.userId !== found.userId) {
+    if (!order || !(opts.from ?? ['pending']).includes(order.status) || order.userId !== found.userId) {
       throw createError({ statusCode: 409, statusMessage: 'Transaksi ini sudah tidak menunggu pembayaran.' })
     }
 
@@ -86,7 +90,7 @@ export async function activatePendingTransaction(transactionId: string, opts: { 
     const period = computePackagePeriod({ now, currentEnd: await paidUntil(tx, found.userId, now), durationDays: order.durationDays })
     const [row] = await tx.update(t).set({
       status: 'paid',
-      paidAt: now,
+      paidAt: opts.paidAt ?? now,
       periodStart: period.start,
       periodEnd: period.end,
       reference: opts.reference ?? order.reference,

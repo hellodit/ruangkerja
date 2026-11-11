@@ -38,7 +38,7 @@ export const assignPackageSchema = z.object({
 })
 export type AssignPackageInput = z.infer<typeof assignPackageSchema>
 
-export const TRANSACTION_METHODS = ['manual', 'singapay'] as const
+export const TRANSACTION_METHODS = ['manual', 'sumopay'] as const
 
 /** GET /api/admin/transactions query. */
 export const adminTransactionsQuery = z.object({

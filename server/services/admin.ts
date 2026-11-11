@@ -212,7 +212,7 @@ interface TransactionRow {
   packageName: string
   durationDays: number
   amount: number
-  method: 'manual' | 'singapay'
+  method: 'manual' | 'sumopay'
   status: 'pending' | 'paid' | 'failed' | 'refunded' | 'cancelled'
   periodStart: string | null
   periodEnd: string | null

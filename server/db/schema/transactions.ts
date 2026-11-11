@@ -4,7 +4,7 @@ import { timestamps } from './columns'
 import { users } from './users'
 import { packages } from './packages'
 
-export const transactionMethodEnum = pgEnum('transaction_method', ['manual', 'singapay'])
+export const transactionMethodEnum = pgEnum('transaction_method', ['manual', 'sumopay'])
 export const transactionStatusEnum = pgEnum('transaction_status', ['pending', 'paid', 'failed', 'refunded', 'cancelled'])
 
 /**
@@ -30,7 +30,11 @@ export const transactions = pgTable('transactions', {
   status: transactionStatusEnum('status').notNull(),
   periodStart: timestamp('period_start', { withTimezone: true }),
   periodEnd: timestamp('period_end', { withTimezone: true }),
+  /** Gateway payment id (SumoPay payment_id) or the admin's transfer reference. */
   reference: text('reference'),
+  /** SumoPay hosted payment page for a pending order, and when that link stops working. */
+  paymentUrl: text('payment_url'),
+  paymentExpiresAt: timestamp('payment_expires_at', { withTimezone: true }),
   notes: text('notes'),
   /** Admin who recorded a manual transaction. */
   createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),

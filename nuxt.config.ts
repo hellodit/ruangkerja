@@ -49,9 +49,18 @@ export default defineNuxtConfig({
       publicBucket: '',
       publicUrl: ''
     },
-    singapay: {
-      // Comma-separated list so a rotated key can be accepted alongside the old one.
-      webhookSecret: ''
+    // How self-checkout is paid: 'manual' (bank transfer, admin confirms) or
+    // 'sumopay' (hosted payment page, webhook confirms).
+    paymentMode: 'manual',
+    sumopay: {
+      // Managed Payment API key (X-Api-Key); required when paymentMode is 'sumopay'.
+      apiKey: '',
+      // Live: https://api-pay.sumopod.com · Sandbox: https://api-pay-sandbox.sumopod.com
+      baseUrl: 'https://api-pay.sumopod.com',
+      // Webhook Signing Secret (whsec_...); comma-separate to accept a rotated one too.
+      webhookSecret: '',
+      // Optional payment_method_type_code (e.g. QRIS); empty lets the customer choose.
+      paymentMethod: ''
     },
     turnstile: {
       secretKey: ''
@@ -60,7 +69,7 @@ export default defineNuxtConfig({
       siteUrl: 'http://localhost:3000',
       // Shown on the privacy page (support owner is still an open PRD question)
       supportEmail: '',
-      // Manual bank transfer shown on /subscription until SingaPay checkout is live.
+      // Bank transfer details shown on /subscription when paymentMode is 'manual'.
       payment: {
         bankName: '',
         accountNumber: '',

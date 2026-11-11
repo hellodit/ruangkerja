@@ -24,7 +24,7 @@ export async function getSubscriptionStatus(userId: string, now = new Date()) {
       transactions: {
         where: t => or(and(eq(t.status, 'paid'), gt(t.periodEnd, now)), eq(t.status, 'pending')),
         orderBy: t => [desc(t.periodEnd), desc(t.createdAt)],
-        columns: { id: true, code: true, packageId: true, packageName: true, durationDays: true, amount: true, createdAt: true, status: true, periodStart: true, periodEnd: true }
+        columns: { id: true, code: true, method: true, packageId: true, packageName: true, durationDays: true, amount: true, createdAt: true, status: true, periodStart: true, periodEnd: true, paymentUrl: true, paymentExpiresAt: true }
       }
     }
   })
@@ -36,7 +36,70 @@ export async function getSubscriptionStatus(userId: string, now = new Date()) {
     current: current ? { name: current.name, endsAt: current.paidUntil, daysLeft: daysLeft(current.paidUntil, now) } : null,
     expiredAt: current ? null : (row?.lastPaidEnd ? new Date(row.lastPaidEnd) : null),
     pendingOrder: pending
-      ? { id: pending.id, code: pending.code, packageId: pending.packageId, packageName: pending.packageName, durationDays: pending.durationDays, amount: pending.amount, createdAt: pending.createdAt }
+      ? {
+          id: pending.id,
+          code: pending.code,
+          method: pending.method,
+          packageId: pending.packageId,
+          packageName: pending.packageName,
+          durationDays: pending.durationDays,
+          amount: pending.amount,
+          createdAt: pending.createdAt,
+          // SumoPay hosted page; null once the link has expired.
+          paymentUrl: pending.paymentUrl && (!pending.paymentExpiresAt || pending.paymentExpiresAt > now) ? pending.paymentUrl : null,
+          paymentExpiresAt: pending.paymentExpiresAt
+        }
       : null
   }
+}
+
+/** Most recent orders and payments shown to the user. */
+export const PAYMENT_HISTORY_LIMIT = 50
+
+/**
+ * The user's own payment history, newest first. Admin-written notes are not
+ * exposed: only the system reasons on cancelled or failed orders.
+ */
+export async function listPaymentHistory(userId: string, now = new Date()) {
+  const t = schema.transactions
+  const rows = await useDb().select({
+    id: t.id,
+    code: t.code,
+    packageName: t.packageName,
+    durationDays: t.durationDays,
+    amount: t.amount,
+    method: t.method,
+    status: t.status,
+    reference: t.reference,
+    notes: t.notes,
+    paymentUrl: t.paymentUrl,
+    paymentExpiresAt: t.paymentExpiresAt,
+    periodStart: t.periodStart,
+    periodEnd: t.periodEnd,
+    paidAt: t.paidAt,
+    createdAt: t.createdAt
+  }).from(t)
+    .where(eq(t.userId, userId))
+    .orderBy(desc(t.createdAt))
+    .limit(PAYMENT_HISTORY_LIMIT)
+
+  return rows.map(r => ({
+    id: r.id,
+    code: r.code,
+    packageName: r.packageName,
+    durationDays: r.durationDays,
+    amount: r.amount,
+    method: r.method,
+    status: r.status,
+    // Self-checkout orders carry a code; rows without one were assigned by an admin.
+    source: r.code ? 'checkout' as const : 'admin' as const,
+    paymentId: r.method === 'sumopay' ? r.reference : null,
+    reason: r.status === 'cancelled' || r.status === 'failed' ? r.notes : null,
+    paymentUrl: r.status === 'pending' && r.paymentUrl && (!r.paymentExpiresAt || r.paymentExpiresAt > now) ? r.paymentUrl : null,
+    paymentExpiresAt: r.status === 'pending' ? r.paymentExpiresAt : null,
+    periodStart: r.periodStart,
+    periodEnd: r.periodEnd,
+    paidAt: r.paidAt,
+    createdAt: r.createdAt
+  }))
 }

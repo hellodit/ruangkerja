@@ -5,27 +5,42 @@ useSeoMeta({ title: 'Pilih paket' })
 /**
  * Package checkout. Users without an active package land here; users with
  * one come here to renew (the new period is added after the current one).
- * Payment is a manual bank transfer confirmed by an admin for now.
+ * With SumoPay the user is sent to its hosted payment page and comes back
+ * here (?payment=success|cancel); the webhook activates the package, and a
+ * pending order is reached from the payment history (pay or cancel there).
+ * In manual mode (NUXT_PAYMENT_MODE=manual), payment is a bank transfer
+ * confirmed by an admin, shown in the instructions card.
  */
 const notify = useNotify()
+const toast = useToast()
 const copy = useCopyText()
 const auth = useAuthSession()
 const { me, refresh: refreshMe } = useMe()
 const payment = useRuntimeConfig().public.payment
 const supportEmail = useRuntimeConfig().public.supportEmail
 
-const { data, refresh } = await useFetch('/api/subscription', { key: 'subscription' })
+const { data, refresh: refreshStatus } = await useFetch('/api/subscription', { key: 'subscription' })
+const { data: history, refresh: refreshHistory } = await useFetch('/api/subscription/history', { key: 'subscription-history', default: () => [] })
+const refresh = () => Promise.all([refreshStatus(), refreshHistory()])
 const packages = computed(() => data.value?.packages ?? [])
 const current = computed(() => data.value?.current ?? null)
 const order = computed(() => data.value?.pendingOrder ?? null)
 const longDate = (ts: string | Date) => formatDateLong(todayInTimeZone('Asia/Jakarta', new Date(ts)))
 const bankReady = computed(() => !!(payment.bankName && payment.accountNumber))
+const viaGateway = computed(() => order.value?.method === 'sumopay')
+/** Pending bank-transfer order: the only kind with an instructions card. */
+const manualOrder = computed(() => (order.value && !viaGateway.value ? order.value : null))
 
 const busyId = ref<string | null>(null)
 async function choose(packageId: string) {
   busyId.value = packageId
   try {
-    await $fetch('/api/subscription/checkout', { method: 'POST', body: { packageId } })
+    const res = await $fetch('/api/subscription/checkout', { method: 'POST', body: { packageId } })
+    if (res.paymentUrl) {
+      // Keep the button busy while the browser leaves for SumoPay.
+      await navigateTo(res.paymentUrl, { external: true })
+      return
+    }
     await refresh()
     await nextTick()
     document.getElementById('pembayaran')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -70,8 +85,30 @@ async function checkStatus(manual = false) {
     checking.value = false
   }
 }
-const poll = useIntervalFn(() => checkStatus(), 20_000, { immediate: false })
+// The gateway confirms within seconds; an admin takes longer.
+const pollMs = computed(() => (viaGateway.value ? 5_000 : 20_000))
+const poll = useIntervalFn(() => checkStatus(), pollMs, { immediate: false })
 watch(order, o => (o ? poll.resume() : poll.pause()), { immediate: true })
+
+// Back from SumoPay's hosted page.
+const route = useRoute()
+onMounted(() => {
+  const returned = route.query.payment
+  if (returned !== 'success' && returned !== 'cancel') return
+  navigateTo({ query: { ...route.query, payment: undefined } }, { replace: true })
+  if (returned === 'cancel') {
+    toast.add({ title: 'Pembayaran belum diselesaikan', description: 'Lanjutkan dari Riwayat pembayaran sebelum tautannya kedaluwarsa.', color: 'warning', icon: 'i-ctm-information' })
+    return
+  }
+  // The webhook can beat the redirect: the package is already active.
+  if (!order.value && current.value) {
+    notify.success(`Pembayaran diterima. Paket aktif sampai ${longDate(current.value.endsAt)}.`)
+    navigateTo(me.value?.onboardingCompleted ? '/beranda' : '/onboarding/profil')
+    return
+  }
+  toast.add({ title: 'Pembayaran sedang diverifikasi', description: 'Paket aktif otomatis dalam beberapa detik.', color: 'info', icon: 'i-ctm-clock' })
+  checkStatus()
+})
 
 const waLink = computed(() => {
   if (!payment.whatsapp || !order.value) return null
@@ -139,7 +176,7 @@ async function signOut() {
       />
 
       <UCard
-        v-if="order"
+        v-if="manualOrder"
         id="pembayaran"
         class="scroll-mt-6 ring-2 ring-primary"
         :ui="{ body: 'flex flex-col gap-5' }"
@@ -153,22 +190,22 @@ async function signOut() {
               Menunggu pembayaran
             </StatusChip>
             <h2 class="text-lg/[26px] font-semibold text-highlighted">
-              {{ order.packageName }} · {{ formatDurationDays(order.durationDays) }}
+              {{ manualOrder.packageName }} · {{ formatDurationDays(manualOrder.durationDays) }}
             </h2>
             <p class="text-sm text-toned">
-              Kode pesanan <span class="font-mono font-semibold text-highlighted">{{ order.code }}</span>
+              Kode pesanan <span class="font-mono font-semibold text-highlighted">{{ manualOrder.code }}</span>
               <UButton
                 variant="ghost"
                 size="xs"
                 icon="i-ctm-copy"
-                :aria-label="`Salin kode pesanan ${order.code}`"
-                @click="copy(order.code!, 'Kode pesanan disalin')"
+                :aria-label="`Salin kode pesanan ${manualOrder.code}`"
+                @click="copy(manualOrder.code!, 'Kode pesanan disalin')"
               />
             </p>
           </div>
           <div class="flex flex-col items-start sm:items-end">
             <span class="text-xs text-toned">Total pembayaran</span>
-            <span class="text-[28px]/9 font-bold text-highlighted tabular-nums">{{ formatRupiah(order.amount) }}</span>
+            <span class="text-[28px]/9 font-bold text-highlighted tabular-nums">{{ formatRupiah(manualOrder.amount) }}</span>
           </div>
         </div>
 
@@ -208,8 +245,8 @@ async function signOut() {
         />
 
         <ol class="flex list-decimal flex-col gap-1.5 ps-5 text-sm text-highlighted">
-          <li>Transfer tepat <strong>{{ formatRupiah(order.amount) }}</strong> ke rekening di atas.</li>
-          <li>Tulis kode <strong class="font-mono">{{ order.code }}</strong> di berita transfer.</li>
+          <li>Transfer tepat <strong>{{ formatRupiah(manualOrder.amount) }}</strong> ke rekening di atas.</li>
+          <li>Tulis kode <strong class="font-mono">{{ manualOrder.code }}</strong> di berita transfer.</li>
           <li v-if="waLink">
             Kirim bukti transfer lewat WhatsApp.
           </li>
@@ -253,7 +290,7 @@ async function signOut() {
           id="daftar-paket"
           class="text-lg/[26px] font-semibold text-highlighted"
         >
-          {{ order ? 'Ganti paket' : 'Paket tersedia' }}
+          {{ manualOrder ? 'Ganti paket' : 'Paket tersedia' }}
         </h2>
         <UEmpty
           v-if="!packages.length"
@@ -268,7 +305,7 @@ async function signOut() {
           <UCard
             v-for="p in packages"
             :key="p.id"
-            :class="order?.packageId === p.id && 'ring-2 ring-primary'"
+            :class="manualOrder?.packageId === p.id && 'ring-2 ring-primary'"
             :ui="{ body: 'flex h-full flex-col gap-4' }"
           >
             <div class="flex flex-col gap-1">
@@ -287,16 +324,22 @@ async function signOut() {
             <UButton
               block
               class="mt-auto"
-              :variant="order?.packageId === p.id ? 'soft' : 'solid'"
-              :disabled="order?.packageId === p.id"
+              :variant="manualOrder?.packageId === p.id ? 'soft' : 'solid'"
+              :disabled="manualOrder?.packageId === p.id"
               :loading="busyId === p.id"
               @click="choose(p.id)"
             >
-              {{ order?.packageId === p.id ? 'Dipilih' : current ? 'Perpanjang dengan paket ini' : 'Pilih paket' }}
+              {{ manualOrder?.packageId === p.id ? 'Dipilih' : current ? 'Perpanjang dengan paket ini' : 'Pilih paket' }}
             </UButton>
           </UCard>
         </div>
       </section>
+
+      <PaymentHistory
+        :items="history"
+        :cancelling="cancelling"
+        @cancel="cancelOrder"
+      />
 
       <p class="text-xs text-muted">
         Butuh bantuan? Data akun dan ekspor data tetap bisa dibuka di

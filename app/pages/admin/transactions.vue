@@ -12,7 +12,7 @@ const today = todayInTimeZone('Asia/Jakarta')
 
 const q = ref(typeof route.query.q === 'string' ? route.query.q : '')
 const qDebounced = refDebounced(q, 300)
-const METHODS = ['all', 'manual', 'singapay'] as const
+const METHODS = ['all', 'manual', 'sumopay'] as const
 const method = ref<typeof METHODS[number]>(METHODS.find(m => m === route.query.method) ?? 'all')
 const STATUSES = ['all', 'pending', 'paid'] as const
 const statusFilter = ref<typeof STATUSES[number]>(STATUSES.find(m => m === route.query.status) ?? 'all')
@@ -49,7 +49,7 @@ const statusFilters = computed(() => [
 const methodFilters = [
   { id: 'all' as const, label: 'Semua metode' },
   { id: 'manual' as const, label: 'Manual' },
-  { id: 'singapay' as const, label: 'SingaPay' }
+  { id: 'sumopay' as const, label: 'SumoPay' }
 ]
 
 // Pending self-checkout orders: confirm the transfer arrived, or cancel.
@@ -88,7 +88,7 @@ const pendingMenu = (t: Tx): DropdownMenuItem[][] => [
   [{ label: 'Konfirmasi lunas', icon: 'i-ctm-checkmark-circle', onSelect: () => openConfirm(t) }],
   [{ label: 'Batalkan pesanan', icon: 'i-ctm-close', color: 'error', onSelect: () => cancelOrder(t) }]
 ]
-const METHOD_LABEL: Record<Tx['method'], string> = { manual: 'Manual', singapay: 'SingaPay' }
+const METHOD_LABEL: Record<Tx['method'], string> = { manual: 'Manual', sumopay: 'SumoPay' }
 const STATUS: Record<Tx['status'], { label: string, color: 'success' | 'warning' | 'error' | 'neutral' }> = {
   paid: { label: 'Lunas', color: 'success' },
   pending: { label: 'Menunggu', color: 'warning' },
@@ -147,7 +147,7 @@ const columns: TableColumn<Tx>[] = [
             label="Transaksi lunas"
             icon="i-ctm-credit-cards"
             :value="formatNumber(stats.count)"
-            note="Manual dan SingaPay"
+            note="Manual dan SumoPay"
           />
           <KpiCard
             label="Pelanggan aktif"
