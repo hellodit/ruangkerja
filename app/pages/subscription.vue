@@ -8,8 +8,8 @@ useSeoMeta({ title: 'Pilih paket' })
  * With SumoPay the user is sent to its hosted payment page and comes back
  * here (?payment=success|cancel); the webhook activates the package, and a
  * pending order is reached from the payment history (pay or cancel there).
- * Without it, payment is a manual bank transfer confirmed by an admin, shown
- * in the instructions card.
+ * In manual mode (NUXT_PAYMENT_MODE=manual), payment is a bank transfer
+ * confirmed by an admin, shown in the instructions card.
  */
 const notify = useNotify()
 const toast = useToast()

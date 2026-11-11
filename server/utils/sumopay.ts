@@ -14,6 +14,32 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 import { z } from 'zod'
 
 // ---------------------------------------------------------------------------
+// Payment mode (NUXT_PAYMENT_MODE)
+// ---------------------------------------------------------------------------
+
+export const PAYMENT_MODES = ['manual', 'sumopay'] as const
+export type PaymentMode = typeof PAYMENT_MODES[number]
+
+export type ResolvedPaymentMode
+  = | { ok: true, mode: PaymentMode }
+    | { ok: false, reason: 'invalid_mode' | 'missing_api_key' }
+
+/**
+ * Reads NUXT_PAYMENT_MODE. Never falls back silently: an unknown value, or
+ * 'sumopay' without an API key, is a configuration error.
+ */
+export function resolvePaymentMode(mode: string | undefined, apiKey: string | undefined): ResolvedPaymentMode {
+  const m = (mode ?? '').trim().toLowerCase() || 'manual'
+  if (!(PAYMENT_MODES as readonly string[]).includes(m)) {
+    return { ok: false, reason: 'invalid_mode' }
+  }
+  if (m === 'sumopay' && !apiKey?.trim()) {
+    return { ok: false, reason: 'missing_api_key' }
+  }
+  return { ok: true, mode: m as PaymentMode }
+}
+
+// ---------------------------------------------------------------------------
 // Create payment
 // ---------------------------------------------------------------------------
 

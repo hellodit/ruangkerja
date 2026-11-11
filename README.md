@@ -15,7 +15,7 @@ Asisten kerja digital personal untuk ASN: susun **rencana aksi per RHK**, catat 
 | Realisasi periode | Draf per RHK yang disusun **hanya** dari progres harian (rencana aksi tanpa progres ditandai, tidak diisi otomatis), bisa diubah, salin per RHK atau semua, unduh **.docx** asli. |
 | Profil | Data pribadi/kepegawaian/atasan, foto profil (R2), pengingat, ubah kata sandi, ekspor semua data (JSON), hapus akun permanen. |
 | Admin | Layout tersendiri (sidebar gelap), khusus admin. **Dashboard** (`/admin/dashboard`): angka utama, grafik pendaftaran dan pendapatan per hari (7/30/90 hari, WIB), paket aktif, transaksi terbaru, paket yang segera berakhir, pendaftar terbaru. **Pengguna** (`/admin/users`): statistik, pencarian, saringan, paket aktif tiap pengguna, assign paket. **Paket** (`/admin/packages`): tambah, ubah, nonaktifkan, arsipkan. **Transaksi** (`/admin/transactions`): riwayat dan pendapatan; assign paket manual mencatat transaksi lunas dan memperpanjang masa aktif. Hanya data akun dasar; NIP, tanggal lahir, alamat, nomor HP, dan isi pekerjaan tidak ditampilkan. |
-| Paket dan pembayaran | Ruang kerja butuh paket aktif (admin dikecualikan). Tanpa paket, semua halaman kecuali Profil diarahkan ke `/subscription`: pilih paket → pesanan berkode (RK-YYMMDD-XXXXXX) → pengguna diarahkan ke halaman pembayaran SumoPay → webhook menandai lunas → paket aktif. Tanpa SumoPay, pesanan dibayar lewat transfer bank dan admin mengonfirmasi lunas di Admin → Transaksi. API ruang kerja menjawab 402 tanpa paket aktif. Beranda menampilkan pengingat mulai 7 hari sebelum paket berakhir. Perpanjangan, konfirmasi, dan assign manual menambah durasi paket ke tanggal berakhir yang berjalan (atau hari ini). |
+| Paket dan pembayaran | Ruang kerja butuh paket aktif (admin dikecualikan). Tanpa paket, semua halaman kecuali Profil diarahkan ke `/subscription`: pilih paket → pesanan berkode (RK-YYMMDD-XXXXXX) → dibayar sesuai `NUXT_PAYMENT_MODE`: `sumopay` mengarahkan pengguna ke halaman pembayaran SumoPay dan webhook menandai lunas; `manual` menampilkan instruksi transfer bank dan admin mengonfirmasi lunas di Admin → Transaksi → paket aktif. Pesanan dan pembayaran tampil di Riwayat pembayaran. API ruang kerja menjawab 402 tanpa paket aktif. Beranda menampilkan pengingat mulai 7 hari sebelum paket berakhir. Perpanjangan, konfirmasi, dan assign manual menambah durasi paket ke tanggal berakhir yang berjalan (atau hari ini). |
 
 Di luar Rilis 1.0 (sesuai PRD): fitur AI (rapikan kalimat, draf AI — Rilis 1.1), Alat bantu (Panduan kerja, Asisten AI, Draf SOP), pembayaran.
 
@@ -107,7 +107,22 @@ Atur **CORS** di bucket tersebut (Settings → CORS policy), ganti origin dengan
 ]
 ```
 
-### 7. Pembayaran paket — SumoPay
+### 7. Pembayaran paket
+
+Cara bayar dipilih lewat satu variabel:
+
+```env
+NUXT_PAYMENT_MODE=manual    # manual | sumopay (default: manual)
+```
+
+| Mode | Alur | Variabel yang wajib |
+|---|---|---|
+| `manual` | Instruksi transfer bank → admin mengonfirmasi | `NUXT_PUBLIC_PAYMENT_*` |
+| `sumopay` | Halaman pembayaran SumoPay → webhook mengonfirmasi | `NUXT_SUMOPAY_*` |
+
+Nilai yang tidak dikenal, atau `sumopay` tanpa `NUXT_SUMOPAY_API_KEY`, membuat checkout menjawab 503 dan tercatat di log (tidak diam-diam pindah mode). Paket seharga Rp 0 selalu lewat jalur manual. Mengganti mode tidak memengaruhi pesanan lama: webhook SumoPay tetap memproses pesanan yang dibuat saat mode `sumopay`.
+
+#### Mode `sumopay`
 
 Checkout memakai [SumoPay Managed Payment](https://docs.sumopod.com/guides/managed-payment/create-managed-payment). Saat pengguna memilih paket, server membuat pesanan lalu memanggil `POST {NUXT_SUMOPAY_BASE_URL}/api/v1/payments` (`order_id` = kode pesanan, `amount` = harga paket) dan mengarahkan pengguna ke `payment_link_url`. Setelah membayar, SumoPay mengembalikan pengguna ke `/subscription?payment=success` (atau `?payment=cancel`), dan webhook mengaktifkan paket.
 
@@ -133,7 +148,9 @@ Webhook:
 - `payment.completed` → pesanan lunas dan paket aktif (`server/utils/sumopay-events.ts`). Nominal harus sama dengan pesanan; jika berbeda, paket tidak diaktifkan dan tercatat di log. Pembayaran untuk pesanan yang sudah diganti/dibatalkan tetap diakui.
 - `payment.failed` / `payment.expired` → pesanan yang masih menunggu ditandai gagal / dibatalkan.
 
-**Tanpa SumoPay** (`NUXT_SUMOPAY_API_KEY` kosong) pengguna membayar lewat transfer bank dan admin mengonfirmasi di **Admin → Transaksi** (saringan *Menunggu* → *Konfirmasi lunas*). Isi rekening tujuan:
+#### Mode `manual`
+
+Pengguna membayar lewat transfer bank dan admin mengonfirmasi di **Admin → Transaksi** (saringan *Menunggu* → *Konfirmasi lunas*). Isi rekening tujuan:
 
 ```env
 NUXT_PUBLIC_PAYMENT_BANK_NAME=BCA

@@ -49,8 +49,11 @@ export default defineNuxtConfig({
       publicBucket: '',
       publicUrl: ''
     },
+    // How self-checkout is paid: 'manual' (bank transfer, admin confirms) or
+    // 'sumopay' (hosted payment page, webhook confirms).
+    paymentMode: 'manual',
     sumopay: {
-      // Managed Payment API key (X-Api-Key). Empty = checkout falls back to manual bank transfer.
+      // Managed Payment API key (X-Api-Key); required when paymentMode is 'sumopay'.
       apiKey: '',
       // Live: https://api-pay.sumopod.com · Sandbox: https://api-pay-sandbox.sumopod.com
       baseUrl: 'https://api-pay.sumopod.com',
@@ -66,7 +69,7 @@ export default defineNuxtConfig({
       siteUrl: 'http://localhost:3000',
       // Shown on the privacy page (support owner is still an open PRD question)
       supportEmail: '',
-      // Manual bank transfer shown on /subscription when SumoPay is not configured.
+      // Bank transfer details shown on /subscription when paymentMode is 'manual'.
       payment: {
         bankName: '',
         accountNumber: '',

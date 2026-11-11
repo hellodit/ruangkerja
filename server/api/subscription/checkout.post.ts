@@ -6,15 +6,20 @@ import { checkoutSchema } from '#shared/schemas/admin'
  * The user picks a package: creates an order awaiting payment. A user has at
  * most one pending order: choosing again replaces the previous one.
  *
- * With SumoPay configured the order gets a hosted payment link (returned as
- * `paymentUrl`; the page redirects there) and the webhook marks it paid.
- * Without it the order is paid by manual bank transfer and an admin confirms.
+ * NUXT_PAYMENT_MODE picks how it is paid: 'sumopay' gives the order a hosted
+ * payment link (returned as `paymentUrl`; the page redirects there) and the
+ * webhook marks it paid; 'manual' means a bank transfer an admin confirms.
  */
 export default defineEventHandler(async (event) => {
   const sessionUser = await requireUser(event)
   const { packageId } = await readValidatedBody(event, checkoutSchema.parse)
   const config = useRuntimeConfig(event)
   const sumopay = config.sumopay
+  const paymentMode = resolvePaymentMode(config.paymentMode, sumopay.apiKey)
+  if (!paymentMode.ok) {
+    console.error('[payment] checkout misconfigured', { reason: paymentMode.reason, mode: config.paymentMode })
+    throw createError({ statusCode: 503, statusMessage: 'Pembayaran sedang tidak tersedia. Hubungi admin Ruang Kerja.' })
+  }
 
   const order = await useDb().transaction(async (tx) => {
     const user = await lockUser(tx, sessionUser.id)
@@ -37,7 +42,7 @@ export default defineEventHandler(async (event) => {
       durationDays: pkg.durationDays,
       amount: pkg.price,
       // A free package cannot go through the gateway; an admin confirms it.
-      method: sumopay.apiKey && pkg.price > 0 ? 'sumopay' : 'manual',
+      method: paymentMode.mode === 'sumopay' && pkg.price > 0 ? 'sumopay' : 'manual',
       status: 'pending'
     }).returning({ id: t.id, code: t.code, method: t.method, packageName: t.packageName, amount: t.amount, durationDays: t.durationDays, createdAt: t.createdAt })
     return row!

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { createSumopayPayment, parseSumopayEvent, signSvix, SumopayError, verifySumopayWebhook } from '../../server/utils/sumopay'
+import { createSumopayPayment, parseSumopayEvent, resolvePaymentMode, signSvix, SumopayError, verifySumopayWebhook } from '../../server/utils/sumopay'
 
 // Known-good vector from the Svix reference libraries.
 const SVIX = {
@@ -166,5 +166,25 @@ describe('createSumopayPayment', () => {
 
   it('requires an API key', async () => {
     await expect(createSumopayPayment({ ...config, apiKey: '' }, { orderId: 'x', amount: 1 })).rejects.toThrow(SumopayError)
+  })
+})
+
+describe('resolvePaymentMode (NUXT_PAYMENT_MODE)', () => {
+  it('defaults to manual', () => {
+    expect(resolvePaymentMode('', '')).toEqual({ ok: true, mode: 'manual' })
+    expect(resolvePaymentMode(undefined, 'sk_test')).toEqual({ ok: true, mode: 'manual' })
+  })
+
+  it('stays manual even when an API key is set', () => {
+    expect(resolvePaymentMode('manual', 'sk_test')).toEqual({ ok: true, mode: 'manual' })
+  })
+
+  it('uses SumoPay only when asked and configured', () => {
+    expect(resolvePaymentMode(' SumoPay ', 'sk_test')).toEqual({ ok: true, mode: 'sumopay' })
+    expect(resolvePaymentMode('sumopay', ' ')).toEqual({ ok: false, reason: 'missing_api_key' })
+  })
+
+  it('rejects unknown modes instead of guessing', () => {
+    expect(resolvePaymentMode('auto', 'sk_test')).toEqual({ ok: false, reason: 'invalid_mode' })
   })
 })
