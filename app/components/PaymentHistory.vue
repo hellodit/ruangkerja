@@ -14,12 +14,13 @@ const emit = defineEmits<{ cancel: [] }>()
 const copy = useCopyText()
 const TZ = 'Asia/Jakarta'
 
-const STATUS: Record<Item['status'], { label: string, color: 'success' | 'warning' | 'error' | 'neutral' }> = {
-  paid: { label: 'Lunas', color: 'success' },
-  pending: { label: 'Menunggu pembayaran', color: 'warning' },
-  failed: { label: 'Gagal', color: 'error' },
-  refunded: { label: 'Dikembalikan', color: 'neutral' },
-  cancelled: { label: 'Dibatalkan', color: 'neutral' }
+/** `short` fits the list on phones; `label` everywhere else. */
+const STATUS: Record<Item['status'], { label: string, short: string, color: 'success' | 'warning' | 'error' | 'neutral' }> = {
+  paid: { label: 'Lunas', short: 'Lunas', color: 'success' },
+  pending: { label: 'Menunggu pembayaran', short: 'Menunggu', color: 'warning' },
+  failed: { label: 'Gagal', short: 'Gagal', color: 'error' },
+  refunded: { label: 'Dikembalikan', short: 'Dikembalikan', color: 'neutral' },
+  cancelled: { label: 'Dibatalkan', short: 'Dibatalkan', color: 'neutral' }
 }
 const METHOD: Record<Item['method'], string> = { manual: 'Transfer bank', sumopay: 'SumoPay' }
 
@@ -108,28 +109,27 @@ watch(() => props.cancelling, (now, before) => {
         >
           <button
             type="button"
-            class="flex w-full flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 text-left transition-colors hover:bg-elevated/60 focus-visible:bg-elevated/60 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary sm:px-6"
+            class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-elevated/60 focus-visible:bg-elevated/60 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary sm:gap-4 sm:px-6"
             :aria-label="`Detail pembayaran ${i.packageName}, ${date(i.createdAt)}, ${STATUS[i.status].label}`"
             @click="selected = i"
           >
-            <span class="flex w-full min-w-0 flex-col sm:w-auto sm:flex-1">
+            <!-- One row at every width: info grows, amount + status stack on phones. -->
+            <span class="flex min-w-0 flex-1 flex-col">
               <span class="truncate font-medium text-highlighted">{{ i.packageName }} · {{ formatDurationDays(i.durationDays) }}</span>
               <span class="truncate text-sm text-toned">
                 {{ date(i.createdAt) }} · {{ i.code ?? methodLabel(i) }}
               </span>
             </span>
-            <span class="flex w-full items-center justify-between gap-4 sm:w-auto">
+            <span class="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-4">
               <span class="font-semibold text-highlighted tabular-nums">{{ formatRupiah(i.amount) }}</span>
-              <StatusChip
-                :color="STATUS[i.status].color"
-                class="sm:min-w-[11rem] sm:justify-center"
-              >
-                {{ STATUS[i.status].label }}
+              <StatusChip :color="STATUS[i.status].color">
+                <span class="sm:hidden">{{ STATUS[i.status].short }}</span>
+                <span class="hidden sm:inline">{{ STATUS[i.status].label }}</span>
               </StatusChip>
             </span>
             <UIcon
               name="i-ctm-chevron-right"
-              class="hidden size-5 text-muted sm:block"
+              class="size-5 shrink-0 text-muted"
               aria-hidden="true"
             />
           </button>

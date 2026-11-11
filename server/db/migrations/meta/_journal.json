@@ -43,6 +43,13 @@
       "when": 1794366519252,
       "tag": "0005_sumopay",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794369169795,
+      "tag": "0006_cancel_pending_free_orders",
+      "breakpoints": true
     }
   ]
 }

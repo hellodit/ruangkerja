@@ -18,7 +18,9 @@ export async function getSubscriptionStatus(userId: string, now = new Date()) {
     where: eq(schema.users.id, userId),
     columns: { id: true },
     extras: u => ({
-      lastPaidEnd: sql<Date | null>`(select max(t.period_end) from transactions t where t.user_id = ${u.id} and t.status = 'paid')`.as('last_paid_end')
+      lastPaidEnd: sql<Date | null>`(select max(t.period_end) from transactions t where t.user_id = ${u.id} and t.status = 'paid')`.as('last_paid_end'),
+      // Same rule as freeTrialClaimed() in services/billing.ts.
+      freeClaimed: sql<boolean>`exists(select 1 from transactions t where t.user_id = ${u.id} and t.amount = 0 and t.status = 'paid' and t.code is not null)`.as('free_claimed')
     }),
     with: {
       transactions: {
@@ -35,6 +37,8 @@ export async function getSubscriptionStatus(userId: string, now = new Date()) {
     packages,
     current: current ? { name: current.name, endsAt: current.paidUntil, daysLeft: daysLeft(current.paidUntil, now) } : null,
     expiredAt: current ? null : (row?.lastPaidEnd ? new Date(row.lastPaidEnd) : null),
+    /** The one-time free (Rp 0) package has been used. */
+    freeClaimed: !!row?.freeClaimed,
     pendingOrder: pending
       ? {
           id: pending.id,

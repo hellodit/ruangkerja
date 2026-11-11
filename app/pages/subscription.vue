@@ -30,12 +30,31 @@ const bankReady = computed(() => !!(payment.bankName && payment.accountNumber))
 const viaGateway = computed(() => order.value?.method === 'sumopay')
 /** Pending bank-transfer order: the only kind with an instructions card. */
 const manualOrder = computed(() => (order.value && !viaGateway.value ? order.value : null))
+const freeClaimed = computed(() => !!data.value?.freeClaimed)
+
+/** Package card button: picked (manual order), free trial used, or available. */
+function packageAction(p: { id: string, price: number }) {
+  if (manualOrder.value?.packageId === p.id) return { label: 'Dipilih', disabled: true, variant: 'soft' as const }
+  if (p.price === 0) {
+    return freeClaimed.value
+      ? { label: 'Sudah dipakai', disabled: true, variant: 'soft' as const }
+      : { label: 'Aktifkan gratis', disabled: false, variant: 'solid' as const }
+  }
+  return { label: current.value ? 'Perpanjang dengan paket ini' : 'Pilih paket', disabled: false, variant: 'solid' as const }
+}
 
 const busyId = ref<string | null>(null)
 async function choose(packageId: string) {
   busyId.value = packageId
   try {
     const res = await $fetch('/api/subscription/checkout', { method: 'POST', body: { packageId } })
+    if (res.activated) {
+      // Free package: active right away, no payment step.
+      await refreshMe()
+      notify.success(`Paket ${res.packageName} aktif${res.periodEnd ? ` sampai ${longDate(res.periodEnd)}` : ''}.`)
+      await navigateTo(me.value?.onboardingCompleted ? '/beranda' : '/onboarding/profil')
+      return
+    }
     if (res.paymentUrl) {
       // Keep the button busy while the browser leaves for SumoPay.
       await navigateTo(res.paymentUrl, { external: true })
@@ -127,23 +146,27 @@ async function signOut() {
     <header class="flex items-center gap-3 border-b border-default bg-default px-4 py-3 sm:px-8">
       <AppLogo />
       <div class="ml-auto flex items-center gap-2">
+        <!-- Phones get icon-only actions so the header never overflows. -->
         <UButton
           v-if="current"
           to="/beranda"
           variant="ghost"
           icon="i-ctm-back-01"
+          aria-label="Kembali ke ruang kerja"
         >
-          Kembali ke ruang kerja
+          <span class="hidden sm:inline">Kembali ke ruang kerja</span>
         </UButton>
-        <span class="hidden text-sm text-toned sm:inline">{{ me?.user.email }}</span>
-        <ThemeSwitch />
+        <span class="hidden text-sm text-toned lg:inline">{{ me?.user.email }}</span>
+        <span class="sm:hidden"><ThemeSwitch compact /></span>
+        <span class="hidden sm:inline-flex"><ThemeSwitch /></span>
         <UButton
           color="neutral"
           variant="ghost"
           icon="i-ctm-logout"
+          aria-label="Keluar"
           @click="signOut"
         >
-          Keluar
+          <span class="hidden sm:inline">Keluar</span>
         </UButton>
       </div>
     </header>
@@ -321,15 +344,21 @@ async function signOut() {
             >
               {{ p.description }}
             </p>
+            <p
+              v-if="p.price === 0"
+              class="text-xs text-muted"
+            >
+              {{ freeClaimed ? 'Paket gratis hanya bisa dipakai sekali per akun.' : 'Langsung aktif tanpa pembayaran. Hanya bisa dipakai sekali per akun.' }}
+            </p>
             <UButton
               block
               class="mt-auto"
-              :variant="manualOrder?.packageId === p.id ? 'soft' : 'solid'"
-              :disabled="manualOrder?.packageId === p.id"
+              :variant="packageAction(p).variant"
+              :disabled="packageAction(p).disabled"
               :loading="busyId === p.id"
               @click="choose(p.id)"
             >
-              {{ manualOrder?.packageId === p.id ? 'Dipilih' : current ? 'Perpanjang dengan paket ini' : 'Pilih paket' }}
+              {{ packageAction(p).label }}
             </UButton>
           </UCard>
         </div>

@@ -9,6 +9,9 @@ import { checkoutSchema } from '#shared/schemas/admin'
  * NUXT_PAYMENT_MODE picks how it is paid: 'sumopay' gives the order a hosted
  * payment link (returned as `paymentUrl`; the page redirects there) and the
  * webhook marks it paid; 'manual' means a bank transfer an admin confirms.
+ *
+ * A free (Rp 0) package needs no payment: it is activated at once
+ * (`activated: true`), once per user, and leaves any pending order alone.
  */
 export default defineEventHandler(async (event) => {
   const sessionUser = await requireUser(event)
@@ -29,11 +32,38 @@ export default defineEventHandler(async (event) => {
     if (!pkg) notFound('Paket')
 
     const t = schema.transactions
+    const code = orderCode(todayInTimeZone('Asia/Jakarta'), randomBytes(6))
+
+    if (pkg.price === 0) {
+      if (await hasClaimedFreePackage(tx, user.id)) {
+        throw createError({ statusCode: 409, statusMessage: 'Paket gratis hanya bisa dipakai sekali. Pilih paket berbayar untuk melanjutkan.' })
+      }
+      const now = new Date()
+      const period = computePackagePeriod({ now, currentEnd: await paidUntil(tx, user.id, now), durationDays: pkg.durationDays })
+      const [row] = await tx.insert(t).values({
+        code,
+        userId: user.id,
+        userName: user.name,
+        userEmail: user.email,
+        packageId: pkg.id,
+        packageName: pkg.name,
+        durationDays: pkg.durationDays,
+        amount: 0,
+        method: 'manual',
+        status: 'paid',
+        paidAt: now,
+        periodStart: period.start,
+        periodEnd: period.end,
+        notes: 'Paket gratis'
+      }).returning({ id: t.id, code: t.code, method: t.method, packageName: t.packageName, amount: t.amount, durationDays: t.durationDays, createdAt: t.createdAt, periodEnd: t.periodEnd })
+      return { ...row!, activated: true }
+    }
+
     await tx.update(t).set({ status: 'cancelled', notes: 'Diganti pesanan baru oleh pengguna' })
       .where(and(eq(t.userId, user.id), eq(t.status, 'pending')))
 
     const [row] = await tx.insert(t).values({
-      code: orderCode(todayInTimeZone('Asia/Jakarta'), randomBytes(6)),
+      code,
       userId: user.id,
       userName: user.name,
       userEmail: user.email,
@@ -41,14 +71,13 @@ export default defineEventHandler(async (event) => {
       packageName: pkg.name,
       durationDays: pkg.durationDays,
       amount: pkg.price,
-      // A free package cannot go through the gateway; an admin confirms it.
-      method: paymentMode.mode === 'sumopay' && pkg.price > 0 ? 'sumopay' : 'manual',
+      method: paymentMode.mode,
       status: 'pending'
-    }).returning({ id: t.id, code: t.code, method: t.method, packageName: t.packageName, amount: t.amount, durationDays: t.durationDays, createdAt: t.createdAt })
-    return row!
+    }).returning({ id: t.id, code: t.code, method: t.method, packageName: t.packageName, amount: t.amount, durationDays: t.durationDays, createdAt: t.createdAt, periodEnd: t.periodEnd })
+    return { ...row!, activated: false }
   })
 
-  if (order.method !== 'sumopay') {
+  if (order.activated || order.method !== 'sumopay') {
     setResponseStatus(event, 201)
     return { ...order, paymentUrl: null }
   }
