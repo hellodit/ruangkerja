@@ -3,11 +3,13 @@ import type { InternalApi } from 'nitropack'
 
 /**
  * The user's own payment history on /subscription: a list with status; a row
- * opens a dialog with the details (and the payment link while it is valid).
+ * opens a dialog with the details. A pending order can be paid (while its
+ * link is valid) or cancelled from the dialog.
  */
 type Item = InternalApi['/api/subscription/history']['get'][number]
 
-defineProps<{ items: Item[] }>()
+const props = defineProps<{ items: Item[], cancelling?: boolean }>()
+const emit = defineEmits<{ cancel: [] }>()
 
 const copy = useCopyText()
 const TZ = 'Asia/Jakarta'
@@ -61,6 +63,14 @@ const details = computed(() => {
 async function pay(url: string) {
   await navigateTo(url, { external: true })
 }
+
+// Close once the parent has cancelled the order (the list refreshes).
+function cancel() {
+  emit('cancel')
+}
+watch(() => props.cancelling, (now, before) => {
+  if (before && !now) selected.value = null
+})
 </script>
 
 <template>
@@ -169,7 +179,17 @@ async function pay(url: string) {
         </div>
       </template>
       <template #footer>
-        <div class="flex w-full justify-end gap-2">
+        <div class="flex w-full flex-wrap justify-end gap-2">
+          <UButton
+            v-if="selected?.status === 'pending'"
+            color="error"
+            variant="ghost"
+            class="me-auto"
+            :loading="cancelling"
+            @click="cancel"
+          >
+            Batalkan pesanan
+          </UButton>
           <UButton
             variant="ghost"
             @click="open = false"
