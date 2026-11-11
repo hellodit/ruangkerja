@@ -5,7 +5,9 @@ useSeoMeta({ title: 'Pilih paket' })
 /**
  * Package checkout. Users without an active package land here; users with
  * one come here to renew (the new period is added after the current one).
- * Payment is a manual bank transfer confirmed by an admin for now.
+ * With SumoPay the user is sent to its hosted payment page and comes back
+ * here (?payment=success|cancel); the webhook activates the package. Without
+ * it, payment is a manual bank transfer confirmed by an admin.
  */
 const notify = useNotify()
 const copy = useCopyText()
@@ -20,12 +22,30 @@ const current = computed(() => data.value?.current ?? null)
 const order = computed(() => data.value?.pendingOrder ?? null)
 const longDate = (ts: string | Date) => formatDateLong(todayInTimeZone('Asia/Jakarta', new Date(ts)))
 const bankReady = computed(() => !!(payment.bankName && payment.accountNumber))
+const viaGateway = computed(() => order.value?.method === 'sumopay')
+const linkExpiry = computed(() => {
+  const at = order.value?.paymentExpiresAt
+  if (!at) return null
+  const d = new Date(at)
+  const time = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })
+  return `${longDate(d)} pukul ${time} WIB`
+})
+
+/** Full-page redirect to SumoPay's hosted payment page. */
+async function goToPayment(url: string) {
+  await navigateTo(url, { external: true })
+}
 
 const busyId = ref<string | null>(null)
 async function choose(packageId: string) {
   busyId.value = packageId
   try {
-    await $fetch('/api/subscription/checkout', { method: 'POST', body: { packageId } })
+    const res = await $fetch('/api/subscription/checkout', { method: 'POST', body: { packageId } })
+    if (res.paymentUrl) {
+      // Keep the button busy while the browser leaves for SumoPay.
+      await goToPayment(res.paymentUrl)
+      return
+    }
     await refresh()
     await nextTick()
     document.getElementById('pembayaran')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -65,13 +85,33 @@ async function checkStatus(manual = false) {
       return
     }
     await refresh()
-    if (manual) notify.success('Pembayaran belum dikonfirmasi admin. Coba lagi nanti.')
+    if (manual) {
+      notify.success(viaGateway.value ? 'Pembayaran belum diterima. Coba lagi sebentar lagi.' : 'Pembayaran belum dikonfirmasi admin. Coba lagi nanti.')
+    }
   } finally {
     checking.value = false
   }
 }
-const poll = useIntervalFn(() => checkStatus(), 20_000, { immediate: false })
+// The gateway confirms within seconds; an admin takes longer.
+const pollMs = computed(() => (viaGateway.value ? 5_000 : 20_000))
+const poll = useIntervalFn(() => checkStatus(), pollMs, { immediate: false })
 watch(order, o => (o ? poll.resume() : poll.pause()), { immediate: true })
+
+// Back from SumoPay's hosted page.
+const route = useRoute()
+const returned = ref(route.query.payment === 'success' ? 'success' : route.query.payment === 'cancel' ? 'cancel' : null)
+onMounted(() => {
+  if (!returned.value) return
+  navigateTo({ query: { ...route.query, payment: undefined } }, { replace: true })
+  if (returned.value !== 'success') return
+  // The webhook can beat the redirect: the package is already active.
+  if (!order.value && current.value) {
+    notify.success(`Pembayaran diterima. Paket aktif sampai ${longDate(current.value.endsAt)}.`)
+    navigateTo(me.value?.onboardingCompleted ? '/beranda' : '/onboarding/profil')
+    return
+  }
+  checkStatus()
+})
 
 const waLink = computed(() => {
   if (!payment.whatsapp || !order.value) return null
@@ -172,8 +212,40 @@ async function signOut() {
           </div>
         </div>
 
+        <template v-if="viaGateway">
+          <UAlert
+            v-if="returned === 'success'"
+            color="info"
+            variant="subtle"
+            icon="i-ctm-clock"
+            title="Pembayaran sedang diverifikasi"
+            description="Biasanya hanya beberapa detik. Paket aktif otomatis dan halaman ini berpindah sendiri."
+          />
+          <UAlert
+            v-else-if="returned === 'cancel'"
+            color="warning"
+            variant="subtle"
+            icon="i-ctm-information"
+            title="Pembayaran belum diselesaikan"
+            description="Pesanan masih menunggu. Lanjutkan pembayaran kapan saja sebelum tautannya kedaluwarsa."
+          />
+          <UAlert
+            v-if="!order.paymentUrl"
+            color="warning"
+            variant="subtle"
+            icon="i-ctm-warning"
+            title="Tautan pembayaran sudah tidak berlaku"
+            description="Buat tautan baru untuk paket yang sama, lalu selesaikan pembayarannya."
+          />
+          <ol class="flex list-decimal flex-col gap-1.5 ps-5 text-sm text-highlighted">
+            <li>Klik <strong>Bayar sekarang</strong> untuk membuka halaman pembayaran SumoPay.</li>
+            <li>Bayar tepat <strong>{{ formatRupiah(order.amount) }}</strong>{{ linkExpiry && order.paymentUrl ? ` sebelum ${linkExpiry}` : '' }}.</li>
+            <li>Paket aktif otomatis setelah pembayaran berhasil. Halaman ini memeriksa statusnya otomatis.</li>
+          </ol>
+        </template>
+
         <div
-          v-if="bankReady"
+          v-else-if="bankReady"
           class="grid gap-4 rounded-md bg-muted p-4 sm:grid-cols-3"
         >
           <div class="flex flex-col">
@@ -199,7 +271,7 @@ async function signOut() {
           </div>
         </div>
         <UAlert
-          v-else
+          v-if="!viaGateway && !bankReady"
           color="warning"
           variant="subtle"
           icon="i-ctm-information"
@@ -207,7 +279,10 @@ async function signOut() {
           :description="supportEmail ? `Hubungi ${supportEmail} dengan kode pesanan di atas untuk menyelesaikan pembayaran.` : 'Hubungi admin Ruang Kerja dengan kode pesanan di atas untuk menyelesaikan pembayaran.'"
         />
 
-        <ol class="flex list-decimal flex-col gap-1.5 ps-5 text-sm text-highlighted">
+        <ol
+          v-if="!viaGateway"
+          class="flex list-decimal flex-col gap-1.5 ps-5 text-sm text-highlighted"
+        >
           <li>Transfer tepat <strong>{{ formatRupiah(order.amount) }}</strong> ke rekening di atas.</li>
           <li>Tulis kode <strong class="font-mono">{{ order.code }}</strong> di berita transfer.</li>
           <li v-if="waLink">
@@ -217,8 +292,25 @@ async function signOut() {
         </ol>
 
         <div class="flex flex-wrap items-center gap-3 border-t border-default pt-4">
+          <template v-if="viaGateway">
+            <UButton
+              v-if="order.paymentUrl"
+              icon="i-ctm-credit-cards"
+              @click="goToPayment(order.paymentUrl)"
+            >
+              Bayar sekarang
+            </UButton>
+            <UButton
+              v-else-if="order.packageId"
+              icon="i-ctm-refresh"
+              :loading="busyId === order.packageId"
+              @click="choose(order.packageId)"
+            >
+              Buat tautan pembayaran baru
+            </UButton>
+          </template>
           <UButton
-            v-if="waLink"
+            v-else-if="waLink"
             :to="waLink"
             target="_blank"
             icon="i-ctm-whatsapp"

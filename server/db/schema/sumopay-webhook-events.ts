@@ -1,7 +1,7 @@
 import { jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 
-/** Idempotency ledger for SingaPay webhook deliveries. */
-export const singapayWebhookEvents = pgTable('singapay_webhook_events', {
+/** Idempotency ledger for SumoPay webhook deliveries (one row per svix-id). */
+export const sumopayWebhookEvents = pgTable('sumopay_webhook_events', {
   id: uuid('id').primaryKey().defaultRandom(),
   eventId: text('event_id').notNull().unique(),
   eventType: text('event_type'),

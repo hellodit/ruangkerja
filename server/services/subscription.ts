@@ -24,7 +24,7 @@ export async function getSubscriptionStatus(userId: string, now = new Date()) {
       transactions: {
         where: t => or(and(eq(t.status, 'paid'), gt(t.periodEnd, now)), eq(t.status, 'pending')),
         orderBy: t => [desc(t.periodEnd), desc(t.createdAt)],
-        columns: { id: true, code: true, packageId: true, packageName: true, durationDays: true, amount: true, createdAt: true, status: true, periodStart: true, periodEnd: true }
+        columns: { id: true, code: true, method: true, packageId: true, packageName: true, durationDays: true, amount: true, createdAt: true, status: true, periodStart: true, periodEnd: true, paymentUrl: true, paymentExpiresAt: true }
       }
     }
   })
@@ -36,7 +36,19 @@ export async function getSubscriptionStatus(userId: string, now = new Date()) {
     current: current ? { name: current.name, endsAt: current.paidUntil, daysLeft: daysLeft(current.paidUntil, now) } : null,
     expiredAt: current ? null : (row?.lastPaidEnd ? new Date(row.lastPaidEnd) : null),
     pendingOrder: pending
-      ? { id: pending.id, code: pending.code, packageId: pending.packageId, packageName: pending.packageName, durationDays: pending.durationDays, amount: pending.amount, createdAt: pending.createdAt }
+      ? {
+          id: pending.id,
+          code: pending.code,
+          method: pending.method,
+          packageId: pending.packageId,
+          packageName: pending.packageName,
+          durationDays: pending.durationDays,
+          amount: pending.amount,
+          createdAt: pending.createdAt,
+          // SumoPay hosted page; null once the link has expired.
+          paymentUrl: pending.paymentUrl && (!pending.paymentExpiresAt || pending.paymentExpiresAt > now) ? pending.paymentUrl : null,
+          paymentExpiresAt: pending.paymentExpiresAt
+        }
       : null
   }
 }
